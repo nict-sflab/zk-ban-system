@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"encoding/base64"
 	"net/http"
 
 	"github.com/akakou/zk-ban-system/core"
@@ -26,7 +27,12 @@ func RequestJoin(idToken []byte, prover []byte, url string) ([]byte, error) {
 		return nil, err
 	}
 
-	signer, err = core.SetCredential(buf.Bytes(), signer)
+	cred, err := base64.URLEncoding.DecodeString(buf.String())
+	if err != nil {
+		return nil, err
+	}
+
+	signer, err = core.SetCredential(cred, signer)
 	if err != nil {
 		return nil, err
 	}

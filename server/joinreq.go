@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	"io"
 
 	"github.com/akakou/zk-ban-system/core"
@@ -8,8 +9,10 @@ import (
 )
 
 type GroupManager struct {
-	GroupSecretKey []byte
-	VerifyKey      []byte
+	GroupSecretKey  []byte
+	GroupPublicKey  []byte
+	JoinVerifyKey   []byte
+	UpdateVerifyKey []byte
 }
 
 func IssueCredential(gm *GroupManager) func(c echo.Context) error {
@@ -19,11 +22,12 @@ func IssueCredential(gm *GroupManager) func(c echo.Context) error {
 			return err
 		}
 
-		cred, err := core.IssueCredential[string](reqBody, gm.GroupSecretKey, gm.VerifyKey)
+		cred, err := core.IssueCredential[string](reqBody, gm.GroupSecretKey, gm.JoinVerifyKey)
 		if err != nil {
 			return err
 		}
 
-		return c.JSON(200, cred)
+		resp := base64.URLEncoding.EncodeToString(cred)
+		return c.String(200, resp)
 	}
 }
