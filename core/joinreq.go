@@ -79,3 +79,21 @@ func IssueCredential[T any](req, gsk, verifyKey []byte) ([]byte, error) {
 
 	return cred, nil
 }
+
+func SetCredential(cred []byte, signer []byte) ([]byte, error) {
+	signerObj := highlevel.HighLevelSigner{}
+	err := json.Unmarshal(signer, &signerObj)
+
+	if err != nil {
+		return nil, err
+	}
+
+	signerObj.Credential = cred
+
+	signerBytes, err := json.Marshal(signerObj)
+	if err != nil {
+		return nil, err
+	}
+
+	return signerBytes, nil
+}
