@@ -6,61 +6,47 @@ import (
 	"time"
 
 	"github.com/akakou/zk-ban-system/client"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/server"
 	"github.com/akakou/zk-ban/circuit"
 	"github.com/akakou/zk-ban/highlevel"
-	"github.com/akakou/zk-ban/snark"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
 )
 
-const SLEEP_TIME = 5
+const SLEEP_TIME = 3
 
 func TestMain(t *testing.T) {
-	joinSnark, err := snark.InitSNARK(&circuit.JoinRequestCircuit{})
+	rl := witness.RevocationList{}
+	rlBuf, err := json.Marshal(rl)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gsk, _, err := witness.RandomGroupKeyPair()
-	if err != nil {
-		t.Fatal(err)
-	}
+	joinProver, joinVerify := core.Prepare(&circuit.JoinRequestCircuit{}, t)
+	updateProver, updateVerify := core.Prepare(&circuit.UpdateCircuit{
+		RevocationList: circuit.NewRevocationListWitness(rl),
+	}, t)
 
-	proveKey, err := snark.EncodeProverKey(joinSnark.ProveKey)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	verifyKey, err := snark.EncodeVerifierKey(joinSnark.VerifyKey)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	circuit, err := snark.EncodeCircuit(joinSnark.ConstraintSystem)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	prover := highlevel.HighLevelSnarkProver{
-		ConstraintSystem: circuit,
-		ProveKey:         proveKey,
-	}
-
-	proverBuf, err := json.Marshal(&prover)
+	gsk, gpk, err := witness.RandomGroupKeyPair()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	gm := server.GroupManager{
-		GroupSecretKey: gsk.Bytes(),
-		VerifyKey:      verifyKey,
+		GroupSecretKey:  gsk.Bytes(),
+		GroupPublicKey:  gpk.Bytes(),
+		JoinVerifyKey:   joinVerify,
+		UpdateVerifyKey: updateVerify,
 	}
 
 	e := echo.New()
 	issueCred := server.IssueCredential(&gm)
+	updateCred := server.UpdateCredential(&gm)
 
 	e.POST("/issue-credential", issueCred)
+	e.POST("/update-credential", updateCred)
+
 	go func() {
 		if err := e.Start(":1323"); err != nil {
 			t.Fatal(err)
@@ -69,7 +55,15 @@ func TestMain(t *testing.T) {
 
 	time.Sleep(SLEEP_TIME * time.Second)
 
-	_, err = client.RequestJoin([]byte{}, proverBuf, "http://localhost:1323/issue-credential")
+	signer, err := client.RequestJoin([]byte{}, joinProver, "http://localhost:1323/issue-credential")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s := highlevel.HighLevelSigner{}
+	json.Unmarshal(signer, &s)
+
+	_, err = client.RequestUpdate(signer, rlBuf, gpk.Bytes(), updateProver, "http://localhost:1323/update-credential")
 	if err != nil {
 		t.Fatal(err)
 	}
