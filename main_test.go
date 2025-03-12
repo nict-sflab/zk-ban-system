@@ -27,7 +27,7 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	updateProver, updateVerify, err := core.UpdateCircuit([]int{})
+	updateProver, updateVerify, err := core.UpdateCircuit([]int32{})
 	if err != nil {
 		t.Fatal(err)
 	}

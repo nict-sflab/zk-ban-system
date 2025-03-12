@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 
+	snarkencode "github.com/akakou/snark-utils/encode"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
 	"github.com/akakou/zk-ban/witness"
@@ -18,7 +19,7 @@ type UpdateRequest struct {
 func RequestUpdate(signer, rl, gpk, prover []byte) ([]byte, error) {
 	today := utils.Today()
 
-	proverObj := highlevel.HighLevelSnarkProver{}
+	proverObj := snarkencode.HighLevelSnarkProver{}
 	err := json.Unmarshal(prover, &proverObj)
 
 	if err != nil {

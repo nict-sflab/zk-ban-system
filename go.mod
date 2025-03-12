@@ -7,6 +7,7 @@ replace github.com/akakou/zk-ban => ../zk-ban
 require github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
 
 require (
+	github.com/akakou/snark-utils v0.0.2 // indirect
 	github.com/bits-and-blooms/bitset v1.20.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/consensys/bavard v0.1.27 // indirect

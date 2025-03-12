@@ -3,11 +3,12 @@ package core
 import (
 	"encoding/json"
 
+	snarkencode "github.com/akakou/snark-utils/encode"
 	"github.com/akakou/zk-ban/highlevel"
 )
 
 func Sign(message []byte, count int64, signer []byte, gpk []byte, prover []byte) ([]byte, error) {
-	proverObj := highlevel.HighLevelSnarkProver{}
+	proverObj := snarkencode.HighLevelSnarkProver{}
 	err := json.Unmarshal(prover, &proverObj)
 
 	if err != nil {

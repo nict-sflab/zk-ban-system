@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"math/big"
 
+	snark "github.com/akakou/snark-utils"
+	snarkencode "github.com/akakou/snark-utils/encode"
 	"github.com/akakou/zk-ban/circuit"
-	"github.com/akakou/zk-ban/highlevel"
-	"github.com/akakou/zk-ban/snark"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/consensys/gnark/frontend"
 )
@@ -17,22 +17,22 @@ func Prepare[T frontend.Circuit](c T) ([]byte, []byte, error) {
 		return nil, nil, err
 	}
 
-	encodedProveKey, err := snark.EncodeProverKey(cc.ProveKey)
+	encodedProveKey, err := snarkencode.EncodeProverKey(cc.ProveKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	encodedVerifyKey, err := snark.EncodeVerifierKey(cc.VerifyKey)
+	encodedVerifyKey, err := snarkencode.EncodeVerifierKey(cc.VerifyKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	encodedCircuit, err := snark.EncodeCircuit(cc.ConstraintSystem)
+	encodedCircuit, err := snarkencode.EncodeCircuit(cc.ConstraintSystem)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	prover := highlevel.HighLevelSnarkProver{
+	prover := snarkencode.HighLevelSnarkProver{
 		ConstraintSystem: encodedCircuit,
 		ProveKey:         encodedProveKey,
 	}
@@ -53,7 +53,7 @@ func SignCircuit() ([]byte, []byte, error) {
 	return Prepare(&circuit.SignCircuit{})
 }
 
-func UpdateCircuit(rl []int) ([]byte, []byte, error) {
+func UpdateCircuit(rl []int32) ([]byte, []byte, error) {
 	rlWit := witness.RevocationList{}
 	for _, r := range rl {
 		rns := witness.RevokedNymsPerSession{
