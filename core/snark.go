@@ -2,32 +2,34 @@ package core
 
 import (
 	"encoding/json"
-	"testing"
+	"math/big"
 
+	"github.com/akakou/zk-ban/circuit"
 	"github.com/akakou/zk-ban/highlevel"
 	"github.com/akakou/zk-ban/snark"
+	"github.com/akakou/zk-ban/witness"
 	"github.com/consensys/gnark/frontend"
 )
 
-func Prepare[T frontend.Circuit](c T, t *testing.T) ([]byte, []byte) {
+func Prepare[T frontend.Circuit](c T) ([]byte, []byte, error) {
 	cc, err := snark.InitSNARK(c)
 	if err != nil {
-		t.Fatal(err)
+		return nil, nil, err
 	}
 
 	encodedProveKey, err := snark.EncodeProverKey(cc.ProveKey)
 	if err != nil {
-		t.Fatal(err)
+		return nil, nil, err
 	}
 
 	encodedVerifyKey, err := snark.EncodeVerifierKey(cc.VerifyKey)
 	if err != nil {
-		t.Fatal(err)
+		return nil, nil, err
 	}
 
 	encodedCircuit, err := snark.EncodeCircuit(cc.ConstraintSystem)
 	if err != nil {
-		t.Fatal(err)
+		return nil, nil, err
 	}
 
 	prover := highlevel.HighLevelSnarkProver{
@@ -37,8 +39,32 @@ func Prepare[T frontend.Circuit](c T, t *testing.T) ([]byte, []byte) {
 
 	proverBuf, err := json.Marshal(&prover)
 	if err != nil {
-		t.Fatal(err)
+		return nil, nil, err
 	}
 
-	return proverBuf, encodedVerifyKey
+	return proverBuf, encodedVerifyKey, nil
+}
+
+func JoinRequestCircuit() ([]byte, []byte, error) {
+	return Prepare(&circuit.JoinRequestCircuit{})
+}
+
+func SignCircuit() ([]byte, []byte, error) {
+	return Prepare(&circuit.SignCircuit{})
+}
+
+func UpdateCircuit(rl []int) ([]byte, []byte, error) {
+	rlWit := witness.RevocationList{}
+	for _, r := range rl {
+		rns := witness.RevokedNymsPerSession{
+			SessionTag: big.NewInt(0),
+			Nyms:       make([]*big.Int, r),
+		}
+
+		rlWit = append(rlWit, rns)
+	}
+
+	return Prepare(&circuit.UpdateCircuit{
+		RevocationList: circuit.NewRevocationListWitness(rlWit),
+	})
 }

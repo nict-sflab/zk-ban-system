@@ -8,7 +8,6 @@ import (
 	"github.com/akakou/zk-ban-system/client"
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/server"
-	"github.com/akakou/zk-ban/circuit"
 	"github.com/akakou/zk-ban/highlevel"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
@@ -23,10 +22,15 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	joinProver, joinVerify := core.Prepare(&circuit.JoinRequestCircuit{}, t)
-	updateProver, updateVerify := core.Prepare(&circuit.UpdateCircuit{
-		RevocationList: circuit.NewRevocationListWitness(rl),
-	}, t)
+	joinProver, joinVerify, err := core.JoinRequestCircuit()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	updateProver, updateVerify, err := core.UpdateCircuit([]int{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	gsk, gpk, err := witness.RandomGroupKeyPair()
 	if err != nil {

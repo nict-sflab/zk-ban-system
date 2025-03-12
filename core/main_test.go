@@ -4,14 +4,24 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/akakou/zk-ban/circuit"
 	"github.com/akakou/zk-ban/witness"
 )
 
 func TestAll(t *testing.T) {
-	joinProverBuf, joinVerifyKey := Prepare(&circuit.JoinRequestCircuit{}, t)
-	signProverBuf, signVerifyKey := Prepare(&circuit.SignCircuit{}, t)
-	updateProverBuf, updateVerifyKey := Prepare(&circuit.UpdateCircuit{}, t)
+	joinProverBuf, joinVerifyKey, err := JoinRequestCircuit()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	signProverBuf, signVerifyKey, err := SignCircuit()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	updateProverBuf, updateVerifyKey, err := UpdateCircuit([]int{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	rl := witness.RevocationList{}
 	rlBuf, err := json.Marshal(rl)
@@ -49,7 +59,7 @@ func TestAll(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	req, err = RequestUpdate(signer, rlBuf, gpk.Bytes(), updateProverBuf)
 	if err != nil {
 		t.Fatal(err)
