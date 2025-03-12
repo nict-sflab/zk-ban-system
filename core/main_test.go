@@ -5,50 +5,12 @@ import (
 	"testing"
 
 	"github.com/akakou/zk-ban/circuit"
-	"github.com/akakou/zk-ban/highlevel"
-	"github.com/akakou/zk-ban/snark"
 	"github.com/akakou/zk-ban/witness"
-	"github.com/consensys/gnark/frontend"
 )
 
-func prepare[T frontend.Circuit](c T, t *testing.T) ([]byte, []byte) {
-	cc, err := snark.InitSNARK(c)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	encodedProveKey, err := snark.EncodeProverKey(cc.ProveKey)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	encodedVerifyKey, err := snark.EncodeVerifierKey(cc.VerifyKey)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	encodedCircuit, err := snark.EncodeCircuit(cc.ConstraintSystem)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	prover := highlevel.HighLevelSnarkProver{
-		ConstraintSystem: encodedCircuit,
-		ProveKey:         encodedProveKey,
-	}
-
-	proverBuf, err := json.Marshal(&prover)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return proverBuf, encodedVerifyKey
-
-}
-
 func TestAll(t *testing.T) {
-	joinProverBuf, joinVerifyKey := prepare(&circuit.JoinRequestCircuit{}, t)
-	updateProverBuf, updateVerifyKey := prepare(&circuit.UpdateCircuit{}, t)
+	joinProverBuf, joinVerifyKey := Prepare(&circuit.JoinRequestCircuit{}, t)
+	updateProverBuf, updateVerifyKey := Prepare(&circuit.UpdateCircuit{}, t)
 
 	rl := witness.RevocationList{}
 	rlBuf, err := json.Marshal(rl)
@@ -81,7 +43,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cred, err = UpdateCredential(req, signer, gsk.Bytes(), rl, updateVerifyKey)
+	cred, err = UpdateCredential(req, gsk.Bytes(), gpk.Bytes(), rl, updateVerifyKey)
 	if err != nil {
 		t.Fatal(err)
 	}
