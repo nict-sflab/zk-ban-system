@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"math/big"
 
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
@@ -14,19 +15,30 @@ type JoinRequest[T any] struct {
 	Option        T
 }
 
-func RequestJoin[T any](prover []byte, option T) ([]byte, error) {
+func RequestJoin[T any](prover []byte, option T) ([]byte, []byte, error) {
 	period := utils.Today()
 
 	proverObj := highlevel.HighLevelSnarkProver{}
 	err := json.Unmarshal(prover, &proverObj)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	proof, reqObj, err := highlevel.JoinRequest(period, &proverObj)
+	proof, reqObj, assign, err := highlevel.JoinRequest(period, &proverObj)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+
+	signer := highlevel.HighLevelSigner{
+		Secret:        assign.UserSecretKey.(*big.Int).Bytes(),
+		UserPublicKey: reqObj.UserPublicKey,
+		Period:        period,
+	}
+
+	signerBytes, err := json.Marshal(signer)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	req := JoinRequest[T]{
@@ -38,10 +50,10 @@ func RequestJoin[T any](prover []byte, option T) ([]byte, error) {
 
 	reqBytes, err := json.Marshal(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return reqBytes, nil
+	return reqBytes, signerBytes, nil
 
 }
 
