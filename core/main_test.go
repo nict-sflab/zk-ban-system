@@ -10,6 +10,7 @@ import (
 
 func TestAll(t *testing.T) {
 	joinProverBuf, joinVerifyKey := Prepare(&circuit.JoinRequestCircuit{}, t)
+	signProverBuf, signVerifyKey := Prepare(&circuit.SignCircuit{}, t)
 	updateProverBuf, updateVerifyKey := Prepare(&circuit.UpdateCircuit{}, t)
 
 	rl := witness.RevocationList{}
@@ -38,6 +39,17 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	m := []byte("test")
+	signature, err := Sign(m, 0, signer, gsk.Bytes(), signProverBuf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = Verify(signature, m, gpk.Bytes(), signVerifyKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	
 	req, err = RequestUpdate(signer, rlBuf, gpk.Bytes(), updateProverBuf)
 	if err != nil {
 		t.Fatal(err)
