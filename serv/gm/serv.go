@@ -1,0 +1,11 @@
+package gm
+
+import "github.com/labstack/echo/v4"
+
+func (serv *GMServer[T]) SetupEchoServer(e *echo.Echo) {
+	issueCred := serv.IssueCredentialEndpoint()
+	updateCred := serv.UpdateCredentialEndpoint()
+
+	e.POST("/issue-credential", issueCred)
+	e.POST("/update-credential", updateCred)
+}

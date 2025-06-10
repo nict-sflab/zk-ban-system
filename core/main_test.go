@@ -1,24 +1,42 @@
 package core
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"testing"
 
+	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core/gm"
+	"github.com/akakou/zk-ban-system/core/signer"
+	"github.com/akakou/zk-ban-system/core/verifier"
+	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/witness"
 )
 
+var period = 1
+
+func today() int64 {
+	return int64(period)
+}
+
+func passDay() {
+	period += 1
+}
+
 func TestAll(t *testing.T) {
-	joinProverBuf, joinVerifyKey, err := JoinRequestCircuit()
+	utils.Today = today
+
+	joinProverBuf, joinVerifyKey, err := core.JoinRequestCircuit()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	signProverBuf, signVerifyKey, err := SignCircuit()
+	signProverBuf, signVerifyKey, err := core.SignCircuit()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	updateProverBuf, updateVerifyKey, err := UpdateCircuit([]int32{})
+	updateProverBuf, updateVerifyKey, err := core.UpdateCircuit([]int32{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,55 +52,101 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	reqBody, signer, err := RequestJoin(joinProverBuf, "")
+	gmDB, err := gm.NewDB(&gm.DBConfig{
+		Type:   "sqlite3",
+		Config: "file::memory:?cache=shared&_fk=1",
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var req JoinRequest[string]
+	verifierDB, err := verifier.NewDB(&verifier.DBConfig{
+		Type:   "sqlite3",
+		Config: "file::memory:?cache=shared&_fk=1",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	g := gm.GroupManager[string]{
+		GroupSecretKey:  gsk.Bytes(),
+		GroupPublicKey:  gpk.Bytes(),
+		JoinVerifyKey:   joinVerifyKey,
+		UpdateVerifyKey: updateVerifyKey,
+		DB:              gmDB,
+	}
+
+	v := verifier.Verifier{
+		GroupPublicKey: gpk.Bytes(),
+		SignVerifyKey:  signVerifyKey,
+		DB:             verifierDB,
+	}
+
+	reqBody, s, err := signer.RequestJoin(joinProverBuf, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var req core.JoinRequest[string]
 	err = json.Unmarshal(reqBody, &req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cred, err := IssueCredential(&req, gsk.Bytes(), joinVerifyKey)
+	cred, err := g.IssueCredential("", &req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	signer, err = SetCredential(cred, signer)
+	failCred, err := g.IssueCredential("", &req)
+	if err == nil {
+		t.Fatal(failCred, err)
+	}
+
+	rawCred, err := base64.URLEncoding.DecodeString(cred)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s, err = signer.SetCredential(rawCred, s)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	m := []byte("test")
-	signature, err := Sign(m, 0, signer, gsk.Bytes(), signProverBuf)
+	signature, err := signer.Sign(m, 0, s, gsk.Bytes(), signProverBuf)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = Verify(signature, gpk.Bytes(), signVerifyKey)
+	err = v.Verify(signature)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	updateReqBody, err := RequestUpdate(signer, rlBuf, gpk.Bytes(), updateProverBuf)
+	passDay()
+
+	updateReq, err := signer.RequestUpdate(rlBuf, s, gpk.Bytes(), updateProverBuf)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var updateReq UpdateRequest
-	err = json.Unmarshal(updateReqBody, &updateReq)
+	cred, err = g.UpdateCredential(updateReq)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cred, err = UpdateCredential(&updateReq, gsk.Bytes(), gpk.Bytes(), rl, updateVerifyKey)
+	failCred, err = g.UpdateCredential(updateReq)
+	if err == nil {
+		t.Fatal(failCred, err)
+	}
+
+	rawCred, err = base64.URLEncoding.DecodeString(cred)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = SetCredential(cred, signer)
+	_, err = signer.SetCredential(rawCred, s)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -5,9 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/gm"
-	"github.com/akakou/zk-ban-system/signer"
+	"github.com/akakou/zk-ban-system/client/signer"
+	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core/gm"
+	gmserv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
 	"github.com/akakou/zk-ban/witness"
@@ -58,19 +59,23 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	g := gm.GroupManager[any]{
+	g := gm.GroupManager[string]{
 		GroupSecretKey:  gsk.Bytes(),
 		GroupPublicKey:  gpk.Bytes(),
 		JoinVerifyKey:   joinVerify,
 		UpdateVerifyKey: updateVerify,
-		AuthToken: func(t *core.JoinRequest[any]) (string, error) {
+		DB:              db,
+	}
+
+	gmServ := gmserv.GMServer[string]{
+		GM: &g,
+		AuthToken: func(t *core.JoinRequest[string]) (string, error) {
 			return "token", nil
 		},
-		DB: db,
 	}
 
 	e := echo.New()
-	g.SetupEchoServer(e)
+	gmServ.SetupEchoServer(e)
 
 	go func() {
 		if err := e.Start(":1323"); err != nil {
