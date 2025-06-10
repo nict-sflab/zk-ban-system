@@ -16,6 +16,14 @@ import (
 const SLEEP_TIME = 3
 
 func TestMain(t *testing.T) {
+	db, err := gm.NewDB(&gm.DBConfig{
+		Type:   "sqlite3",
+		Config: "file::memory:?cache=shared&_fk=1",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	rl := witness.RevocationList{}
 	rlBuf, err := json.Marshal(rl)
 	if err != nil {
@@ -42,9 +50,10 @@ func TestMain(t *testing.T) {
 		GroupPublicKey:  gpk.Bytes(),
 		JoinVerifyKey:   joinVerify,
 		UpdateVerifyKey: updateVerify,
-		CheckToken: func(t *core.JoinRequest[any]) error {
-			return nil
+		AuthToken: func(t *core.JoinRequest[any]) (string, error) {
+			return "token", nil
 		},
+		DB: db,
 	}
 
 	e := echo.New()
@@ -61,6 +70,11 @@ func TestMain(t *testing.T) {
 	s, err := signer.RequestJoin([]byte{}, joinProver, "http://localhost:1323/issue-credential")
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	ns, err := signer.RequestJoin([]byte{}, joinProver, "http://localhost:1323/issue-credential")
+	if err == nil {
+		t.Fatal(ns, err)
 	}
 
 	ss := highlevel.HighLevelSigner{}
