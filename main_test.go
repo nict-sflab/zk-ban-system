@@ -45,11 +45,7 @@ func TestMain(t *testing.T) {
 	}
 
 	e := echo.New()
-	issueCred := gm.IssueCredential(&g)
-	updateCred := gm.UpdateCredential(&g)
-
-	e.POST("/issue-credential", issueCred)
-	e.POST("/update-credential", updateCred)
+	gm.SetupEchoServer(e, &g)
 
 	go func() {
 		if err := e.Start(":1323"); err != nil {
