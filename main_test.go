@@ -131,6 +131,11 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	failSign, err := signer.Sign([]byte("aaa"), 0, s, gpk.Bytes(), signProver, "http://localhost:1323/verify")
+	if err == nil {
+		t.Fatal(err, failSign)
+	}
+
 	passDay()
 	_, err = signer.RequestUpdate(s, rlBuf, gpk.Bytes(), updateProver, "http://localhost:1323/update-credential")
 	if err != nil {

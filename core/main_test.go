@@ -124,6 +124,11 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	err = v.Verify(signature)
+	if err == nil {
+		t.Fatal(err)
+	}
+
 	passDay()
 
 	updateReq, err := signer.RequestUpdate(rlBuf, s, gpk.Bytes(), updateProverBuf)
