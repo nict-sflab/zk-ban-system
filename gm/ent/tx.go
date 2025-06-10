@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Credential is the client for interacting with the Credential builders.
 	Credential *CredentialClient
+	// Revocation is the client for interacting with the Revocation builders.
+	Revocation *RevocationClient
 
 	// lazily loaded.
 	client     *Client
@@ -146,6 +148,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Credential = NewCredentialClient(tx.config)
+	tx.Revocation = NewRevocationClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

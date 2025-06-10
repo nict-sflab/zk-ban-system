@@ -8,3 +8,6 @@ import (
 
 // Credential is the predicate function for credential builders.
 type Credential func(*sql.Selector)
+
+// Revocation is the predicate function for revocation builders.
+type Revocation func(*sql.Selector)

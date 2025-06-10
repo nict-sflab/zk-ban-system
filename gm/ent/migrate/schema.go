@@ -21,9 +21,26 @@ var (
 		Columns:    CredentialsColumns,
 		PrimaryKey: []*schema.Column{CredentialsColumns[0]},
 	}
+	// RevocationsColumns holds the columns for the "revocations" table.
+	RevocationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "proof", Type: field.TypeBytes},
+		{Name: "nym", Type: field.TypeBytes},
+		{Name: "sigma", Type: field.TypeBytes},
+		{Name: "message", Type: field.TypeBytes},
+		{Name: "count", Type: field.TypeInt},
+		{Name: "period", Type: field.TypeInt},
+	}
+	// RevocationsTable holds the schema information for the "revocations" table.
+	RevocationsTable = &schema.Table{
+		Name:       "revocations",
+		Columns:    RevocationsColumns,
+		PrimaryKey: []*schema.Column{RevocationsColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CredentialsTable,
+		RevocationsTable,
 	}
 )
 

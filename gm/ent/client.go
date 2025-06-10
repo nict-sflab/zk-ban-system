@@ -15,6 +15,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"github.com/akakou/zk-ban-system/gm/ent/credential"
+	"github.com/akakou/zk-ban-system/gm/ent/revocation"
 )
 
 // Client is the client that holds all ent builders.
@@ -24,6 +25,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Credential is the client for interacting with the Credential builders.
 	Credential *CredentialClient
+	// Revocation is the client for interacting with the Revocation builders.
+	Revocation *RevocationClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -36,6 +39,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Credential = NewCredentialClient(c.config)
+	c.Revocation = NewRevocationClient(c.config)
 }
 
 type (
@@ -129,6 +133,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:        ctx,
 		config:     cfg,
 		Credential: NewCredentialClient(cfg),
+		Revocation: NewRevocationClient(cfg),
 	}, nil
 }
 
@@ -149,6 +154,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:        ctx,
 		config:     cfg,
 		Credential: NewCredentialClient(cfg),
+		Revocation: NewRevocationClient(cfg),
 	}, nil
 }
 
@@ -178,12 +184,14 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Credential.Use(hooks...)
+	c.Revocation.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Credential.Intercept(interceptors...)
+	c.Revocation.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -191,6 +199,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *CredentialMutation:
 		return c.Credential.mutate(ctx, m)
+	case *RevocationMutation:
+		return c.Revocation.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -329,12 +339,145 @@ func (c *CredentialClient) mutate(ctx context.Context, m *CredentialMutation) (V
 	}
 }
 
+// RevocationClient is a client for the Revocation schema.
+type RevocationClient struct {
+	config
+}
+
+// NewRevocationClient returns a client for the Revocation from the given config.
+func NewRevocationClient(c config) *RevocationClient {
+	return &RevocationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `revocation.Hooks(f(g(h())))`.
+func (c *RevocationClient) Use(hooks ...Hook) {
+	c.hooks.Revocation = append(c.hooks.Revocation, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `revocation.Intercept(f(g(h())))`.
+func (c *RevocationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Revocation = append(c.inters.Revocation, interceptors...)
+}
+
+// Create returns a builder for creating a Revocation entity.
+func (c *RevocationClient) Create() *RevocationCreate {
+	mutation := newRevocationMutation(c.config, OpCreate)
+	return &RevocationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Revocation entities.
+func (c *RevocationClient) CreateBulk(builders ...*RevocationCreate) *RevocationCreateBulk {
+	return &RevocationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RevocationClient) MapCreateBulk(slice any, setFunc func(*RevocationCreate, int)) *RevocationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RevocationCreateBulk{err: fmt.Errorf("calling to RevocationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RevocationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RevocationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Revocation.
+func (c *RevocationClient) Update() *RevocationUpdate {
+	mutation := newRevocationMutation(c.config, OpUpdate)
+	return &RevocationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RevocationClient) UpdateOne(r *Revocation) *RevocationUpdateOne {
+	mutation := newRevocationMutation(c.config, OpUpdateOne, withRevocation(r))
+	return &RevocationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RevocationClient) UpdateOneID(id int) *RevocationUpdateOne {
+	mutation := newRevocationMutation(c.config, OpUpdateOne, withRevocationID(id))
+	return &RevocationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Revocation.
+func (c *RevocationClient) Delete() *RevocationDelete {
+	mutation := newRevocationMutation(c.config, OpDelete)
+	return &RevocationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RevocationClient) DeleteOne(r *Revocation) *RevocationDeleteOne {
+	return c.DeleteOneID(r.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RevocationClient) DeleteOneID(id int) *RevocationDeleteOne {
+	builder := c.Delete().Where(revocation.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RevocationDeleteOne{builder}
+}
+
+// Query returns a query builder for Revocation.
+func (c *RevocationClient) Query() *RevocationQuery {
+	return &RevocationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRevocation},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Revocation entity by its id.
+func (c *RevocationClient) Get(ctx context.Context, id int) (*Revocation, error) {
+	return c.Query().Where(revocation.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RevocationClient) GetX(ctx context.Context, id int) *Revocation {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *RevocationClient) Hooks() []Hook {
+	return c.hooks.Revocation
+}
+
+// Interceptors returns the client interceptors.
+func (c *RevocationClient) Interceptors() []Interceptor {
+	return c.inters.Revocation
+}
+
+func (c *RevocationClient) mutate(ctx context.Context, m *RevocationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RevocationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RevocationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RevocationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RevocationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Revocation mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Credential []ent.Hook
+		Credential, Revocation []ent.Hook
 	}
 	inters struct {
-		Credential []ent.Interceptor
+		Credential, Revocation []ent.Interceptor
 	}
 )
