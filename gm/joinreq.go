@@ -1,4 +1,4 @@
-package server
+package gm
 
 import (
 	"encoding/base64"

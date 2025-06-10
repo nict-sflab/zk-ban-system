@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/akakou/zk-ban-system/client"
 	"github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/server"
+	"github.com/akakou/zk-ban-system/gm"
+	"github.com/akakou/zk-ban-system/signer"
 	"github.com/akakou/zk-ban/highlevel"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
@@ -37,7 +37,7 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	gm := server.GroupManager{
+	g := gm.GroupManager{
 		GroupSecretKey:  gsk.Bytes(),
 		GroupPublicKey:  gpk.Bytes(),
 		JoinVerifyKey:   joinVerify,
@@ -45,8 +45,8 @@ func TestMain(t *testing.T) {
 	}
 
 	e := echo.New()
-	issueCred := server.IssueCredential(&gm)
-	updateCred := server.UpdateCredential(&gm)
+	issueCred := gm.IssueCredential(&g)
+	updateCred := gm.UpdateCredential(&g)
 
 	e.POST("/issue-credential", issueCred)
 	e.POST("/update-credential", updateCred)
@@ -59,15 +59,15 @@ func TestMain(t *testing.T) {
 
 	time.Sleep(SLEEP_TIME * time.Second)
 
-	signer, err := client.RequestJoin([]byte{}, joinProver, "http://localhost:1323/issue-credential")
+	s, err := signer.RequestJoin([]byte{}, joinProver, "http://localhost:1323/issue-credential")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	s := highlevel.HighLevelSigner{}
-	json.Unmarshal(signer, &s)
+	ss := highlevel.HighLevelSigner{}
+	json.Unmarshal(s, &ss)
 
-	_, err = client.RequestUpdate(signer, rlBuf, gpk.Bytes(), updateProver, "http://localhost:1323/update-credential")
+	_, err = signer.RequestUpdate(s, rlBuf, gpk.Bytes(), updateProver, "http://localhost:1323/update-credential")
 	if err != nil {
 		t.Fatal(err)
 	}

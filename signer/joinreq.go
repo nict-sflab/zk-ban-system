@@ -1,4 +1,4 @@
-package client
+package signer
 
 import (
 	"bytes"
@@ -8,13 +8,13 @@ import (
 	"github.com/akakou/zk-ban-system/core"
 )
 
-func RequestUpdate(signer, rl, gpk, prover []byte, url string) ([]byte, error) {
-	reqBytes, err := core.RequestUpdate(signer, rl, gpk, prover)
+func RequestJoin(idToken []byte, prover []byte, url string) ([]byte, error) {
+	requestBytes, signer, err := core.RequestJoin(prover, idToken)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := http.Post(url, "application/json", bytes.NewBuffer(reqBytes))
+	res, err := http.Post(url, "application/json", bytes.NewBuffer(requestBytes))
 	if err != nil {
 		return nil, err
 	}
