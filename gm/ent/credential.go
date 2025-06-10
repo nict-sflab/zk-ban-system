@@ -18,6 +18,8 @@ type Credential struct {
 	ID int `json:"id,omitempty"`
 	// Credential holds the value of the "credential" field.
 	Credential []byte `json:"credential,omitempty"`
+	// PublicKey holds the value of the "public_key" field.
+	PublicKey []byte `json:"public_key,omitempty"`
 	// Identifier holds the value of the "identifier" field.
 	Identifier   string `json:"identifier,omitempty"`
 	selectValues sql.SelectValues
@@ -28,7 +30,7 @@ func (*Credential) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case credential.FieldCredential:
+		case credential.FieldCredential, credential.FieldPublicKey:
 			values[i] = new([]byte)
 		case credential.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -60,6 +62,12 @@ func (c *Credential) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field credential", values[i])
 			} else if value != nil {
 				c.Credential = *value
+			}
+		case credential.FieldPublicKey:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field public_key", values[i])
+			} else if value != nil {
+				c.PublicKey = *value
 			}
 		case credential.FieldIdentifier:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -105,6 +113,9 @@ func (c *Credential) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
 	builder.WriteString("credential=")
 	builder.WriteString(fmt.Sprintf("%v", c.Credential))
+	builder.WriteString(", ")
+	builder.WriteString("public_key=")
+	builder.WriteString(fmt.Sprintf("%v", c.PublicKey))
 	builder.WriteString(", ")
 	builder.WriteString("identifier=")
 	builder.WriteString(c.Identifier)

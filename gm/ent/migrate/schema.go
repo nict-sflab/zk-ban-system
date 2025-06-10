@@ -12,6 +12,7 @@ var (
 	CredentialsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "credential", Type: field.TypeBytes},
+		{Name: "public_key", Type: field.TypeBytes},
 		{Name: "identifier", Type: field.TypeString, Nullable: true},
 	}
 	// CredentialsTable holds the schema information for the "credentials" table.

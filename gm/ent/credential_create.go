@@ -25,6 +25,12 @@ func (cc *CredentialCreate) SetCredential(b []byte) *CredentialCreate {
 	return cc
 }
 
+// SetPublicKey sets the "public_key" field.
+func (cc *CredentialCreate) SetPublicKey(b []byte) *CredentialCreate {
+	cc.mutation.SetPublicKey(b)
+	return cc
+}
+
 // SetIdentifier sets the "identifier" field.
 func (cc *CredentialCreate) SetIdentifier(s string) *CredentialCreate {
 	cc.mutation.SetIdentifier(s)
@@ -76,6 +82,9 @@ func (cc *CredentialCreate) check() error {
 	if _, ok := cc.mutation.Credential(); !ok {
 		return &ValidationError{Name: "credential", err: errors.New(`ent: missing required field "Credential.credential"`)}
 	}
+	if _, ok := cc.mutation.PublicKey(); !ok {
+		return &ValidationError{Name: "public_key", err: errors.New(`ent: missing required field "Credential.public_key"`)}
+	}
 	return nil
 }
 
@@ -105,6 +114,10 @@ func (cc *CredentialCreate) createSpec() (*Credential, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Credential(); ok {
 		_spec.SetField(credential.FieldCredential, field.TypeBytes, value)
 		_node.Credential = value
+	}
+	if value, ok := cc.mutation.PublicKey(); ok {
+		_spec.SetField(credential.FieldPublicKey, field.TypeBytes, value)
+		_node.PublicKey = value
 	}
 	if value, ok := cc.mutation.Identifier(); ok {
 		_spec.SetField(credential.FieldIdentifier, field.TypeString, value)

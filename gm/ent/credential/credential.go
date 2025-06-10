@@ -13,6 +13,8 @@ const (
 	FieldID = "id"
 	// FieldCredential holds the string denoting the credential field in the database.
 	FieldCredential = "credential"
+	// FieldPublicKey holds the string denoting the public_key field in the database.
+	FieldPublicKey = "public_key"
 	// FieldIdentifier holds the string denoting the identifier field in the database.
 	FieldIdentifier = "identifier"
 	// Table holds the table name of the credential in the database.
@@ -23,6 +25,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldCredential,
+	FieldPublicKey,
 	FieldIdentifier,
 }
 

@@ -33,6 +33,12 @@ func (cu *CredentialUpdate) SetCredential(b []byte) *CredentialUpdate {
 	return cu
 }
 
+// SetPublicKey sets the "public_key" field.
+func (cu *CredentialUpdate) SetPublicKey(b []byte) *CredentialUpdate {
+	cu.mutation.SetPublicKey(b)
+	return cu
+}
+
 // SetIdentifier sets the "identifier" field.
 func (cu *CredentialUpdate) SetIdentifier(s string) *CredentialUpdate {
 	cu.mutation.SetIdentifier(s)
@@ -97,6 +103,9 @@ func (cu *CredentialUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Credential(); ok {
 		_spec.SetField(credential.FieldCredential, field.TypeBytes, value)
 	}
+	if value, ok := cu.mutation.PublicKey(); ok {
+		_spec.SetField(credential.FieldPublicKey, field.TypeBytes, value)
+	}
 	if value, ok := cu.mutation.Identifier(); ok {
 		_spec.SetField(credential.FieldIdentifier, field.TypeString, value)
 	}
@@ -126,6 +135,12 @@ type CredentialUpdateOne struct {
 // SetCredential sets the "credential" field.
 func (cuo *CredentialUpdateOne) SetCredential(b []byte) *CredentialUpdateOne {
 	cuo.mutation.SetCredential(b)
+	return cuo
+}
+
+// SetPublicKey sets the "public_key" field.
+func (cuo *CredentialUpdateOne) SetPublicKey(b []byte) *CredentialUpdateOne {
+	cuo.mutation.SetPublicKey(b)
 	return cuo
 }
 
@@ -222,6 +237,9 @@ func (cuo *CredentialUpdateOne) sqlSave(ctx context.Context) (_node *Credential,
 	}
 	if value, ok := cuo.mutation.Credential(); ok {
 		_spec.SetField(credential.FieldCredential, field.TypeBytes, value)
+	}
+	if value, ok := cuo.mutation.PublicKey(); ok {
+		_spec.SetField(credential.FieldPublicKey, field.TypeBytes, value)
 	}
 	if value, ok := cuo.mutation.Identifier(); ok {
 		_spec.SetField(credential.FieldIdentifier, field.TypeString, value)

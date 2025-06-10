@@ -33,6 +33,7 @@ type CredentialMutation struct {
 	typ           string
 	id            *int
 	credential    *[]byte
+	public_key    *[]byte
 	identifier    *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -174,6 +175,42 @@ func (m *CredentialMutation) ResetCredential() {
 	m.credential = nil
 }
 
+// SetPublicKey sets the "public_key" field.
+func (m *CredentialMutation) SetPublicKey(b []byte) {
+	m.public_key = &b
+}
+
+// PublicKey returns the value of the "public_key" field in the mutation.
+func (m *CredentialMutation) PublicKey() (r []byte, exists bool) {
+	v := m.public_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPublicKey returns the old "public_key" field's value of the Credential entity.
+// If the Credential object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CredentialMutation) OldPublicKey(ctx context.Context) (v []byte, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPublicKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPublicKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPublicKey: %w", err)
+	}
+	return oldValue.PublicKey, nil
+}
+
+// ResetPublicKey resets all changes to the "public_key" field.
+func (m *CredentialMutation) ResetPublicKey() {
+	m.public_key = nil
+}
+
 // SetIdentifier sets the "identifier" field.
 func (m *CredentialMutation) SetIdentifier(s string) {
 	m.identifier = &s
@@ -257,9 +294,12 @@ func (m *CredentialMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CredentialMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
 	if m.credential != nil {
 		fields = append(fields, credential.FieldCredential)
+	}
+	if m.public_key != nil {
+		fields = append(fields, credential.FieldPublicKey)
 	}
 	if m.identifier != nil {
 		fields = append(fields, credential.FieldIdentifier)
@@ -274,6 +314,8 @@ func (m *CredentialMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case credential.FieldCredential:
 		return m.Credential()
+	case credential.FieldPublicKey:
+		return m.PublicKey()
 	case credential.FieldIdentifier:
 		return m.Identifier()
 	}
@@ -287,6 +329,8 @@ func (m *CredentialMutation) OldField(ctx context.Context, name string) (ent.Val
 	switch name {
 	case credential.FieldCredential:
 		return m.OldCredential(ctx)
+	case credential.FieldPublicKey:
+		return m.OldPublicKey(ctx)
 	case credential.FieldIdentifier:
 		return m.OldIdentifier(ctx)
 	}
@@ -304,6 +348,13 @@ func (m *CredentialMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCredential(v)
+		return nil
+	case credential.FieldPublicKey:
+		v, ok := value.([]byte)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPublicKey(v)
 		return nil
 	case credential.FieldIdentifier:
 		v, ok := value.(string)
@@ -372,6 +423,9 @@ func (m *CredentialMutation) ResetField(name string) error {
 	switch name {
 	case credential.FieldCredential:
 		m.ResetCredential()
+		return nil
+	case credential.FieldPublicKey:
+		m.ResetPublicKey()
 		return nil
 	case credential.FieldIdentifier:
 		m.ResetIdentifier()

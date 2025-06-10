@@ -14,6 +14,7 @@ type Credential struct {
 func (Credential) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bytes("credential"),
+		field.Bytes("public_key"),
 		field.String("identifier").Optional(),
 	}
 }
