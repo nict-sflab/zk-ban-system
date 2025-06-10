@@ -2,27 +2,32 @@ package gm
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"io"
 
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/labstack/echo/v4"
 )
 
-type GroupManager struct {
-	GroupSecretKey  []byte
-	GroupPublicKey  []byte
-	JoinVerifyKey   []byte
-	UpdateVerifyKey []byte
-}
-
-func IssueCredential(gm *GroupManager) func(c echo.Context) error {
+func IssueCredential[T any](gm *GroupManager[T]) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		reqBody, err := io.ReadAll(c.Request().Body)
 		if err != nil {
 			return err
 		}
 
-		cred, err := core.IssueCredential[string](reqBody, gm.GroupSecretKey, gm.JoinVerifyKey)
+		var req core.JoinRequest[T]
+		err = json.Unmarshal(reqBody, &req)
+		if err != nil {
+			return err
+		}
+
+		err = gm.CheckToken(&req)
+		if err != nil {
+			return err
+		}
+
+		cred, err := core.IssueCredential(&req, gm.GroupSecretKey, gm.JoinVerifyKey)
 		if err != nil {
 			return err
 		}

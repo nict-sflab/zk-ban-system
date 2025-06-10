@@ -37,15 +37,18 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	g := gm.GroupManager{
+	g := gm.GroupManager[any]{
 		GroupSecretKey:  gsk.Bytes(),
 		GroupPublicKey:  gpk.Bytes(),
 		JoinVerifyKey:   joinVerify,
 		UpdateVerifyKey: updateVerify,
+		CheckToken: func(t *core.JoinRequest[any]) error {
+			return nil
+		},
 	}
 
 	e := echo.New()
-	gm.SetupEchoServer(e, &g)
+	g.SetupEchoServer(e)
 
 	go func() {
 		if err := e.Start(":1323"); err != nil {

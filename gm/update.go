@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func UpdateCredential(gm *GroupManager) func(c echo.Context) error {
+func UpdateCredential[T any](gm *GroupManager[T]) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		rl := witness.RevocationList{}
 

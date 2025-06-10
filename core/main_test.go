@@ -34,12 +34,18 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	req, signer, err := RequestJoin(joinProverBuf, "")
+	reqBody, signer, err := RequestJoin(joinProverBuf, "")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cred, err := IssueCredential[string](req, gsk.Bytes(), joinVerifyKey)
+	var req JoinRequest[string]
+	err = json.Unmarshal(reqBody, &req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cred, err := IssueCredential(&req, gsk.Bytes(), joinVerifyKey)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,12 +66,12 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	req, err = RequestUpdate(signer, rlBuf, gpk.Bytes(), updateProverBuf)
+	updateReq, err := RequestUpdate(signer, rlBuf, gpk.Bytes(), updateProverBuf)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cred, err = UpdateCredential(req, gsk.Bytes(), gpk.Bytes(), rl, updateVerifyKey)
+	cred, err = UpdateCredential(updateReq, gsk.Bytes(), gpk.Bytes(), rl, updateVerifyKey)
 	if err != nil {
 		t.Fatal(err)
 	}

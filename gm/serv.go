@@ -2,7 +2,7 @@ package gm
 
 import "github.com/labstack/echo/v4"
 
-func SetupEchoServer(e *echo.Echo, g *GroupManager) {
+func (g *GroupManager[T]) SetupEchoServer(e *echo.Echo) {
 	issueCred := IssueCredential(g)
 	updateCred := UpdateCredential(g)
 

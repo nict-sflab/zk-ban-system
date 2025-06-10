@@ -57,22 +57,15 @@ func RequestJoin[T any](prover []byte, option T) ([]byte, []byte, error) {
 
 }
 
-func IssueCredential[T any](req, gsk, verifyKey []byte) ([]byte, error) {
+func IssueCredential[T any](req *JoinRequest[T], gsk, verifyKey []byte) ([]byte, error) {
 	period := utils.Today()
 
-	var reqObj JoinRequest[T]
-
-	err := json.Unmarshal(req, &reqObj)
+	err := highlevel.VerifyJoinReq(req.Proof, req.UserPublicKey, period, verifyKey)
 	if err != nil {
 		return nil, err
 	}
 
-	err = highlevel.VerifyJoinReq(reqObj.Proof, reqObj.UserPublicKey, period, verifyKey)
-	if err != nil {
-		return nil, err
-	}
-
-	cred, err := highlevel.IssueCredential(period, reqObj.UserPublicKey, gsk)
+	cred, err := highlevel.IssueCredential(period, req.UserPublicKey, gsk)
 	if err != nil {
 		return nil, err
 	}
