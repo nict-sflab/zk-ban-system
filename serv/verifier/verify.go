@@ -16,8 +16,12 @@ func (serv *VerifierServer) VerifyEndpoint() func(c echo.Context) error {
 		}
 
 		var signature core.Signature
-
 		err = json.Unmarshal(reqBody, &signature)
+		if err != nil {
+			return err
+		}
+
+		err = serv.Verifier.Verify(&signature)
 		if err != nil {
 			return err
 		}
