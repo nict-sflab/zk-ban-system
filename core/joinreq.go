@@ -3,7 +3,6 @@ package core
 import (
 	"encoding/json"
 	"math/big"
-	snarkencode "github.com/akakou/snark-utils/encode"
 
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
@@ -19,7 +18,7 @@ type JoinRequest[T any] struct {
 func RequestJoin[T any](prover []byte, option T) ([]byte, []byte, error) {
 	period := utils.Today()
 
-	proverObj := snarkencode.HighLevelSnarkProver{}
+	proverObj := highlevel.HighLevelSnarkProver{}
 	err := json.Unmarshal(prover, &proverObj)
 
 	if err != nil {
