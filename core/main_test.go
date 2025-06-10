@@ -61,7 +61,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = Verify(signature, m, gpk.Bytes(), signVerifyKey)
+	err = Verify(signature, gpk.Bytes(), signVerifyKey)
 	if err != nil {
 		t.Fatal(err)
 	}

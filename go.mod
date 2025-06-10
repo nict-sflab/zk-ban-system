@@ -5,15 +5,16 @@ go 1.23.3
 replace github.com/akakou/zk-ban => ../zk-ban
 
 require (
+	entgo.io/ent v0.14.4
 	github.com/akakou/snark-utils v0.0.2
 	github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
 	github.com/consensys/gnark v0.12.1-0.20250604223016-bee1077628bd
 	github.com/labstack/echo/v4 v4.13.3
+	github.com/mattn/go-sqlite3 v1.14.28
 )
 
 require (
 	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83 // indirect
-	entgo.io/ent v0.14.4 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
@@ -29,21 +30,15 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/iden3/go-iden3-crypto v0.0.17 // indirect
-	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/ingonyama-zk/icicle-gnark/v3 v3.2.2 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/liyue201/gnark-circomlib v0.0.0-20241024021655-892bf7c71a20 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/mattn/go-sqlite3 v1.14.28 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/mmcloughlin/addchain v0.4.0 // indirect
-	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/ronanh/intcomp v1.1.0 // indirect
 	github.com/rs/zerolog v1.33.0 // indirect
-	github.com/spf13/cobra v1.8.1 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
@@ -55,6 +50,5 @@ require (
 	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
-	golang.org/x/tools v0.33.0 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )

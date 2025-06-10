@@ -6,7 +6,12 @@ import (
 	"github.com/akakou/zk-ban/highlevel"
 )
 
-func Sign(message []byte, count int64, signer []byte, gpk []byte, prover []byte) ([]byte, error) {
+type Signature struct {
+	Signature *highlevel.Signature
+	Message   []byte
+}
+
+func Sign(message []byte, count int64, signer []byte, gpk []byte, prover []byte) (*Signature, error) {
 	proverObj := highlevel.HighLevelSnarkProver{}
 	err := json.Unmarshal(prover, &proverObj)
 
@@ -32,23 +37,19 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte, prover []byte)
 		return nil, err
 	}
 
-	sigBytes, err := json.Marshal(signature)
-	if err != nil {
-		return nil, err
-	}
+	// sigBytes, err := json.Marshal(signature)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return sigBytes, err
+	return &Signature{
+		Signature: signature,
+		Message:   message,
+	}, err
 }
 
-func Verify(signature, m, gpk, verifyKey []byte) error {
-	sigObj := highlevel.Signature{}
-
-	err := json.Unmarshal(signature, &sigObj)
-	if err != nil {
-		return err
-	}
-
-	err = highlevel.Verify(&sigObj, m, gpk, verifyKey)
+func Verify(signature *Signature, gpk, verifyKey []byte) error {
+	err := highlevel.Verify(signature.Signature, signature.Message, gpk, verifyKey)
 	if err != nil {
 		return err
 	}
