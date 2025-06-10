@@ -3,6 +3,7 @@ package signer
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
@@ -30,6 +31,10 @@ func Sign(message []byte, count int64, signer, gpk, prover []byte, url string) (
 	_, err = buf.ReadFrom(res.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("status code is %v, not 200\n%v", res.StatusCode, buf.String())
 	}
 
 	return buf.Bytes(), nil
