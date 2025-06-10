@@ -27,7 +27,8 @@ func (verifier *Verifier) Verify(signature *corecore.Signature) error {
 	verifier.DB.Client.Pseudonyms.Create().
 		SetCount(int(signature.Signature.Counter)).
 		SetNym(signature.Signature.Nym).
-		SetPeriod(int(signature.Signature.Period))
+		SetPeriod(int(signature.Signature.Period)).
+		SaveX(*verifier.DB.Ctx)
 
 	return nil
 }
