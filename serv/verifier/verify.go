@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func VerifyEndpoint(serv *VerifierServer) func(c echo.Context) error {
+func (serv *VerifierServer) VerifyEndpoint() func(c echo.Context) error {
 	return func(c echo.Context) error {
 		reqBody, err := io.ReadAll(c.Request().Body)
 		if err != nil {
