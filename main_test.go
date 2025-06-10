@@ -8,7 +8,9 @@ import (
 	"github.com/akakou/zk-ban-system/client/signer"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm"
+	coreverifier "github.com/akakou/zk-ban-system/core/verifier"
 	gmserv "github.com/akakou/zk-ban-system/serv/gm"
+	"github.com/akakou/zk-ban-system/serv/verifier"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
 	"github.com/akakou/zk-ban/witness"
@@ -30,7 +32,15 @@ func passDay() {
 func TestMain(t *testing.T) {
 	utils.Today = today
 
-	db, err := gm.NewDB(&gm.DBConfig{
+	gmDB, err := gm.NewDB(&gm.DBConfig{
+		Type:   "sqlite3",
+		Config: "file::memory:?cache=shared&_fk=1",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	verifierDB, err := coreverifier.NewDB(&coreverifier.DBConfig{
 		Type:   "sqlite3",
 		Config: "file::memory:?cache=shared&_fk=1",
 	})
@@ -45,6 +55,11 @@ func TestMain(t *testing.T) {
 	}
 
 	joinProver, joinVerify, err := core.JoinRequestCircuit()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	signProver, signVerifyKey, err := core.SignCircuit()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +79,7 @@ func TestMain(t *testing.T) {
 		GroupPublicKey:  gpk.Bytes(),
 		JoinVerifyKey:   joinVerify,
 		UpdateVerifyKey: updateVerify,
-		DB:              db,
+		DB:              gmDB,
 	}
 
 	gmServ := gmserv.GMServer[string]{
@@ -77,10 +92,23 @@ func TestMain(t *testing.T) {
 	e := echo.New()
 	gmServ.SetupEchoServer(e)
 
+	v := coreverifier.Verifier{
+		GroupPublicKey: gpk.Bytes(),
+		SignVerifyKey:  signVerifyKey,
+		DB:             verifierDB,
+	}
+
+	verifierServ := verifier.VerifierServer{
+		Verifier: &v,
+	}
+
+	verifierServ.SetupEchoServer(e)
+
 	go func() {
 		if err := e.Start(":1323"); err != nil {
 			t.Fatal(err)
 		}
+
 	}()
 
 	time.Sleep(SLEEP_TIME * time.Second)
@@ -97,6 +125,11 @@ func TestMain(t *testing.T) {
 
 	ss := highlevel.HighLevelSigner{}
 	json.Unmarshal(s, &ss)
+
+	_, err = signer.Sign([]byte("aaa"), 0, s, gpk.Bytes(), signProver, "http://localhost:1323/verify")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	passDay()
 	_, err = signer.RequestUpdate(s, rlBuf, gpk.Bytes(), updateProver, "http://localhost:1323/update-credential")
