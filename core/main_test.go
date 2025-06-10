@@ -66,12 +66,18 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	updateReq, err := RequestUpdate(signer, rlBuf, gpk.Bytes(), updateProverBuf)
+	updateReqBody, err := RequestUpdate(signer, rlBuf, gpk.Bytes(), updateProverBuf)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cred, err = UpdateCredential(updateReq, gsk.Bytes(), gpk.Bytes(), rl, updateVerifyKey)
+	var updateReq UpdateRequest
+	err = json.Unmarshal(updateReqBody, &updateReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cred, err = UpdateCredential(&updateReq, gsk.Bytes(), gpk.Bytes(), rl, updateVerifyKey)
 	if err != nil {
 		t.Fatal(err)
 	}

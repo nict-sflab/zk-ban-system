@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var ErrAlreadyRegisterd = errors.New("Alread account registered")
+var ErrAlreadyRegisterd = errors.New("already account registered")
 
 func IssueCredential[T any](gm *GroupManager[T]) func(c echo.Context) error {
 	return func(c echo.Context) error {
@@ -51,6 +51,7 @@ func IssueCredential[T any](gm *GroupManager[T]) func(c echo.Context) error {
 
 		gm.DB.Client.Credential.Create().
 			SetCredential(cred).
+			SetPublicKey(req.UserPublicKey).
 			SetIdentifier(identifer).
 			SaveX(*gm.DB.Ctx)
 

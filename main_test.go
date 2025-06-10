@@ -8,6 +8,7 @@ import (
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/gm"
 	"github.com/akakou/zk-ban-system/signer"
+	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
@@ -15,7 +16,19 @@ import (
 
 const SLEEP_TIME = 3
 
+var period = 1
+
+func today() int64 {
+	return int64(period)
+}
+
+func passDay() {
+	period += 1
+}
+
 func TestMain(t *testing.T) {
+	utils.Today = today
+
 	db, err := gm.NewDB(&gm.DBConfig{
 		Type:   "sqlite3",
 		Config: "file::memory:?cache=shared&_fk=1",
@@ -80,8 +93,14 @@ func TestMain(t *testing.T) {
 	ss := highlevel.HighLevelSigner{}
 	json.Unmarshal(s, &ss)
 
+	passDay()
 	_, err = signer.RequestUpdate(s, rlBuf, gpk.Bytes(), updateProver, "http://localhost:1323/update-credential")
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	ns, err = signer.RequestUpdate(s, rlBuf, gpk.Bytes(), updateProver, "http://localhost:1323/update-credential")
+	if err == nil {
+		t.Fatal(ns, err)
 	}
 }

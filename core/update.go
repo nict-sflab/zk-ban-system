@@ -59,21 +59,15 @@ func RequestUpdate(signer, rl, gpk, prover []byte) ([]byte, error) {
 	return reqBytes, nil
 }
 
-func UpdateCredential(req, gsk, gpk []byte, rl witness.RevocationList, verifyKey []byte) ([]byte, error) {
+func UpdateCredential(req *UpdateRequest, gsk, gpk []byte, rl witness.RevocationList, verifyKey []byte) ([]byte, error) {
 	period := utils.Today()
 
-	var reqObj UpdateRequest
-	err := json.Unmarshal(req, &reqObj)
+	err := highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, period, req.Before, rl, gpk, verifyKey)
 	if err != nil {
 		return nil, err
 	}
 
-	err = highlevel.VerifyUpdateRequest(reqObj.Proof, reqObj.UserPublicKey, period, reqObj.Before, rl, gpk, verifyKey)
-	if err != nil {
-		return nil, err
-	}
-
-	cred, err := highlevel.IssueCredential(period, reqObj.UserPublicKey, gsk)
+	cred, err := highlevel.IssueCredential(period, req.UserPublicKey, gsk)
 	if err != nil {
 		return nil, err
 	}
