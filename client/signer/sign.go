@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	neturl "net/url"
 
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
 )
@@ -20,7 +21,18 @@ func Sign(message []byte, count int64, signer, gpk, prover []byte, url string) (
 		return nil, err
 	}
 
-	res, err := http.Post(url, "application/json", bytes.NewBuffer(signatureBuf))
+	signatureStr := string(signatureBuf)
+
+	parsed, err := neturl.Parse(url)
+	if err != nil {
+		return nil, err
+	}
+
+	query := parsed.Query()
+	query.Add("signature", signatureStr)
+	parsed.RawQuery = query.Encode()
+
+	res, err := http.Get(parsed.String())
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,6 @@ package verifier
 
 import (
 	"encoding/json"
-	"io"
 
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/labstack/echo/v4"
@@ -10,13 +9,10 @@ import (
 
 func (serv *VerifierServer) VerifyEndpoint() func(c echo.Context) error {
 	return func(c echo.Context) error {
-		reqBody, err := io.ReadAll(c.Request().Body)
-		if err != nil {
-			return err
-		}
+		sigString := c.QueryParam("signature")
 
 		var signature core.Signature
-		err = json.Unmarshal(reqBody, &signature)
+		err := json.Unmarshal([]byte(sigString), &signature)
 		if err != nil {
 			return err
 		}
