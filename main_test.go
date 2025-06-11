@@ -48,12 +48,6 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rl := witness.RevocationList{}
-	rlBuf, err := json.Marshal(rl)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	joinProver, joinVerify, err := core.JoinRequestCircuit()
 	if err != nil {
 		t.Fatal(err)
@@ -142,6 +136,11 @@ func TestMain(t *testing.T) {
 	}
 
 	passDay()
+	rlBuf, err := signer.FetchRevocationList("http://localhost:1323/revocation-list")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	_, err = signer.RequestUpdate(s, rlBuf, gpk2, updateProver, "http://localhost:1323/update-credential")
 	if err != nil {
 		t.Fatal(err)
