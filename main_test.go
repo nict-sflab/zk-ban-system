@@ -126,23 +126,28 @@ func TestMain(t *testing.T) {
 	ss := highlevel.HighLevelSigner{}
 	json.Unmarshal(s, &ss)
 
-	_, err = signer.Sign([]byte("aaa"), 0, s, gpk.Bytes(), signProver, "http://localhost:1323/verify")
+	gpk2, err := signer.FetchGroupPublicKey("http://localhost:1323/group-public-key")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	failSign, err := signer.Sign([]byte("aaa"), 0, s, gpk.Bytes(), signProver, "http://localhost:1323/verify")
+	_, err = signer.Sign([]byte("aaa"), 0, s, gpk2, signProver, "http://localhost:1323/verify")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	failSign, err := signer.Sign([]byte("aaa"), 0, s, gpk2, signProver, "http://localhost:1323/verify")
 	if err == nil {
 		t.Fatal(err, failSign)
 	}
 
 	passDay()
-	_, err = signer.RequestUpdate(s, rlBuf, gpk.Bytes(), updateProver, "http://localhost:1323/update-credential")
+	_, err = signer.RequestUpdate(s, rlBuf, gpk2, updateProver, "http://localhost:1323/update-credential")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ns, err = signer.RequestUpdate(s, rlBuf, gpk.Bytes(), updateProver, "http://localhost:1323/update-credential")
+	ns, err = signer.RequestUpdate(s, rlBuf, gpk2, updateProver, "http://localhost:1323/update-credential")
 	if err == nil {
 		t.Fatal(ns, err)
 	}
