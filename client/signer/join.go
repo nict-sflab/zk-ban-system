@@ -8,7 +8,7 @@ import (
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
 )
 
-func RequestJoin(idToken []byte, prover []byte, url string) ([]byte, error) {
+func RequestJoin(idToken string, prover []byte, url string) ([]byte, error) {
 	requestBytes, signer, err := coresigner.RequestJoin(prover, idToken)
 	if err != nil {
 		return nil, err

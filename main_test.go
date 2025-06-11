@@ -113,12 +113,12 @@ func TestMain(t *testing.T) {
 
 	time.Sleep(SLEEP_TIME * time.Second)
 
-	s, err := signer.RequestJoin([]byte{}, joinProver, "http://localhost:1323/issue-credential")
+	s, err := signer.RequestJoin("", joinProver, "http://localhost:1323/issue-credential")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ns, err := signer.RequestJoin([]byte{}, joinProver, "http://localhost:1323/issue-credential")
+	ns, err := signer.RequestJoin("", joinProver, "http://localhost:1323/issue-credential")
 	if err == nil {
 		t.Fatal(ns, err)
 	}
