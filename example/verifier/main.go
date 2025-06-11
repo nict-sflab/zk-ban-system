@@ -15,15 +15,6 @@ import (
 const SIGN_VERIFIER_PATH = "../../../zk-ban-android/tools/sign_verifier.json"
 
 func main() {
-	db, err := core.NewDB(&core.DBConfig{
-		Type:   "sqlite3",
-		Config: "file::memory:?cache=shared&_fk=1",
-	})
-
-	if err != nil {
-		panic(err)
-	}
-
 	signVerifier, err := os.ReadFile(SIGN_VERIFIER_PATH)
 	if err != nil {
 		panic(err)
@@ -38,7 +29,6 @@ func main() {
 		Verifier: &core.Verifier{
 			SignVerifyKey:  signVerifier,
 			GroupPublicKey: gpk,
-			DB:             db,
 		},
 	}
 

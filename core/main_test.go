@@ -56,14 +56,7 @@ func TestAll(t *testing.T) {
 		Type:   "sqlite3",
 		Config: "file::memory:?cache=shared&_fk=1",
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	verifierDB, err := verifier.NewDB(&verifier.DBConfig{
-		Type:   "sqlite3",
-		Config: "file::memory:?cache=shared&_fk=1",
-	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,7 +72,6 @@ func TestAll(t *testing.T) {
 	v := verifier.Verifier{
 		GroupPublicKey: gpk.Bytes(),
 		SignVerifyKey:  signVerifyKey,
-		DB:             verifierDB,
 	}
 
 	reqBody, s, err := signer.RequestJoin(joinProverBuf, "")
@@ -121,11 +113,6 @@ func TestAll(t *testing.T) {
 
 	err = v.Verify(signature)
 	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = v.Verify(signature)
-	if err == nil {
 		t.Fatal(err)
 	}
 

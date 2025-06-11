@@ -40,14 +40,6 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	verifierDB, err := coreverifier.NewDB(&coreverifier.DBConfig{
-		Type:   "sqlite3",
-		Config: "file::memory:?cache=shared&_fk=1",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	joinProver, joinVerify, err := core.JoinRequestCircuit()
 	if err != nil {
 		t.Fatal(err)
@@ -89,7 +81,6 @@ func TestMain(t *testing.T) {
 	v := coreverifier.Verifier{
 		GroupPublicKey: gpk.Bytes(),
 		SignVerifyKey:  signVerifyKey,
-		DB:             verifierDB,
 	}
 
 	verifierServ := verifier.VerifierServer{
@@ -102,7 +93,6 @@ func TestMain(t *testing.T) {
 		if err := e.Start(":1323"); err != nil {
 			t.Fatal(err)
 		}
-
 	}()
 
 	time.Sleep(SLEEP_TIME * time.Second)
@@ -128,11 +118,6 @@ func TestMain(t *testing.T) {
 	_, err = signer.Sign([]byte("aaa"), 0, s, gpk2, signProver, "http://localhost:1323/verify")
 	if err != nil {
 		t.Fatal(err)
-	}
-
-	failSign, err := signer.Sign([]byte("aaa"), 0, s, gpk2, signProver, "http://localhost:1323/verify")
-	if err == nil {
-		t.Fatal(err, failSign)
 	}
 
 	passDay()
