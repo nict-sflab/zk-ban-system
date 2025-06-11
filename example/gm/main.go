@@ -2,10 +2,12 @@ package main
 
 import (
 	"os"
+	"strconv"
 
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	core "github.com/akakou/zk-ban-system/core/gm"
 	serv "github.com/akakou/zk-ban-system/serv/gm"
+	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -55,20 +57,19 @@ func main() {
 	}
 
 	e := echo.New()
-	e.GET("/reset", func(c echo.Context) error {
-		gmServ.GM.DB.Close()
 
-		gmDB, err := core.NewDB(&core.DBConfig{
-			Type:   "sqlite3",
-			Config: "file::memory:?cache=shared&_fk=1",
-		})
+	e.GET("/period", func(c echo.Context) error {
+		str := c.QueryParam("period")
+		i, err := strconv.Atoi(str)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
-		gmServ.GM.DB = gmDB
+		utils.Today = func() int64 {
+			return int64(i)
+		}
 
-		return c.String(200, "reset")
+		return c.String(200, strconv.Itoa(i))
 	})
 
 	gmServ.SetupEchoServer(e)
