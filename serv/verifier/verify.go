@@ -22,6 +22,6 @@ func (serv *VerifierServer) VerifyEndpoint() func(c echo.Context) error {
 			return err
 		}
 
-		return nil
+		return c.String(200, "ok")
 	}
 }
