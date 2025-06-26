@@ -77,9 +77,14 @@ func Count(v int) predicate.Revocation {
 	return predicate.Revocation(sql.FieldEQ(FieldCount, v))
 }
 
-// Period applies equality check predicate on the "period" field. It's identical to PeriodEQ.
-func Period(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldPeriod, v))
+// RevokedPeriod applies equality check predicate on the "revoked_period" field. It's identical to RevokedPeriodEQ.
+func RevokedPeriod(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldEQ(FieldRevokedPeriod, v))
+}
+
+// SignedPeriod applies equality check predicate on the "signed_period" field. It's identical to SignedPeriodEQ.
+func SignedPeriod(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldEQ(FieldSignedPeriod, v))
 }
 
 // ProofEQ applies the EQ predicate on the "proof" field.
@@ -282,44 +287,84 @@ func CountLTE(v int) predicate.Revocation {
 	return predicate.Revocation(sql.FieldLTE(FieldCount, v))
 }
 
-// PeriodEQ applies the EQ predicate on the "period" field.
-func PeriodEQ(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldPeriod, v))
+// RevokedPeriodEQ applies the EQ predicate on the "revoked_period" field.
+func RevokedPeriodEQ(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldEQ(FieldRevokedPeriod, v))
 }
 
-// PeriodNEQ applies the NEQ predicate on the "period" field.
-func PeriodNEQ(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNEQ(FieldPeriod, v))
+// RevokedPeriodNEQ applies the NEQ predicate on the "revoked_period" field.
+func RevokedPeriodNEQ(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldNEQ(FieldRevokedPeriod, v))
 }
 
-// PeriodIn applies the In predicate on the "period" field.
-func PeriodIn(vs ...int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldIn(FieldPeriod, vs...))
+// RevokedPeriodIn applies the In predicate on the "revoked_period" field.
+func RevokedPeriodIn(vs ...int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldIn(FieldRevokedPeriod, vs...))
 }
 
-// PeriodNotIn applies the NotIn predicate on the "period" field.
-func PeriodNotIn(vs ...int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNotIn(FieldPeriod, vs...))
+// RevokedPeriodNotIn applies the NotIn predicate on the "revoked_period" field.
+func RevokedPeriodNotIn(vs ...int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldNotIn(FieldRevokedPeriod, vs...))
 }
 
-// PeriodGT applies the GT predicate on the "period" field.
-func PeriodGT(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGT(FieldPeriod, v))
+// RevokedPeriodGT applies the GT predicate on the "revoked_period" field.
+func RevokedPeriodGT(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldGT(FieldRevokedPeriod, v))
 }
 
-// PeriodGTE applies the GTE predicate on the "period" field.
-func PeriodGTE(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGTE(FieldPeriod, v))
+// RevokedPeriodGTE applies the GTE predicate on the "revoked_period" field.
+func RevokedPeriodGTE(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldGTE(FieldRevokedPeriod, v))
 }
 
-// PeriodLT applies the LT predicate on the "period" field.
-func PeriodLT(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLT(FieldPeriod, v))
+// RevokedPeriodLT applies the LT predicate on the "revoked_period" field.
+func RevokedPeriodLT(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldLT(FieldRevokedPeriod, v))
 }
 
-// PeriodLTE applies the LTE predicate on the "period" field.
-func PeriodLTE(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLTE(FieldPeriod, v))
+// RevokedPeriodLTE applies the LTE predicate on the "revoked_period" field.
+func RevokedPeriodLTE(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldLTE(FieldRevokedPeriod, v))
+}
+
+// SignedPeriodEQ applies the EQ predicate on the "signed_period" field.
+func SignedPeriodEQ(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldEQ(FieldSignedPeriod, v))
+}
+
+// SignedPeriodNEQ applies the NEQ predicate on the "signed_period" field.
+func SignedPeriodNEQ(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldNEQ(FieldSignedPeriod, v))
+}
+
+// SignedPeriodIn applies the In predicate on the "signed_period" field.
+func SignedPeriodIn(vs ...int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldIn(FieldSignedPeriod, vs...))
+}
+
+// SignedPeriodNotIn applies the NotIn predicate on the "signed_period" field.
+func SignedPeriodNotIn(vs ...int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldNotIn(FieldSignedPeriod, vs...))
+}
+
+// SignedPeriodGT applies the GT predicate on the "signed_period" field.
+func SignedPeriodGT(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldGT(FieldSignedPeriod, v))
+}
+
+// SignedPeriodGTE applies the GTE predicate on the "signed_period" field.
+func SignedPeriodGTE(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldGTE(FieldSignedPeriod, v))
+}
+
+// SignedPeriodLT applies the LT predicate on the "signed_period" field.
+func SignedPeriodLT(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldLT(FieldSignedPeriod, v))
+}
+
+// SignedPeriodLTE applies the LTE predicate on the "signed_period" field.
+func SignedPeriodLTE(v int) predicate.Revocation {
+	return predicate.Revocation(sql.FieldLTE(FieldSignedPeriod, v))
 }
 
 // And groups predicates with the AND operator between them.

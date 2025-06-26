@@ -29,7 +29,8 @@ var (
 		{Name: "sigma", Type: field.TypeBytes},
 		{Name: "message", Type: field.TypeBytes},
 		{Name: "count", Type: field.TypeInt},
-		{Name: "period", Type: field.TypeInt},
+		{Name: "revoked_period", Type: field.TypeInt},
+		{Name: "signed_period", Type: field.TypeInt},
 	}
 	// RevocationsTable holds the schema information for the "revocations" table.
 	RevocationsTable = &schema.Table{

@@ -26,8 +26,10 @@ type Revocation struct {
 	Message []byte `json:"message,omitempty"`
 	// Count holds the value of the "count" field.
 	Count int `json:"count,omitempty"`
-	// Period holds the value of the "period" field.
-	Period       int `json:"period,omitempty"`
+	// RevokedPeriod holds the value of the "revoked_period" field.
+	RevokedPeriod int `json:"revoked_period,omitempty"`
+	// SignedPeriod holds the value of the "signed_period" field.
+	SignedPeriod int `json:"signed_period,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -38,7 +40,7 @@ func (*Revocation) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case revocation.FieldProof, revocation.FieldNym, revocation.FieldSigma, revocation.FieldMessage:
 			values[i] = new([]byte)
-		case revocation.FieldID, revocation.FieldCount, revocation.FieldPeriod:
+		case revocation.FieldID, revocation.FieldCount, revocation.FieldRevokedPeriod, revocation.FieldSignedPeriod:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -91,11 +93,17 @@ func (r *Revocation) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				r.Count = int(value.Int64)
 			}
-		case revocation.FieldPeriod:
+		case revocation.FieldRevokedPeriod:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field period", values[i])
+				return fmt.Errorf("unexpected type %T for field revoked_period", values[i])
 			} else if value.Valid {
-				r.Period = int(value.Int64)
+				r.RevokedPeriod = int(value.Int64)
+			}
+		case revocation.FieldSignedPeriod:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field signed_period", values[i])
+			} else if value.Valid {
+				r.SignedPeriod = int(value.Int64)
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -148,8 +156,11 @@ func (r *Revocation) String() string {
 	builder.WriteString("count=")
 	builder.WriteString(fmt.Sprintf("%v", r.Count))
 	builder.WriteString(", ")
-	builder.WriteString("period=")
-	builder.WriteString(fmt.Sprintf("%v", r.Period))
+	builder.WriteString("revoked_period=")
+	builder.WriteString(fmt.Sprintf("%v", r.RevokedPeriod))
+	builder.WriteString(", ")
+	builder.WriteString("signed_period=")
+	builder.WriteString(fmt.Sprintf("%v", r.SignedPeriod))
 	builder.WriteByte(')')
 	return builder.String()
 }

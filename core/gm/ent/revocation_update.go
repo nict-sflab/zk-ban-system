@@ -72,24 +72,45 @@ func (ru *RevocationUpdate) AddCount(i int) *RevocationUpdate {
 	return ru
 }
 
-// SetPeriod sets the "period" field.
-func (ru *RevocationUpdate) SetPeriod(i int) *RevocationUpdate {
-	ru.mutation.ResetPeriod()
-	ru.mutation.SetPeriod(i)
+// SetRevokedPeriod sets the "revoked_period" field.
+func (ru *RevocationUpdate) SetRevokedPeriod(i int) *RevocationUpdate {
+	ru.mutation.ResetRevokedPeriod()
+	ru.mutation.SetRevokedPeriod(i)
 	return ru
 }
 
-// SetNillablePeriod sets the "period" field if the given value is not nil.
-func (ru *RevocationUpdate) SetNillablePeriod(i *int) *RevocationUpdate {
+// SetNillableRevokedPeriod sets the "revoked_period" field if the given value is not nil.
+func (ru *RevocationUpdate) SetNillableRevokedPeriod(i *int) *RevocationUpdate {
 	if i != nil {
-		ru.SetPeriod(*i)
+		ru.SetRevokedPeriod(*i)
 	}
 	return ru
 }
 
-// AddPeriod adds i to the "period" field.
-func (ru *RevocationUpdate) AddPeriod(i int) *RevocationUpdate {
-	ru.mutation.AddPeriod(i)
+// AddRevokedPeriod adds i to the "revoked_period" field.
+func (ru *RevocationUpdate) AddRevokedPeriod(i int) *RevocationUpdate {
+	ru.mutation.AddRevokedPeriod(i)
+	return ru
+}
+
+// SetSignedPeriod sets the "signed_period" field.
+func (ru *RevocationUpdate) SetSignedPeriod(i int) *RevocationUpdate {
+	ru.mutation.ResetSignedPeriod()
+	ru.mutation.SetSignedPeriod(i)
+	return ru
+}
+
+// SetNillableSignedPeriod sets the "signed_period" field if the given value is not nil.
+func (ru *RevocationUpdate) SetNillableSignedPeriod(i *int) *RevocationUpdate {
+	if i != nil {
+		ru.SetSignedPeriod(*i)
+	}
+	return ru
+}
+
+// AddSignedPeriod adds i to the "signed_period" field.
+func (ru *RevocationUpdate) AddSignedPeriod(i int) *RevocationUpdate {
+	ru.mutation.AddSignedPeriod(i)
 	return ru
 }
 
@@ -152,11 +173,17 @@ func (ru *RevocationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ru.mutation.AddedCount(); ok {
 		_spec.AddField(revocation.FieldCount, field.TypeInt, value)
 	}
-	if value, ok := ru.mutation.Period(); ok {
-		_spec.SetField(revocation.FieldPeriod, field.TypeInt, value)
+	if value, ok := ru.mutation.RevokedPeriod(); ok {
+		_spec.SetField(revocation.FieldRevokedPeriod, field.TypeInt, value)
 	}
-	if value, ok := ru.mutation.AddedPeriod(); ok {
-		_spec.AddField(revocation.FieldPeriod, field.TypeInt, value)
+	if value, ok := ru.mutation.AddedRevokedPeriod(); ok {
+		_spec.AddField(revocation.FieldRevokedPeriod, field.TypeInt, value)
+	}
+	if value, ok := ru.mutation.SignedPeriod(); ok {
+		_spec.SetField(revocation.FieldSignedPeriod, field.TypeInt, value)
+	}
+	if value, ok := ru.mutation.AddedSignedPeriod(); ok {
+		_spec.AddField(revocation.FieldSignedPeriod, field.TypeInt, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -223,24 +250,45 @@ func (ruo *RevocationUpdateOne) AddCount(i int) *RevocationUpdateOne {
 	return ruo
 }
 
-// SetPeriod sets the "period" field.
-func (ruo *RevocationUpdateOne) SetPeriod(i int) *RevocationUpdateOne {
-	ruo.mutation.ResetPeriod()
-	ruo.mutation.SetPeriod(i)
+// SetRevokedPeriod sets the "revoked_period" field.
+func (ruo *RevocationUpdateOne) SetRevokedPeriod(i int) *RevocationUpdateOne {
+	ruo.mutation.ResetRevokedPeriod()
+	ruo.mutation.SetRevokedPeriod(i)
 	return ruo
 }
 
-// SetNillablePeriod sets the "period" field if the given value is not nil.
-func (ruo *RevocationUpdateOne) SetNillablePeriod(i *int) *RevocationUpdateOne {
+// SetNillableRevokedPeriod sets the "revoked_period" field if the given value is not nil.
+func (ruo *RevocationUpdateOne) SetNillableRevokedPeriod(i *int) *RevocationUpdateOne {
 	if i != nil {
-		ruo.SetPeriod(*i)
+		ruo.SetRevokedPeriod(*i)
 	}
 	return ruo
 }
 
-// AddPeriod adds i to the "period" field.
-func (ruo *RevocationUpdateOne) AddPeriod(i int) *RevocationUpdateOne {
-	ruo.mutation.AddPeriod(i)
+// AddRevokedPeriod adds i to the "revoked_period" field.
+func (ruo *RevocationUpdateOne) AddRevokedPeriod(i int) *RevocationUpdateOne {
+	ruo.mutation.AddRevokedPeriod(i)
+	return ruo
+}
+
+// SetSignedPeriod sets the "signed_period" field.
+func (ruo *RevocationUpdateOne) SetSignedPeriod(i int) *RevocationUpdateOne {
+	ruo.mutation.ResetSignedPeriod()
+	ruo.mutation.SetSignedPeriod(i)
+	return ruo
+}
+
+// SetNillableSignedPeriod sets the "signed_period" field if the given value is not nil.
+func (ruo *RevocationUpdateOne) SetNillableSignedPeriod(i *int) *RevocationUpdateOne {
+	if i != nil {
+		ruo.SetSignedPeriod(*i)
+	}
+	return ruo
+}
+
+// AddSignedPeriod adds i to the "signed_period" field.
+func (ruo *RevocationUpdateOne) AddSignedPeriod(i int) *RevocationUpdateOne {
+	ruo.mutation.AddSignedPeriod(i)
 	return ruo
 }
 
@@ -333,11 +381,17 @@ func (ruo *RevocationUpdateOne) sqlSave(ctx context.Context) (_node *Revocation,
 	if value, ok := ruo.mutation.AddedCount(); ok {
 		_spec.AddField(revocation.FieldCount, field.TypeInt, value)
 	}
-	if value, ok := ruo.mutation.Period(); ok {
-		_spec.SetField(revocation.FieldPeriod, field.TypeInt, value)
+	if value, ok := ruo.mutation.RevokedPeriod(); ok {
+		_spec.SetField(revocation.FieldRevokedPeriod, field.TypeInt, value)
 	}
-	if value, ok := ruo.mutation.AddedPeriod(); ok {
-		_spec.AddField(revocation.FieldPeriod, field.TypeInt, value)
+	if value, ok := ruo.mutation.AddedRevokedPeriod(); ok {
+		_spec.AddField(revocation.FieldRevokedPeriod, field.TypeInt, value)
+	}
+	if value, ok := ruo.mutation.SignedPeriod(); ok {
+		_spec.SetField(revocation.FieldSignedPeriod, field.TypeInt, value)
+	}
+	if value, ok := ruo.mutation.AddedSignedPeriod(); ok {
+		_spec.AddField(revocation.FieldSignedPeriod, field.TypeInt, value)
 	}
 	_node = &Revocation{config: ruo.config}
 	_spec.Assign = _node.assignValues

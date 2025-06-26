@@ -487,21 +487,23 @@ func (m *CredentialMutation) ResetEdge(name string) error {
 // RevocationMutation represents an operation that mutates the Revocation nodes in the graph.
 type RevocationMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	proof         *[]byte
-	nym           *[]byte
-	sigma         *[]byte
-	message       *[]byte
-	count         *int
-	addcount      *int
-	period        *int
-	addperiod     *int
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Revocation, error)
-	predicates    []predicate.Revocation
+	op                Op
+	typ               string
+	id                *int
+	proof             *[]byte
+	nym               *[]byte
+	sigma             *[]byte
+	message           *[]byte
+	count             *int
+	addcount          *int
+	revoked_period    *int
+	addrevoked_period *int
+	signed_period     *int
+	addsigned_period  *int
+	clearedFields     map[string]struct{}
+	done              bool
+	oldValue          func(context.Context) (*Revocation, error)
+	predicates        []predicate.Revocation
 }
 
 var _ ent.Mutation = (*RevocationMutation)(nil)
@@ -802,60 +804,116 @@ func (m *RevocationMutation) ResetCount() {
 	m.addcount = nil
 }
 
-// SetPeriod sets the "period" field.
-func (m *RevocationMutation) SetPeriod(i int) {
-	m.period = &i
-	m.addperiod = nil
+// SetRevokedPeriod sets the "revoked_period" field.
+func (m *RevocationMutation) SetRevokedPeriod(i int) {
+	m.revoked_period = &i
+	m.addrevoked_period = nil
 }
 
-// Period returns the value of the "period" field in the mutation.
-func (m *RevocationMutation) Period() (r int, exists bool) {
-	v := m.period
+// RevokedPeriod returns the value of the "revoked_period" field in the mutation.
+func (m *RevocationMutation) RevokedPeriod() (r int, exists bool) {
+	v := m.revoked_period
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPeriod returns the old "period" field's value of the Revocation entity.
+// OldRevokedPeriod returns the old "revoked_period" field's value of the Revocation entity.
 // If the Revocation object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RevocationMutation) OldPeriod(ctx context.Context) (v int, err error) {
+func (m *RevocationMutation) OldRevokedPeriod(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPeriod is only allowed on UpdateOne operations")
+		return v, errors.New("OldRevokedPeriod is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPeriod requires an ID field in the mutation")
+		return v, errors.New("OldRevokedPeriod requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPeriod: %w", err)
+		return v, fmt.Errorf("querying old value for OldRevokedPeriod: %w", err)
 	}
-	return oldValue.Period, nil
+	return oldValue.RevokedPeriod, nil
 }
 
-// AddPeriod adds i to the "period" field.
-func (m *RevocationMutation) AddPeriod(i int) {
-	if m.addperiod != nil {
-		*m.addperiod += i
+// AddRevokedPeriod adds i to the "revoked_period" field.
+func (m *RevocationMutation) AddRevokedPeriod(i int) {
+	if m.addrevoked_period != nil {
+		*m.addrevoked_period += i
 	} else {
-		m.addperiod = &i
+		m.addrevoked_period = &i
 	}
 }
 
-// AddedPeriod returns the value that was added to the "period" field in this mutation.
-func (m *RevocationMutation) AddedPeriod() (r int, exists bool) {
-	v := m.addperiod
+// AddedRevokedPeriod returns the value that was added to the "revoked_period" field in this mutation.
+func (m *RevocationMutation) AddedRevokedPeriod() (r int, exists bool) {
+	v := m.addrevoked_period
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetPeriod resets all changes to the "period" field.
-func (m *RevocationMutation) ResetPeriod() {
-	m.period = nil
-	m.addperiod = nil
+// ResetRevokedPeriod resets all changes to the "revoked_period" field.
+func (m *RevocationMutation) ResetRevokedPeriod() {
+	m.revoked_period = nil
+	m.addrevoked_period = nil
+}
+
+// SetSignedPeriod sets the "signed_period" field.
+func (m *RevocationMutation) SetSignedPeriod(i int) {
+	m.signed_period = &i
+	m.addsigned_period = nil
+}
+
+// SignedPeriod returns the value of the "signed_period" field in the mutation.
+func (m *RevocationMutation) SignedPeriod() (r int, exists bool) {
+	v := m.signed_period
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSignedPeriod returns the old "signed_period" field's value of the Revocation entity.
+// If the Revocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RevocationMutation) OldSignedPeriod(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSignedPeriod is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSignedPeriod requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSignedPeriod: %w", err)
+	}
+	return oldValue.SignedPeriod, nil
+}
+
+// AddSignedPeriod adds i to the "signed_period" field.
+func (m *RevocationMutation) AddSignedPeriod(i int) {
+	if m.addsigned_period != nil {
+		*m.addsigned_period += i
+	} else {
+		m.addsigned_period = &i
+	}
+}
+
+// AddedSignedPeriod returns the value that was added to the "signed_period" field in this mutation.
+func (m *RevocationMutation) AddedSignedPeriod() (r int, exists bool) {
+	v := m.addsigned_period
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSignedPeriod resets all changes to the "signed_period" field.
+func (m *RevocationMutation) ResetSignedPeriod() {
+	m.signed_period = nil
+	m.addsigned_period = nil
 }
 
 // Where appends a list predicates to the RevocationMutation builder.
@@ -892,7 +950,7 @@ func (m *RevocationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RevocationMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.proof != nil {
 		fields = append(fields, revocation.FieldProof)
 	}
@@ -908,8 +966,11 @@ func (m *RevocationMutation) Fields() []string {
 	if m.count != nil {
 		fields = append(fields, revocation.FieldCount)
 	}
-	if m.period != nil {
-		fields = append(fields, revocation.FieldPeriod)
+	if m.revoked_period != nil {
+		fields = append(fields, revocation.FieldRevokedPeriod)
+	}
+	if m.signed_period != nil {
+		fields = append(fields, revocation.FieldSignedPeriod)
 	}
 	return fields
 }
@@ -929,8 +990,10 @@ func (m *RevocationMutation) Field(name string) (ent.Value, bool) {
 		return m.Message()
 	case revocation.FieldCount:
 		return m.Count()
-	case revocation.FieldPeriod:
-		return m.Period()
+	case revocation.FieldRevokedPeriod:
+		return m.RevokedPeriod()
+	case revocation.FieldSignedPeriod:
+		return m.SignedPeriod()
 	}
 	return nil, false
 }
@@ -950,8 +1013,10 @@ func (m *RevocationMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldMessage(ctx)
 	case revocation.FieldCount:
 		return m.OldCount(ctx)
-	case revocation.FieldPeriod:
-		return m.OldPeriod(ctx)
+	case revocation.FieldRevokedPeriod:
+		return m.OldRevokedPeriod(ctx)
+	case revocation.FieldSignedPeriod:
+		return m.OldSignedPeriod(ctx)
 	}
 	return nil, fmt.Errorf("unknown Revocation field %s", name)
 }
@@ -996,12 +1061,19 @@ func (m *RevocationMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCount(v)
 		return nil
-	case revocation.FieldPeriod:
+	case revocation.FieldRevokedPeriod:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPeriod(v)
+		m.SetRevokedPeriod(v)
+		return nil
+	case revocation.FieldSignedPeriod:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSignedPeriod(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Revocation field %s", name)
@@ -1014,8 +1086,11 @@ func (m *RevocationMutation) AddedFields() []string {
 	if m.addcount != nil {
 		fields = append(fields, revocation.FieldCount)
 	}
-	if m.addperiod != nil {
-		fields = append(fields, revocation.FieldPeriod)
+	if m.addrevoked_period != nil {
+		fields = append(fields, revocation.FieldRevokedPeriod)
+	}
+	if m.addsigned_period != nil {
+		fields = append(fields, revocation.FieldSignedPeriod)
 	}
 	return fields
 }
@@ -1027,8 +1102,10 @@ func (m *RevocationMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case revocation.FieldCount:
 		return m.AddedCount()
-	case revocation.FieldPeriod:
-		return m.AddedPeriod()
+	case revocation.FieldRevokedPeriod:
+		return m.AddedRevokedPeriod()
+	case revocation.FieldSignedPeriod:
+		return m.AddedSignedPeriod()
 	}
 	return nil, false
 }
@@ -1045,12 +1122,19 @@ func (m *RevocationMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddCount(v)
 		return nil
-	case revocation.FieldPeriod:
+	case revocation.FieldRevokedPeriod:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddPeriod(v)
+		m.AddRevokedPeriod(v)
+		return nil
+	case revocation.FieldSignedPeriod:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSignedPeriod(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Revocation numeric field %s", name)
@@ -1094,8 +1178,11 @@ func (m *RevocationMutation) ResetField(name string) error {
 	case revocation.FieldCount:
 		m.ResetCount()
 		return nil
-	case revocation.FieldPeriod:
-		m.ResetPeriod()
+	case revocation.FieldRevokedPeriod:
+		m.ResetRevokedPeriod()
+		return nil
+	case revocation.FieldSignedPeriod:
+		m.ResetSignedPeriod()
 		return nil
 	}
 	return fmt.Errorf("unknown Revocation field %s", name)

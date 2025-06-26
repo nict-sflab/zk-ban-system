@@ -21,8 +21,10 @@ const (
 	FieldMessage = "message"
 	// FieldCount holds the string denoting the count field in the database.
 	FieldCount = "count"
-	// FieldPeriod holds the string denoting the period field in the database.
-	FieldPeriod = "period"
+	// FieldRevokedPeriod holds the string denoting the revoked_period field in the database.
+	FieldRevokedPeriod = "revoked_period"
+	// FieldSignedPeriod holds the string denoting the signed_period field in the database.
+	FieldSignedPeriod = "signed_period"
 	// Table holds the table name of the revocation in the database.
 	Table = "revocations"
 )
@@ -35,7 +37,8 @@ var Columns = []string{
 	FieldSigma,
 	FieldMessage,
 	FieldCount,
-	FieldPeriod,
+	FieldRevokedPeriod,
+	FieldSignedPeriod,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -61,7 +64,12 @@ func ByCount(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCount, opts...).ToFunc()
 }
 
-// ByPeriod orders the results by the period field.
-func ByPeriod(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPeriod, opts...).ToFunc()
+// ByRevokedPeriod orders the results by the revoked_period field.
+func ByRevokedPeriod(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRevokedPeriod, opts...).ToFunc()
+}
+
+// BySignedPeriod orders the results by the signed_period field.
+func BySignedPeriod(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSignedPeriod, opts...).ToFunc()
 }

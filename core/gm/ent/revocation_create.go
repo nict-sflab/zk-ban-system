@@ -49,9 +49,15 @@ func (rc *RevocationCreate) SetCount(i int) *RevocationCreate {
 	return rc
 }
 
-// SetPeriod sets the "period" field.
-func (rc *RevocationCreate) SetPeriod(i int) *RevocationCreate {
-	rc.mutation.SetPeriod(i)
+// SetRevokedPeriod sets the "revoked_period" field.
+func (rc *RevocationCreate) SetRevokedPeriod(i int) *RevocationCreate {
+	rc.mutation.SetRevokedPeriod(i)
+	return rc
+}
+
+// SetSignedPeriod sets the "signed_period" field.
+func (rc *RevocationCreate) SetSignedPeriod(i int) *RevocationCreate {
+	rc.mutation.SetSignedPeriod(i)
 	return rc
 }
 
@@ -104,8 +110,11 @@ func (rc *RevocationCreate) check() error {
 	if _, ok := rc.mutation.Count(); !ok {
 		return &ValidationError{Name: "count", err: errors.New(`ent: missing required field "Revocation.count"`)}
 	}
-	if _, ok := rc.mutation.Period(); !ok {
-		return &ValidationError{Name: "period", err: errors.New(`ent: missing required field "Revocation.period"`)}
+	if _, ok := rc.mutation.RevokedPeriod(); !ok {
+		return &ValidationError{Name: "revoked_period", err: errors.New(`ent: missing required field "Revocation.revoked_period"`)}
+	}
+	if _, ok := rc.mutation.SignedPeriod(); !ok {
+		return &ValidationError{Name: "signed_period", err: errors.New(`ent: missing required field "Revocation.signed_period"`)}
 	}
 	return nil
 }
@@ -153,9 +162,13 @@ func (rc *RevocationCreate) createSpec() (*Revocation, *sqlgraph.CreateSpec) {
 		_spec.SetField(revocation.FieldCount, field.TypeInt, value)
 		_node.Count = value
 	}
-	if value, ok := rc.mutation.Period(); ok {
-		_spec.SetField(revocation.FieldPeriod, field.TypeInt, value)
-		_node.Period = value
+	if value, ok := rc.mutation.RevokedPeriod(); ok {
+		_spec.SetField(revocation.FieldRevokedPeriod, field.TypeInt, value)
+		_node.RevokedPeriod = value
+	}
+	if value, ok := rc.mutation.SignedPeriod(); ok {
+		_spec.SetField(revocation.FieldSignedPeriod, field.TypeInt, value)
+		_node.SignedPeriod = value
 	}
 	return _node, _spec
 }

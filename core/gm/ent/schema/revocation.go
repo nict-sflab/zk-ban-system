@@ -18,7 +18,8 @@ func (Revocation) Fields() []ent.Field {
 		field.Bytes("sigma"),
 		field.Bytes("message"),
 		field.Int("count"),
-		field.Int("period"),
+		field.Int("revoked_period"),
+		field.Int("signed_period"),
 	}
 }
 
