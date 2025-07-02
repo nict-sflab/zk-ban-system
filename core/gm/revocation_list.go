@@ -30,10 +30,10 @@ func SelectVerifierKeyFromSize(size *corecore.RevocationListSize) *PreparableSna
 	return verifierKey
 }
 
-func (gm *GroupManager[T]) RevocationList(req *corecore.UpdateRequest) (string, error) {
+func (gm *GroupManager[T]) RevocationList(before int64) (string, error) {
 	after := utils.Today()
 
-	rl, key, err := gm.QueryRLAndKey(int(req.Before), int(after))
+	rl, key, err := gm.QueryRLAndKey(before, after)
 	if err != nil {
 		return "", err
 	}

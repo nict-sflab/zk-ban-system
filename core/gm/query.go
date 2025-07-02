@@ -7,7 +7,7 @@ import (
 	"github.com/akakou/zk-ban/highlevel"
 )
 
-func (gm *GroupManager[T]) QueryRLAndKey(before, after int) (*highlevel.HighLevelRevocationList, *PreparableSnarkVerifierKey, error) {
+func (gm *GroupManager[T]) QueryRLAndKey(before, after int64) (*highlevel.HighLevelRevocationList, *PreparableSnarkVerifierKey, error) {
 	var v []struct {
 		CountAll     int `json:"count_all"`
 		Count        int `json:"count"`
@@ -16,8 +16,8 @@ func (gm *GroupManager[T]) QueryRLAndKey(before, after int) (*highlevel.HighLeve
 
 	query := gm.DB.Client.Revocation.Query().
 		Where(revocation.And(
-			revocation.RevokedPeriodGTE(before),
-			revocation.SignedPeriodLTE(before),
+			revocation.RevokedPeriodGTE(int(before)),
+			revocation.SignedPeriodLTE(int(before)),
 		))
 
 	query.GroupBy(revocation.FieldSignedPeriod, revocation.FieldCount).
