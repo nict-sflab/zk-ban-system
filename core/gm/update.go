@@ -15,6 +15,7 @@ var ErrAlreadyIssueCredential = errors.New("already issue credential")
 
 func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string, error) {
 	rl := witness.RevocationList{}
+
 	exist, err := gm.DB.Client.Credential.
 		Query().
 		Where(credential.PublicKey(req.UserPublicKey)).
@@ -28,19 +29,39 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 		return "", ErrAlreadyIssueCredential
 	}
 
-	period := utils.Today()
+	after := utils.Today()
 
-	prepared, err := highlevel.PrepareVerification(rl, gm.UpdateVerifyKey)
+	index := DoubleMapKey{
+		First:  int(after),
+		Second: int(req.Before),
+	}
+	verifier, hasVerifier := PreparedSnarkVerifiers[index]
+
+	if !hasVerifier {
+		prepared, err := highlevel.PrepareVerification(rl, gm.UpdateVerifyKey)
+		if err != nil {
+			return "", err
+		}
+
+		verifier = &PreparedSnarkVerifier{
+			VerifierKey: PreparableSnarkVerifierKey{
+				VerifyingKey: gm.UpdateVerifyKey,
+				Size: &RevocationListSize{
+					0, 0,
+				},
+			},
+			Prepared: prepared,
+		}
+
+		PreparedSnarkVerifiers[index] = verifier
+	}
+
+	err = highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, after, req.Before, rl, gm.GroupPublicKey, verifier.Prepared, gm.UpdateVerifyKey)
 	if err != nil {
 		return "", err
 	}
 
-	err = highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, period, req.Before, rl, gm.GroupPublicKey, prepared, gm.UpdateVerifyKey)
-	if err != nil {
-		return "", err
-	}
-
-	cred, err := highlevel.IssueCredential(period, req.UserPublicKey, gm.GroupSecretKey)
+	cred, err := highlevel.IssueCredential(after, req.UserPublicKey, gm.GroupSecretKey)
 	if err != nil {
 		return "", err
 	}
