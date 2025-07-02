@@ -8,14 +8,11 @@ import (
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
-	"github.com/akakou/zk-ban/witness"
 )
 
 var ErrAlreadyIssueCredential = errors.New("already issue credential")
 
 func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string, error) {
-	rl := witness.RevocationList{}
-
 	exist, err := gm.DB.Client.Credential.
 		Query().
 		Where(credential.PublicKey(req.UserPublicKey)).
@@ -38,15 +35,25 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 	verifier, hasVerifier := PreparedSnarkVerifiers[index]
 
 	if !hasVerifier {
-		verifier, err = gm.BuildVerifier(int(req.Before), int(after))
+		rlWit, key, err := gm.QueryRLAndKey(int(req.Before), int(after))
 		if err != nil {
 			return "", err
+		}
+
+		prepared, err := highlevel.PrepareVerification(rlWit, key.VerifyingKey)
+		if err != nil {
+			return "", err
+		}
+
+		verifier = &PreparedSnarkVerifier{
+			VerifierKey: key,
+			Prepared:    prepared,
 		}
 
 		PreparedSnarkVerifiers[index] = verifier
 	}
 
-	err = highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, after, req.Before, rl, gm.GroupPublicKey, verifier.Prepared, gm.UpdateVerifyKey)
+	err = highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, after, req.Before, gm.GroupPublicKey, verifier.Prepared, verifier.VerifierKey.VerifyingKey)
 	if err != nil {
 		return "", err
 	}

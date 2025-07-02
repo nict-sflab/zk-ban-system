@@ -62,7 +62,7 @@ func TestMain(t *testing.T) {
 
 	gm.PreparableSnarkVerifierKeys = append(gm.PreparableSnarkVerifierKeys, &gm.PreparableSnarkVerifierKey{
 		VerifyingKey: updateVerify,
-		Size: &gm.RevocationListSize{
+		Size: &core.RevocationListSize{
 			NymsNumberPerSession: 0, SessionNumber: 0,
 		},
 	})

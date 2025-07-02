@@ -1,40 +1,15 @@
 package gm
 
 import (
-	"math"
+	"encoding/json"
 
-	"github.com/akakou/zk-ban/witness"
+	corecore "github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/utils"
 )
 
-type RevocationListSize struct {
-	NymsNumberPerSession int
-	SessionNumber        int
-}
-type RevocationList struct {
-	List witness.RevocationList
-	Size RevocationListSize
-}
-
-type RevocationListSizeWeight struct {
-	NymsNumberPerSession float64
-	SessionNumber        float64
-}
-
-var RevocationListSizeWeightSetting = &RevocationListSizeWeight{
-	NymsNumberPerSession: 3,
-	SessionNumber:        1,
-}
-
-func (size *RevocationListSize) Distance(weight *RevocationListSizeWeight) float64 {
-	weightedNymNumber := float64(size.NymsNumberPerSession) * weight.NymsNumberPerSession
-	weightedSessionNumber := float64(size.SessionNumber) * weight.SessionNumber
-
-	return math.Pow(weightedNymNumber, 2.0) + math.Pow(weightedSessionNumber, 2.0)
-}
-
-func SelectVerifierKeyFromSize(size *RevocationListSize) *PreparableSnarkVerifierKey {
+func SelectVerifierKeyFromSize(size *corecore.RevocationListSize) *PreparableSnarkVerifierKey {
 	verifierKey := PreparableSnarkVerifierKeys[0]
-	distance := verifierKey.Size.Distance(RevocationListSizeWeightSetting)
+	distance := verifierKey.Size.Distance(corecore.RevocationListSizeWeightSetting)
 
 	for _, vk := range PreparableSnarkVerifierKeys[1:] {
 		isFitSize1 := vk.Size.NymsNumberPerSession <= size.SessionNumber
@@ -44,7 +19,7 @@ func SelectVerifierKeyFromSize(size *RevocationListSize) *PreparableSnarkVerifie
 			continue
 		}
 
-		d := vk.Size.Distance(RevocationListSizeWeightSetting)
+		d := vk.Size.Distance(corecore.RevocationListSizeWeightSetting)
 
 		if distance > d {
 			distance = d
@@ -53,4 +28,22 @@ func SelectVerifierKeyFromSize(size *RevocationListSize) *PreparableSnarkVerifie
 	}
 
 	return verifierKey
+}
+
+func (gm *GroupManager[T]) RevocationList(req *corecore.UpdateRequest) (string, error) {
+	after := utils.Today()
+
+	rl, key, err := gm.QueryRLAndKey(int(req.Before), int(after))
+	if err != nil {
+		return "", err
+	}
+
+	rlWithSize := corecore.RevocationList{
+		List: rl,
+		Size: key.Size,
+	}
+
+	res, err := json.Marshal(rlWithSize)
+
+	return string(res), err
 }

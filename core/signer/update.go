@@ -6,7 +6,6 @@ import (
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
-	"github.com/akakou/zk-ban/witness"
 )
 
 func RequestUpdate(rl, signer, gpk, prover []byte) (*core.UpdateRequest, error) {
@@ -19,9 +18,8 @@ func RequestUpdate(rl, signer, gpk, prover []byte) (*core.UpdateRequest, error) 
 		return nil, err
 	}
 
-	rlObj := witness.RevocationList{}
+	var rlObj highlevel.HighLevelRevocationList
 	err = json.Unmarshal(rl, &rlObj)
-
 	if err != nil {
 		return nil, err
 	}

@@ -3,11 +3,12 @@ package gm
 import (
 	"math/big"
 
+	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
 	"github.com/akakou/zk-ban/witness"
 )
 
-func TranslateRLFromDBToWit(dbEntries []*ent.Revocation, size *RevocationListSize) witness.RevocationList {
+func TranslateRLFromDBToWit(dbEntries []*ent.Revocation, size *corecore.RevocationListSize) witness.RevocationList {
 	rl := witness.EmptyConstantRevocationAddList(size.SessionNumber, size.NymsNumberPerSession)
 	tag := big.NewInt(0)
 

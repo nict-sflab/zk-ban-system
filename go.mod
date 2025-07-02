@@ -8,6 +8,7 @@ replace github.com/akakou/gnark-precomputes => ../gnark-precomputes
 
 require (
 	entgo.io/ent v0.14.4
+	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000
 	github.com/akakou/snark-utils v0.0.2
 	github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
 	github.com/consensys/gnark v0.13.0
@@ -18,7 +19,6 @@ require (
 require (
 	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
-	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect
