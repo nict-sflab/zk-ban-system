@@ -41,7 +41,7 @@ func (gm *GroupManager[T]) BuildVerifier(before, after int) (*PreparedSnarkVerif
 	query := gm.DB.Client.Revocation.Query().
 		Where(revocation.And(
 			revocation.RevokedPeriodGTE(before),
-			revocation.SignedPeriodGTE(after),
+			revocation.SignedPeriodLTE(before),
 		))
 
 	query.GroupBy(revocation.FieldSignedPeriod, revocation.FieldCount).
