@@ -1,8 +1,10 @@
 module github.com/akakou/zk-ban-system
 
-go 1.23.3
+go 1.24.3
 
 replace github.com/akakou/zk-ban => ../zk-ban
+
+replace github.com/akakou/gnark-precomputes => ../gnark-precomputes
 
 require (
 	entgo.io/ent v0.14.4
@@ -16,6 +18,7 @@ require (
 require (
 	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
+	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect

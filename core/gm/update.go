@@ -30,7 +30,12 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 
 	period := utils.Today()
 
-	err = highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, period, req.Before, rl, gm.GroupPublicKey, gm.UpdateVerifyKey)
+	prepared, err := highlevel.PrepareVerification(rl, gm.UpdateVerifyKey)
+	if err != nil {
+		return "", err
+	}
+
+	err = highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, period, req.Before, rl, gm.GroupPublicKey, prepared, gm.UpdateVerifyKey)
 	if err != nil {
 		return "", err
 	}
