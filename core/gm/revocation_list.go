@@ -16,6 +16,11 @@ type RevocationListSizeWeight struct {
 	SessionNumber        float64
 }
 
+var RevocationListSizeWeightSetting = &RevocationListSizeWeight{
+	NymsNumberPerSession: 3,
+	SessionNumber:        1,
+}
+
 func (size *RevocationListSize) Distance(weight *RevocationListSizeWeight) float64 {
 	weightedNymNumber := float64(size.NymsNumberPerSession) * weight.NymsNumberPerSession
 	weightedSessionNumber := float64(size.SessionNumber) * weight.SessionNumber
@@ -28,11 +33,11 @@ type RevocationList struct {
 	Size RevocationListSize
 }
 
-func SelectVerifierFromSize(verifierKeys []*PreparableSnarkVerifierKey, size *RevocationListSize, weight *RevocationListSizeWeight) *PreparableSnarkVerifierKey {
-	verifierKey := verifierKeys[0]
-	distance := verifierKey.Size.Distance(weight)
+func SelectVerifierKeyFromSize(size *RevocationListSize) *PreparableSnarkVerifierKey {
+	verifierKey := PreparableSnarkVerifierKeys[0]
+	distance := verifierKey.Size.Distance(RevocationListSizeWeightSetting)
 
-	for _, vk := range verifierKeys[1:] {
+	for _, vk := range PreparableSnarkVerifierKeys[1:] {
 		isFitSize1 := vk.Size.NymsNumberPerSession <= size.SessionNumber
 		isFitSize2 := vk.Size.SessionNumber <= size.SessionNumber
 
@@ -40,7 +45,7 @@ func SelectVerifierFromSize(verifierKeys []*PreparableSnarkVerifierKey, size *Re
 			continue
 		}
 
-		d := vk.Size.Distance(weight)
+		d := vk.Size.Distance(RevocationListSizeWeightSetting)
 
 		if distance > d {
 			distance = d

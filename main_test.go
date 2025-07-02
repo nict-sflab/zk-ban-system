@@ -60,6 +60,13 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	gm.PreparableSnarkVerifierKeys = append(gm.PreparableSnarkVerifierKeys, &gm.PreparableSnarkVerifierKey{
+		VerifyingKey: updateVerify,
+		Size: &gm.RevocationListSize{
+			NymsNumberPerSession: 0, SessionNumber: 0,
+		},
+	})
+
 	g := gm.GroupManager[string]{
 		GroupSecretKey:  gsk.Bytes(),
 		GroupPublicKey:  gpk.Bytes(),

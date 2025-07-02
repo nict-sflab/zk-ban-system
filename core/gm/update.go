@@ -38,19 +38,9 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 	verifier, hasVerifier := PreparedSnarkVerifiers[index]
 
 	if !hasVerifier {
-		prepared, err := highlevel.PrepareVerification(rl, gm.UpdateVerifyKey)
+		verifier, err = gm.BuildVerifier(int(req.Before), int(after))
 		if err != nil {
 			return "", err
-		}
-
-		verifier = &PreparedSnarkVerifier{
-			VerifierKey: PreparableSnarkVerifierKey{
-				VerifyingKey: gm.UpdateVerifyKey,
-				Size: &RevocationListSize{
-					0, 0,
-				},
-			},
-			Prepared: prepared,
 		}
 
 		PreparedSnarkVerifiers[index] = verifier
