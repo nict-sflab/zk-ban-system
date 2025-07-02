@@ -36,7 +36,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	updateProverBuf, updateVerifyKey, err := core.UpdateCircuit([]int32{})
+	updateProverBuf, updateVerifyKey, err := core.UpdateCircuit(0, 0)
 	if err != nil {
 		t.Fatal(err)
 	}

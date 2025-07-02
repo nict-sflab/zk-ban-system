@@ -10,6 +10,10 @@ type RevocationListSize struct {
 	NymsNumberPerSession int
 	SessionNumber        int
 }
+type RevocationList struct {
+	List witness.RevocationList
+	Size RevocationListSize
+}
 
 type RevocationListSizeWeight struct {
 	NymsNumberPerSession float64
@@ -26,11 +30,6 @@ func (size *RevocationListSize) Distance(weight *RevocationListSizeWeight) float
 	weightedSessionNumber := float64(size.SessionNumber) * weight.SessionNumber
 
 	return math.Pow(weightedNymNumber, 2.0) + math.Pow(weightedSessionNumber, 2.0)
-}
-
-type RevocationList struct {
-	List witness.RevocationList
-	Size RevocationListSize
 }
 
 func SelectVerifierKeyFromSize(size *RevocationListSize) *PreparableSnarkVerifierKey {

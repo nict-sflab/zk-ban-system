@@ -53,12 +53,12 @@ func SignCircuit() ([]byte, []byte, error) {
 	return Prepare(&circuit.SignCircuit{})
 }
 
-func UpdateCircuit(rl []int32) ([]byte, []byte, error) {
+func UpdateCircuit(nymsNumberPerSession, sessionNumber int) ([]byte, []byte, error) {
 	rlWit := witness.RevocationList{}
-	for _, r := range rl {
+	for range sessionNumber {
 		rns := witness.RevokedNymsPerSession{
 			SessionTag: big.NewInt(0),
-			Nyms:       make([]*big.Int, r),
+			Nyms:       make([]*big.Int, nymsNumberPerSession),
 		}
 
 		rlWit = append(rlWit, rns)
