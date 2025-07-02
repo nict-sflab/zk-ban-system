@@ -40,18 +40,19 @@ func DumpBasicKeys() {
 
 }
 
-func DumpUpdateKeys(a, b int) {
-	updateProver, updateVerify, err := core.UpdateCircuit(a, b)
+func DumpUpdateKeys(nymsNumberPerSession, sessionNumber int) {
+	updateProver, updateVerify, err := core.UpdateCircuit(nymsNumberPerSession, sessionNumber)
 	if err != nil {
 		fmt.Printf("failed to generate join keys")
 	}
 
-	err = os.WriteFile("./update_prover.key.json", updateProver, 0644)
+	base := fmt.Sprintf("%d-%d.key.json", nymsNumberPerSession, sessionNumber)
+	err = os.WriteFile("./update_prover-"+base, updateProver, 0644)
 	if err != nil {
 		fmt.Printf("failed to generate join keys")
 	}
 
-	err = os.WriteFile("./update_verifier.key.json", updateVerify, 0644)
+	err = os.WriteFile("./update_verifier"+base, updateVerify, 0644)
 	if err != nil {
 		fmt.Printf("failed to generate join keys")
 	}
