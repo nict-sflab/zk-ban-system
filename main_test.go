@@ -68,11 +68,10 @@ func TestMain(t *testing.T) {
 	})
 
 	g := gm.GroupManager[string]{
-		GroupSecretKey:  gsk.Bytes(),
-		GroupPublicKey:  gpk.Bytes(),
-		JoinVerifyKey:   joinVerify,
-		UpdateVerifyKey: updateVerify,
-		DB:              gmDB,
+		GroupSecretKey: gsk.Bytes(),
+		GroupPublicKey: gpk.Bytes(),
+		JoinVerifyKey:  joinVerify,
+		DB:             gmDB,
 	}
 
 	gmServ := gmserv.GMServer[string]{

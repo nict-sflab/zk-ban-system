@@ -41,6 +41,14 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	gm.PreparableSnarkVerifierKeys = append(gm.PreparableSnarkVerifierKeys, &gm.PreparableSnarkVerifierKey{
+		VerifyingKey: updateVerifyKey,
+		Size: &core.RevocationListSize{
+			NymsNumberPerSession: 0,
+			SessionNumber:        0,
+		},
+	})
+
 	rl := witness.RevocationList{}
 	rlBuf, err := json.Marshal(rl)
 	if err != nil {
@@ -62,11 +70,10 @@ func TestAll(t *testing.T) {
 	}
 
 	g := gm.GroupManager[string]{
-		GroupSecretKey:  gsk.Bytes(),
-		GroupPublicKey:  gpk.Bytes(),
-		JoinVerifyKey:   joinVerifyKey,
-		UpdateVerifyKey: updateVerifyKey,
-		DB:              gmDB,
+		GroupSecretKey: gsk.Bytes(),
+		GroupPublicKey: gpk.Bytes(),
+		JoinVerifyKey:  joinVerifyKey,
+		DB:             gmDB,
 	}
 
 	v := verifier.Verifier{
