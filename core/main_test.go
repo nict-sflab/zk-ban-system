@@ -25,6 +25,7 @@ func passDay() {
 
 func TestAll(t *testing.T) {
 	utils.Today = today
+	before := today()
 
 	joinProverBuf, joinVerifyKey, err := core.JoinRequestCircuit()
 	if err != nil {
@@ -48,12 +49,6 @@ func TestAll(t *testing.T) {
 			SessionNumber:        0,
 		},
 	})
-
-	rl := witness.RevocationList{}
-	rlBuf, err := json.Marshal(rl)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	gsk, gpk, err := witness.RandomGroupKeyPair()
 	if err != nil {
@@ -125,7 +120,12 @@ func TestAll(t *testing.T) {
 
 	passDay()
 
-	updateReq, err := signer.RequestUpdate(rlBuf, s, gpk.Bytes(), updateProverBuf)
+	rl, err := g.RevocationList(before)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	updateReq, err := signer.RequestUpdate(rl, s, gpk.Bytes(), updateProverBuf)
 	if err != nil {
 		t.Fatal(err)
 	}
