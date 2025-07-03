@@ -19,6 +19,6 @@ func (serv *GMServer[T]) RevocationList() func(c echo.Context) error {
 			return err
 		}
 
-		return c.String(200, rl)
+		return c.String(200, string(rl))
 	}
 }

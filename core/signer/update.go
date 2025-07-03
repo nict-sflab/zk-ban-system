@@ -18,7 +18,7 @@ func RequestUpdate(rl, signer, gpk, prover []byte) (*core.UpdateRequest, error) 
 		return nil, err
 	}
 
-	var rlObj highlevel.HighLevelRevocationList
+	var rlObj core.RevocationList
 	err = json.Unmarshal(rl, &rlObj)
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func RequestUpdate(rl, signer, gpk, prover []byte) (*core.UpdateRequest, error) 
 		return nil, err
 	}
 
-	updatedSigner, proof, err := highlevel.UpdateRequest(today, &signerObj, rlObj, gpk, &proverObj)
+	updatedSigner, proof, err := highlevel.UpdateRequest(today, &signerObj, *rlObj.List, gpk, &proverObj)
 	if err != nil {
 		return nil, err
 	}

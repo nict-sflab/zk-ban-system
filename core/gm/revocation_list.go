@@ -30,12 +30,12 @@ func SelectVerifierKeyFromSize(size *corecore.RevocationListSize) *PreparableSna
 	return verifierKey
 }
 
-func (gm *GroupManager[T]) RevocationList(before int64) (string, error) {
+func (gm *GroupManager[T]) RevocationList(before int64) ([]byte, error) {
 	after := utils.Today()
 
 	rl, key, err := gm.QueryRLAndKey(before, after)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	rlWithSize := corecore.RevocationList{
@@ -45,5 +45,5 @@ func (gm *GroupManager[T]) RevocationList(before int64) (string, error) {
 
 	res, err := json.Marshal(rlWithSize)
 
-	return string(res), err
+	return res, err
 }
