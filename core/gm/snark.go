@@ -9,28 +9,32 @@ import (
 type PreparedSnarkVerifier struct {
 	VerifierKey *corecore.SnarkKey
 	Prepared    []byte
-	KeyIndex    corecore.KeyIndex
 }
 
-func QueryProperVerifier(verifierKeys []*corecore.SnarkKey, size *corecore.RevocationListSize) *corecore.SnarkKey {
+func QueryProperRLWitSize(verifierKeys corecore.SnarkKeys, size *corecore.RevocationListSize) *corecore.RevocationListSize {
 	distance := math.MaxFloat64
-	verifierKey := verifierKeys[0]
+	var result *corecore.RevocationListSize = nil
 
-	for _, vk := range verifierKeys[1:] {
-		isNotFitSize1 := vk.Size.NymsNumberPerSession <= size.SessionNumber
-		isNotFitSize2 := vk.Size.SessionNumber <= size.SessionNumber
+	for i := range verifierKeys {
+		isNotFitSize1 := i.NymsNumberPerSession < size.NymsNumberPerSession
+		isNotFitSize2 := i.SessionNumber < size.SessionNumber
 
 		if isNotFitSize1 || isNotFitSize2 {
 			continue
 		}
 
-		d := vk.Size.Distance(corecore.RevocationListSizeWeightSetting)
+		if verifierKeys == nil {
+			result = &i
+			continue
+		}
+
+		d := i.Distance(corecore.RevocationListSizeWeightSetting)
 
 		if distance > d {
 			distance = d
-			verifierKey = vk
+			result = &i
 		}
 	}
 
-	return verifierKey
+	return result
 }

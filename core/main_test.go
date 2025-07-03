@@ -60,13 +60,13 @@ func TestAll(t *testing.T) {
 	g.GroupSecretKey = gsk.Bytes()
 	g.JoinVerifyKey = joinVerifyKey
 
-	g.VerifierKeys = append(g.VerifierKeys, &core.SnarkKey{
-		VerifyingKey: updateVerifyKey,
-		Size: &core.RevocationListSize{
-			NymsNumberPerSession: 0,
-			SessionNumber:        0,
-		},
-	})
+	emptySize := core.RevocationListSize{
+		NymsNumberPerSession: 0,
+		SessionNumber:        0,
+	}
+
+	k := core.SnarkKey(updateVerifyKey)
+	g.VerifierKeys[emptySize] = &k
 
 	v := verifier.Verifier{
 		GroupPublicKey: gpk.Bytes(),

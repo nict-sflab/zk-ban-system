@@ -6,7 +6,7 @@ type GroupManager[T any] struct {
 	GroupSecretKey         []byte
 	GroupPublicKey         []byte
 	JoinVerifyKey          []byte
-	VerifierKeys           []*corecore.SnarkKey
+	VerifierKeys           corecore.SnarkKeys
 	PreparedSnarkVerifiers map[corecore.KeyIndex]*PreparedSnarkVerifier
 	//  = make(map[corecore.KeyIndex]*PreparedSnarkVerifier)
 	DB *DB
@@ -22,7 +22,7 @@ func Default[T any](dbConfig *DBConfig) (*GroupManager[T], error) {
 		GroupSecretKey:         []byte{},
 		GroupPublicKey:         []byte{},
 		JoinVerifyKey:          []byte{},
-		VerifierKeys:           []*corecore.SnarkKey{},
+		VerifierKeys:           make(corecore.SnarkKeys),
 		PreparedSnarkVerifiers: make(map[corecore.KeyIndex]*PreparedSnarkVerifier),
 		DB:                     db,
 	}

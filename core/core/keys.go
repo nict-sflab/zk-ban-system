@@ -10,13 +10,10 @@ type Witness = any
 type Prepared = any
 type Proof = any
 
-type SnarkKey struct {
-	VerifyingKey []byte
-	Size         *RevocationListSize
-}
-
-var SnarkKeys map[KeyIndex]*SnarkKey = make(map[KeyIndex]*SnarkKey)
+type SnarkKey []byte
 
 type KeyIndex struct {
 	First, Second int64
 }
+
+type SnarkKeys map[RevocationListSize]*SnarkKey

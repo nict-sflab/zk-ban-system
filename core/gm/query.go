@@ -1,13 +1,14 @@
 package gm
 
 import (
+	"github.com/akakou/zk-ban-system/core/core"
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
 	"github.com/akakou/zk-ban-system/core/gm/ent/revocation"
 	"github.com/akakou/zk-ban/highlevel"
 )
 
-func (gm *GroupManager[T]) QueryRLAndKey(before, after int64) (*highlevel.HighLevelRevocationList, *corecore.SnarkKey, error) {
+func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, error) {
 	var v []struct {
 		CountAll     int `json:"count_all"`
 		Count        int `json:"count"`
@@ -39,11 +40,14 @@ func (gm *GroupManager[T]) QueryRLAndKey(before, after int64) (*highlevel.HighLe
 
 	rlDB := query.AllX(*gm.DB.Ctx)
 
-	key := QueryProperVerifier(gm.VerifierKeys, &size)
-	rlObj := TranslateRLFromDBToWit(rlDB, key.Size)
+	rlSize := QueryProperRLWitSize(gm.VerifierKeys, &size)
+	rlObj := TranslateRLFromDBToWit(rlDB, rlSize)
 
 	rl := highlevel.HighLevelRevocationList{}
 	rl.FromRevocationList(&rlObj)
 
-	return &rl, key, nil
+	return &core.RevocationList{
+		List: &rl,
+		Size: rlSize,
+	}, nil
 }

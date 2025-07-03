@@ -36,12 +36,13 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 	verifier, hasVerifier := gm.PreparedSnarkVerifiers[index]
 
 	if !hasVerifier {
-		rlWit, key, err := gm.QueryRLAndKey(req.Before, after)
+		rl, err := gm.QueryRL(req.Before, after)
 		if err != nil {
 			return "", err
 		}
 
-		prepared, err := highlevel.PrepareVerification(rlWit, key.VerifyingKey)
+		key := gm.VerifierKeys[*rl.Size]
+		prepared, err := highlevel.PrepareVerification(rl.List, *key)
 		if err != nil {
 			return "", err
 		}
@@ -54,7 +55,7 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 		gm.PreparedSnarkVerifiers[index] = verifier
 	}
 
-	err = highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, after, req.Before, gm.GroupPublicKey, verifier.Prepared, verifier.VerifierKey.VerifyingKey)
+	err = highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, after, req.Before, gm.GroupPublicKey, verifier.Prepared, *verifier.VerifierKey)
 	if err != nil {
 		return "", err
 	}

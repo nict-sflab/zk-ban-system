@@ -64,12 +64,12 @@ func TestMain(t *testing.T) {
 	g.GroupSecretKey = gsk.Bytes()
 	g.JoinVerifyKey = joinVerify
 
-	g.VerifierKeys = append(g.VerifierKeys, &core.SnarkKey{
-		VerifyingKey: updateVerify,
-		Size: &core.RevocationListSize{
-			NymsNumberPerSession: 0, SessionNumber: 0,
-		},
-	})
+	size := core.RevocationListSize{
+		NymsNumberPerSession: 0,
+		SessionNumber:        0,
+	}
+	k := core.SnarkKey(updateVerify)
+	g.VerifierKeys[size] = &k
 
 	gmServ := gmserv.GMServer[string]{
 		GM: g,
