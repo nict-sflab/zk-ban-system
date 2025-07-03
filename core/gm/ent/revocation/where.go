@@ -52,24 +52,9 @@ func IDLTE(id int) predicate.Revocation {
 	return predicate.Revocation(sql.FieldLTE(FieldID, id))
 }
 
-// Proof applies equality check predicate on the "proof" field. It's identical to ProofEQ.
-func Proof(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldProof, v))
-}
-
 // Nym applies equality check predicate on the "nym" field. It's identical to NymEQ.
 func Nym(v []byte) predicate.Revocation {
 	return predicate.Revocation(sql.FieldEQ(FieldNym, v))
-}
-
-// Sigma applies equality check predicate on the "sigma" field. It's identical to SigmaEQ.
-func Sigma(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldSigma, v))
-}
-
-// Message applies equality check predicate on the "message" field. It's identical to MessageEQ.
-func Message(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldMessage, v))
 }
 
 // Count applies equality check predicate on the "count" field. It's identical to CountEQ.
@@ -85,46 +70,6 @@ func RevokedPeriod(v int) predicate.Revocation {
 // SignedPeriod applies equality check predicate on the "signed_period" field. It's identical to SignedPeriodEQ.
 func SignedPeriod(v int) predicate.Revocation {
 	return predicate.Revocation(sql.FieldEQ(FieldSignedPeriod, v))
-}
-
-// ProofEQ applies the EQ predicate on the "proof" field.
-func ProofEQ(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldProof, v))
-}
-
-// ProofNEQ applies the NEQ predicate on the "proof" field.
-func ProofNEQ(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNEQ(FieldProof, v))
-}
-
-// ProofIn applies the In predicate on the "proof" field.
-func ProofIn(vs ...[]byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldIn(FieldProof, vs...))
-}
-
-// ProofNotIn applies the NotIn predicate on the "proof" field.
-func ProofNotIn(vs ...[]byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNotIn(FieldProof, vs...))
-}
-
-// ProofGT applies the GT predicate on the "proof" field.
-func ProofGT(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGT(FieldProof, v))
-}
-
-// ProofGTE applies the GTE predicate on the "proof" field.
-func ProofGTE(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGTE(FieldProof, v))
-}
-
-// ProofLT applies the LT predicate on the "proof" field.
-func ProofLT(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLT(FieldProof, v))
-}
-
-// ProofLTE applies the LTE predicate on the "proof" field.
-func ProofLTE(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLTE(FieldProof, v))
 }
 
 // NymEQ applies the EQ predicate on the "nym" field.
@@ -165,86 +110,6 @@ func NymLT(v []byte) predicate.Revocation {
 // NymLTE applies the LTE predicate on the "nym" field.
 func NymLTE(v []byte) predicate.Revocation {
 	return predicate.Revocation(sql.FieldLTE(FieldNym, v))
-}
-
-// SigmaEQ applies the EQ predicate on the "sigma" field.
-func SigmaEQ(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldSigma, v))
-}
-
-// SigmaNEQ applies the NEQ predicate on the "sigma" field.
-func SigmaNEQ(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNEQ(FieldSigma, v))
-}
-
-// SigmaIn applies the In predicate on the "sigma" field.
-func SigmaIn(vs ...[]byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldIn(FieldSigma, vs...))
-}
-
-// SigmaNotIn applies the NotIn predicate on the "sigma" field.
-func SigmaNotIn(vs ...[]byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNotIn(FieldSigma, vs...))
-}
-
-// SigmaGT applies the GT predicate on the "sigma" field.
-func SigmaGT(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGT(FieldSigma, v))
-}
-
-// SigmaGTE applies the GTE predicate on the "sigma" field.
-func SigmaGTE(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGTE(FieldSigma, v))
-}
-
-// SigmaLT applies the LT predicate on the "sigma" field.
-func SigmaLT(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLT(FieldSigma, v))
-}
-
-// SigmaLTE applies the LTE predicate on the "sigma" field.
-func SigmaLTE(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLTE(FieldSigma, v))
-}
-
-// MessageEQ applies the EQ predicate on the "message" field.
-func MessageEQ(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldMessage, v))
-}
-
-// MessageNEQ applies the NEQ predicate on the "message" field.
-func MessageNEQ(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNEQ(FieldMessage, v))
-}
-
-// MessageIn applies the In predicate on the "message" field.
-func MessageIn(vs ...[]byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldIn(FieldMessage, vs...))
-}
-
-// MessageNotIn applies the NotIn predicate on the "message" field.
-func MessageNotIn(vs ...[]byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNotIn(FieldMessage, vs...))
-}
-
-// MessageGT applies the GT predicate on the "message" field.
-func MessageGT(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGT(FieldMessage, v))
-}
-
-// MessageGTE applies the GTE predicate on the "message" field.
-func MessageGTE(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGTE(FieldMessage, v))
-}
-
-// MessageLT applies the LT predicate on the "message" field.
-func MessageLT(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLT(FieldMessage, v))
-}
-
-// MessageLTE applies the LTE predicate on the "message" field.
-func MessageLTE(v []byte) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLTE(FieldMessage, v))
 }
 
 // CountEQ applies the EQ predicate on the "count" field.

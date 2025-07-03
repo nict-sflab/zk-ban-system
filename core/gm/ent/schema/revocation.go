@@ -13,10 +13,7 @@ type Revocation struct {
 // Fields of the Credential.
 func (Revocation) Fields() []ent.Field {
 	return []ent.Field{
-		field.Bytes("proof"),
 		field.Bytes("nym"),
-		field.Bytes("sigma"),
-		field.Bytes("message"),
 		field.Int("count"),
 		field.Int("revoked_period"),
 		field.Int("signed_period"),

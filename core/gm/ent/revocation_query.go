@@ -262,12 +262,12 @@ func (rq *RevocationQuery) Clone() *RevocationQuery {
 // Example:
 //
 //	var v []struct {
-//		Proof []byte `json:"proof,omitempty"`
+//		Nym []byte `json:"nym,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Revocation.Query().
-//		GroupBy(revocation.FieldProof).
+//		GroupBy(revocation.FieldNym).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (rq *RevocationQuery) GroupBy(field string, fields ...string) *RevocationGroupBy {
@@ -285,11 +285,11 @@ func (rq *RevocationQuery) GroupBy(field string, fields ...string) *RevocationGr
 // Example:
 //
 //	var v []struct {
-//		Proof []byte `json:"proof,omitempty"`
+//		Nym []byte `json:"nym,omitempty"`
 //	}
 //
 //	client.Revocation.Query().
-//		Select(revocation.FieldProof).
+//		Select(revocation.FieldNym).
 //		Scan(ctx, &v)
 func (rq *RevocationQuery) Select(fields ...string) *RevocationSelect {
 	rq.ctx.Fields = append(rq.ctx.Fields, fields...)

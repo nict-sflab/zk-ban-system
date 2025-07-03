@@ -24,10 +24,7 @@ var (
 	// RevocationsColumns holds the columns for the "revocations" table.
 	RevocationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "proof", Type: field.TypeBytes},
 		{Name: "nym", Type: field.TypeBytes},
-		{Name: "sigma", Type: field.TypeBytes},
-		{Name: "message", Type: field.TypeBytes},
 		{Name: "count", Type: field.TypeInt},
 		{Name: "revoked_period", Type: field.TypeInt},
 		{Name: "signed_period", Type: field.TypeInt},

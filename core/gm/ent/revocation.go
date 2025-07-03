@@ -16,14 +16,8 @@ type Revocation struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Proof holds the value of the "proof" field.
-	Proof []byte `json:"proof,omitempty"`
 	// Nym holds the value of the "nym" field.
 	Nym []byte `json:"nym,omitempty"`
-	// Sigma holds the value of the "sigma" field.
-	Sigma []byte `json:"sigma,omitempty"`
-	// Message holds the value of the "message" field.
-	Message []byte `json:"message,omitempty"`
 	// Count holds the value of the "count" field.
 	Count int `json:"count,omitempty"`
 	// RevokedPeriod holds the value of the "revoked_period" field.
@@ -38,7 +32,7 @@ func (*Revocation) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case revocation.FieldProof, revocation.FieldNym, revocation.FieldSigma, revocation.FieldMessage:
+		case revocation.FieldNym:
 			values[i] = new([]byte)
 		case revocation.FieldID, revocation.FieldCount, revocation.FieldRevokedPeriod, revocation.FieldSignedPeriod:
 			values[i] = new(sql.NullInt64)
@@ -63,29 +57,11 @@ func (r *Revocation) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			r.ID = int(value.Int64)
-		case revocation.FieldProof:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field proof", values[i])
-			} else if value != nil {
-				r.Proof = *value
-			}
 		case revocation.FieldNym:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field nym", values[i])
 			} else if value != nil {
 				r.Nym = *value
-			}
-		case revocation.FieldSigma:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field sigma", values[i])
-			} else if value != nil {
-				r.Sigma = *value
-			}
-		case revocation.FieldMessage:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field message", values[i])
-			} else if value != nil {
-				r.Message = *value
 			}
 		case revocation.FieldCount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -141,17 +117,8 @@ func (r *Revocation) String() string {
 	var builder strings.Builder
 	builder.WriteString("Revocation(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
-	builder.WriteString("proof=")
-	builder.WriteString(fmt.Sprintf("%v", r.Proof))
-	builder.WriteString(", ")
 	builder.WriteString("nym=")
 	builder.WriteString(fmt.Sprintf("%v", r.Nym))
-	builder.WriteString(", ")
-	builder.WriteString("sigma=")
-	builder.WriteString(fmt.Sprintf("%v", r.Sigma))
-	builder.WriteString(", ")
-	builder.WriteString("message=")
-	builder.WriteString(fmt.Sprintf("%v", r.Message))
 	builder.WriteString(", ")
 	builder.WriteString("count=")
 	builder.WriteString(fmt.Sprintf("%v", r.Count))

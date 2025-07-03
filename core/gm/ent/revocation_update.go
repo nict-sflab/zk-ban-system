@@ -27,27 +27,9 @@ func (ru *RevocationUpdate) Where(ps ...predicate.Revocation) *RevocationUpdate 
 	return ru
 }
 
-// SetProof sets the "proof" field.
-func (ru *RevocationUpdate) SetProof(b []byte) *RevocationUpdate {
-	ru.mutation.SetProof(b)
-	return ru
-}
-
 // SetNym sets the "nym" field.
 func (ru *RevocationUpdate) SetNym(b []byte) *RevocationUpdate {
 	ru.mutation.SetNym(b)
-	return ru
-}
-
-// SetSigma sets the "sigma" field.
-func (ru *RevocationUpdate) SetSigma(b []byte) *RevocationUpdate {
-	ru.mutation.SetSigma(b)
-	return ru
-}
-
-// SetMessage sets the "message" field.
-func (ru *RevocationUpdate) SetMessage(b []byte) *RevocationUpdate {
-	ru.mutation.SetMessage(b)
 	return ru
 }
 
@@ -155,17 +137,8 @@ func (ru *RevocationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := ru.mutation.Proof(); ok {
-		_spec.SetField(revocation.FieldProof, field.TypeBytes, value)
-	}
 	if value, ok := ru.mutation.Nym(); ok {
 		_spec.SetField(revocation.FieldNym, field.TypeBytes, value)
-	}
-	if value, ok := ru.mutation.Sigma(); ok {
-		_spec.SetField(revocation.FieldSigma, field.TypeBytes, value)
-	}
-	if value, ok := ru.mutation.Message(); ok {
-		_spec.SetField(revocation.FieldMessage, field.TypeBytes, value)
 	}
 	if value, ok := ru.mutation.Count(); ok {
 		_spec.SetField(revocation.FieldCount, field.TypeInt, value)
@@ -205,27 +178,9 @@ type RevocationUpdateOne struct {
 	mutation *RevocationMutation
 }
 
-// SetProof sets the "proof" field.
-func (ruo *RevocationUpdateOne) SetProof(b []byte) *RevocationUpdateOne {
-	ruo.mutation.SetProof(b)
-	return ruo
-}
-
 // SetNym sets the "nym" field.
 func (ruo *RevocationUpdateOne) SetNym(b []byte) *RevocationUpdateOne {
 	ruo.mutation.SetNym(b)
-	return ruo
-}
-
-// SetSigma sets the "sigma" field.
-func (ruo *RevocationUpdateOne) SetSigma(b []byte) *RevocationUpdateOne {
-	ruo.mutation.SetSigma(b)
-	return ruo
-}
-
-// SetMessage sets the "message" field.
-func (ruo *RevocationUpdateOne) SetMessage(b []byte) *RevocationUpdateOne {
-	ruo.mutation.SetMessage(b)
 	return ruo
 }
 
@@ -363,17 +318,8 @@ func (ruo *RevocationUpdateOne) sqlSave(ctx context.Context) (_node *Revocation,
 			}
 		}
 	}
-	if value, ok := ruo.mutation.Proof(); ok {
-		_spec.SetField(revocation.FieldProof, field.TypeBytes, value)
-	}
 	if value, ok := ruo.mutation.Nym(); ok {
 		_spec.SetField(revocation.FieldNym, field.TypeBytes, value)
-	}
-	if value, ok := ruo.mutation.Sigma(); ok {
-		_spec.SetField(revocation.FieldSigma, field.TypeBytes, value)
-	}
-	if value, ok := ruo.mutation.Message(); ok {
-		_spec.SetField(revocation.FieldMessage, field.TypeBytes, value)
 	}
 	if value, ok := ruo.mutation.Count(); ok {
 		_spec.SetField(revocation.FieldCount, field.TypeInt, value)

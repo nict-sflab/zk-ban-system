@@ -490,10 +490,7 @@ type RevocationMutation struct {
 	op                Op
 	typ               string
 	id                *int
-	proof             *[]byte
 	nym               *[]byte
-	sigma             *[]byte
-	message           *[]byte
 	count             *int
 	addcount          *int
 	revoked_period    *int
@@ -604,42 +601,6 @@ func (m *RevocationMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetProof sets the "proof" field.
-func (m *RevocationMutation) SetProof(b []byte) {
-	m.proof = &b
-}
-
-// Proof returns the value of the "proof" field in the mutation.
-func (m *RevocationMutation) Proof() (r []byte, exists bool) {
-	v := m.proof
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldProof returns the old "proof" field's value of the Revocation entity.
-// If the Revocation object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RevocationMutation) OldProof(ctx context.Context) (v []byte, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldProof is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldProof requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldProof: %w", err)
-	}
-	return oldValue.Proof, nil
-}
-
-// ResetProof resets all changes to the "proof" field.
-func (m *RevocationMutation) ResetProof() {
-	m.proof = nil
-}
-
 // SetNym sets the "nym" field.
 func (m *RevocationMutation) SetNym(b []byte) {
 	m.nym = &b
@@ -674,78 +635,6 @@ func (m *RevocationMutation) OldNym(ctx context.Context) (v []byte, err error) {
 // ResetNym resets all changes to the "nym" field.
 func (m *RevocationMutation) ResetNym() {
 	m.nym = nil
-}
-
-// SetSigma sets the "sigma" field.
-func (m *RevocationMutation) SetSigma(b []byte) {
-	m.sigma = &b
-}
-
-// Sigma returns the value of the "sigma" field in the mutation.
-func (m *RevocationMutation) Sigma() (r []byte, exists bool) {
-	v := m.sigma
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSigma returns the old "sigma" field's value of the Revocation entity.
-// If the Revocation object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RevocationMutation) OldSigma(ctx context.Context) (v []byte, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSigma is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSigma requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSigma: %w", err)
-	}
-	return oldValue.Sigma, nil
-}
-
-// ResetSigma resets all changes to the "sigma" field.
-func (m *RevocationMutation) ResetSigma() {
-	m.sigma = nil
-}
-
-// SetMessage sets the "message" field.
-func (m *RevocationMutation) SetMessage(b []byte) {
-	m.message = &b
-}
-
-// Message returns the value of the "message" field in the mutation.
-func (m *RevocationMutation) Message() (r []byte, exists bool) {
-	v := m.message
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldMessage returns the old "message" field's value of the Revocation entity.
-// If the Revocation object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RevocationMutation) OldMessage(ctx context.Context) (v []byte, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMessage is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMessage requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMessage: %w", err)
-	}
-	return oldValue.Message, nil
-}
-
-// ResetMessage resets all changes to the "message" field.
-func (m *RevocationMutation) ResetMessage() {
-	m.message = nil
 }
 
 // SetCount sets the "count" field.
@@ -950,18 +839,9 @@ func (m *RevocationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RevocationMutation) Fields() []string {
-	fields := make([]string, 0, 7)
-	if m.proof != nil {
-		fields = append(fields, revocation.FieldProof)
-	}
+	fields := make([]string, 0, 4)
 	if m.nym != nil {
 		fields = append(fields, revocation.FieldNym)
-	}
-	if m.sigma != nil {
-		fields = append(fields, revocation.FieldSigma)
-	}
-	if m.message != nil {
-		fields = append(fields, revocation.FieldMessage)
 	}
 	if m.count != nil {
 		fields = append(fields, revocation.FieldCount)
@@ -980,14 +860,8 @@ func (m *RevocationMutation) Fields() []string {
 // schema.
 func (m *RevocationMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case revocation.FieldProof:
-		return m.Proof()
 	case revocation.FieldNym:
 		return m.Nym()
-	case revocation.FieldSigma:
-		return m.Sigma()
-	case revocation.FieldMessage:
-		return m.Message()
 	case revocation.FieldCount:
 		return m.Count()
 	case revocation.FieldRevokedPeriod:
@@ -1003,14 +877,8 @@ func (m *RevocationMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *RevocationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case revocation.FieldProof:
-		return m.OldProof(ctx)
 	case revocation.FieldNym:
 		return m.OldNym(ctx)
-	case revocation.FieldSigma:
-		return m.OldSigma(ctx)
-	case revocation.FieldMessage:
-		return m.OldMessage(ctx)
 	case revocation.FieldCount:
 		return m.OldCount(ctx)
 	case revocation.FieldRevokedPeriod:
@@ -1026,33 +894,12 @@ func (m *RevocationMutation) OldField(ctx context.Context, name string) (ent.Val
 // type.
 func (m *RevocationMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case revocation.FieldProof:
-		v, ok := value.([]byte)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetProof(v)
-		return nil
 	case revocation.FieldNym:
 		v, ok := value.([]byte)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNym(v)
-		return nil
-	case revocation.FieldSigma:
-		v, ok := value.([]byte)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSigma(v)
-		return nil
-	case revocation.FieldMessage:
-		v, ok := value.([]byte)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetMessage(v)
 		return nil
 	case revocation.FieldCount:
 		v, ok := value.(int)
@@ -1163,17 +1010,8 @@ func (m *RevocationMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *RevocationMutation) ResetField(name string) error {
 	switch name {
-	case revocation.FieldProof:
-		m.ResetProof()
-		return nil
 	case revocation.FieldNym:
 		m.ResetNym()
-		return nil
-	case revocation.FieldSigma:
-		m.ResetSigma()
-		return nil
-	case revocation.FieldMessage:
-		m.ResetMessage()
 		return nil
 	case revocation.FieldCount:
 		m.ResetCount()

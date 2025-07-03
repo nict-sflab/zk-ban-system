@@ -19,27 +19,9 @@ type RevocationCreate struct {
 	hooks    []Hook
 }
 
-// SetProof sets the "proof" field.
-func (rc *RevocationCreate) SetProof(b []byte) *RevocationCreate {
-	rc.mutation.SetProof(b)
-	return rc
-}
-
 // SetNym sets the "nym" field.
 func (rc *RevocationCreate) SetNym(b []byte) *RevocationCreate {
 	rc.mutation.SetNym(b)
-	return rc
-}
-
-// SetSigma sets the "sigma" field.
-func (rc *RevocationCreate) SetSigma(b []byte) *RevocationCreate {
-	rc.mutation.SetSigma(b)
-	return rc
-}
-
-// SetMessage sets the "message" field.
-func (rc *RevocationCreate) SetMessage(b []byte) *RevocationCreate {
-	rc.mutation.SetMessage(b)
 	return rc
 }
 
@@ -95,17 +77,8 @@ func (rc *RevocationCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (rc *RevocationCreate) check() error {
-	if _, ok := rc.mutation.Proof(); !ok {
-		return &ValidationError{Name: "proof", err: errors.New(`ent: missing required field "Revocation.proof"`)}
-	}
 	if _, ok := rc.mutation.Nym(); !ok {
 		return &ValidationError{Name: "nym", err: errors.New(`ent: missing required field "Revocation.nym"`)}
-	}
-	if _, ok := rc.mutation.Sigma(); !ok {
-		return &ValidationError{Name: "sigma", err: errors.New(`ent: missing required field "Revocation.sigma"`)}
-	}
-	if _, ok := rc.mutation.Message(); !ok {
-		return &ValidationError{Name: "message", err: errors.New(`ent: missing required field "Revocation.message"`)}
 	}
 	if _, ok := rc.mutation.Count(); !ok {
 		return &ValidationError{Name: "count", err: errors.New(`ent: missing required field "Revocation.count"`)}
@@ -142,21 +115,9 @@ func (rc *RevocationCreate) createSpec() (*Revocation, *sqlgraph.CreateSpec) {
 		_node = &Revocation{config: rc.config}
 		_spec = sqlgraph.NewCreateSpec(revocation.Table, sqlgraph.NewFieldSpec(revocation.FieldID, field.TypeInt))
 	)
-	if value, ok := rc.mutation.Proof(); ok {
-		_spec.SetField(revocation.FieldProof, field.TypeBytes, value)
-		_node.Proof = value
-	}
 	if value, ok := rc.mutation.Nym(); ok {
 		_spec.SetField(revocation.FieldNym, field.TypeBytes, value)
 		_node.Nym = value
-	}
-	if value, ok := rc.mutation.Sigma(); ok {
-		_spec.SetField(revocation.FieldSigma, field.TypeBytes, value)
-		_node.Sigma = value
-	}
-	if value, ok := rc.mutation.Message(); ok {
-		_spec.SetField(revocation.FieldMessage, field.TypeBytes, value)
-		_node.Message = value
 	}
 	if value, ok := rc.mutation.Count(); ok {
 		_spec.SetField(revocation.FieldCount, field.TypeInt, value)

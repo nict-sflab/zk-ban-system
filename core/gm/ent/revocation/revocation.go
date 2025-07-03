@@ -11,14 +11,8 @@ const (
 	Label = "revocation"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldProof holds the string denoting the proof field in the database.
-	FieldProof = "proof"
 	// FieldNym holds the string denoting the nym field in the database.
 	FieldNym = "nym"
-	// FieldSigma holds the string denoting the sigma field in the database.
-	FieldSigma = "sigma"
-	// FieldMessage holds the string denoting the message field in the database.
-	FieldMessage = "message"
 	// FieldCount holds the string denoting the count field in the database.
 	FieldCount = "count"
 	// FieldRevokedPeriod holds the string denoting the revoked_period field in the database.
@@ -32,10 +26,7 @@ const (
 // Columns holds all SQL columns for revocation fields.
 var Columns = []string{
 	FieldID,
-	FieldProof,
 	FieldNym,
-	FieldSigma,
-	FieldMessage,
 	FieldCount,
 	FieldRevokedPeriod,
 	FieldSignedPeriod,
