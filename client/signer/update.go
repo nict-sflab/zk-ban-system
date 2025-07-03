@@ -9,8 +9,8 @@ import (
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
 )
 
-func RequestUpdate(signer, rl, gpk, prover []byte, url string) ([]byte, error) {
-	req, err := coresigner.RequestUpdate(rl, signer, gpk, prover)
+func RequestUpdate(signer, rl, gpk []byte, url string) ([]byte, error) {
+	req, err := coresigner.RequestUpdate(rl, signer, gpk)
 	if err != nil {
 		return nil, err
 	}

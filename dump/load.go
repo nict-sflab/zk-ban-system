@@ -45,7 +45,7 @@ func LoadKeyWithRL(format string, fs embed.FS) (core.SnarkKeys, error) {
 			return nil, err
 		}
 
-		buf, err := UpdateProverKey.ReadFile(name)
+		buf, err := fs.ReadFile(name)
 		if err != nil {
 			return nil, err
 		}
@@ -58,17 +58,14 @@ func LoadKeyWithRL(format string, fs embed.FS) (core.SnarkKeys, error) {
 
 }
 
-func LoadSignerKey() ([]byte, []byte, core.SnarkKeys, error) {
-	updateProverKeys, err := LoadKeyWithRL(UpdateProverKeyFileNameFormat, UpdateProverKey)
-	return JoinProverKey, SignProverKey, updateProverKeys, err
+func LoadUserUpdateKey() (core.SnarkKeys, error) {
+	return LoadKeyWithRL(UpdateProverKeyFileNameFormat, UpdateProverKey)
 }
 
 func LoadVerifierKey() []byte {
 	return SignVerifierKey
 }
 
-func LoadGroupManagerKey() ([]byte, core.SnarkKeys, error) {
-	updateVeriferKeys, err := LoadKeyWithRL(UpdateVerifierKeyFileNameFormat, UpdateVerifierKey)
-
-	return JoinProverKey, updateVeriferKeys, err
+func LoadGroupManagerUpdateKey() (core.SnarkKeys, error) {
+	return LoadKeyWithRL(UpdateVerifierKeyFileNameFormat, UpdateVerifierKey)
 }

@@ -33,43 +33,19 @@ func passDay() {
 func TestMain(t *testing.T) {
 	utils.Today = today
 
-	joinProver, joinVerify, err := core.JoinRequestCircuit()
+	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	signProver, signVerifyKey, err := core.SignCircuit()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	updateProver, updateVerify, err := core.UpdateCircuit(0, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	gsk, gpk, err := witness.RandomGroupKeyPair()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	g, err := gm.Default[string](&gm.DBConfig{
+	g, err := gm.Default[string](gsk.Bytes(), &gm.DBConfig{
 		Type:   "sqlite3",
 		Config: "file::memory:?cache=shared&_fk=1",
 	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
-	g.GroupPublicKey = gpk.Bytes()
-	g.GroupSecretKey = gsk.Bytes()
-	g.JoinVerifyKey = joinVerify
-
-	size := core.RevocationListSize{
-		NymsNumberPerSession: 0,
-		SessionNumber:        0,
-	}
-	k := core.SnarkKey(updateVerify)
-	g.VerifierKeys[size] = &k
 
 	gmServ := gmserv.GMServer[string]{
 		GM: g,
@@ -84,8 +60,7 @@ func TestMain(t *testing.T) {
 	gmServ.SetupEchoServer(e)
 
 	v := coreverifier.Verifier{
-		GroupPublicKey: gpk.Bytes(),
-		SignVerifyKey:  signVerifyKey,
+		GroupPublicKey: g.GroupPublicKey,
 	}
 
 	verifierServ := verifier.VerifierServer{
@@ -102,12 +77,12 @@ func TestMain(t *testing.T) {
 
 	time.Sleep(SLEEP_TIME * time.Second)
 
-	s, err := signer.RequestJoin("", joinProver, "http://localhost:1323/issue-credential")
+	s, err := signer.RequestJoin("", "http://localhost:1323/issue-credential")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ns, err := signer.RequestJoin("", joinProver, "http://localhost:1323/issue-credential")
+	ns, err := signer.RequestJoin("", "http://localhost:1323/issue-credential")
 	if err == nil {
 		t.Fatal(ns, err)
 	}
@@ -120,7 +95,7 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = signer.Sign([]byte("aaa"), 0, s, gpk2, signProver, "http://localhost:1323/verify")
+	_, err = signer.Sign([]byte("aaa"), 0, s, gpk2, "http://localhost:1323/verify")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -131,12 +106,12 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = signer.RequestUpdate(s, rlBuf, gpk2, updateProver, "http://localhost:1323/update-credential")
+	_, err = signer.RequestUpdate(s, rlBuf, gpk2, "http://localhost:1323/update-credential")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ns, err = signer.RequestUpdate(s, rlBuf, gpk2, updateProver, "http://localhost:1323/update-credential")
+	ns, err = signer.RequestUpdate(s, rlBuf, gpk2, "http://localhost:1323/update-credential")
 	if err == nil {
 		t.Fatal(ns, err)
 	}

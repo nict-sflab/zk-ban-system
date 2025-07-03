@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 
 	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/dump"
 	"github.com/akakou/zk-ban/highlevel"
 )
 
-func Sign(message []byte, count int64, signer []byte, gpk []byte, prover []byte) (*core.Signature, error) {
+func Sign(message []byte, count int64, signer []byte, gpk []byte) (*core.Signature, error) {
 	proverObj := highlevel.HighLevelSnarkProver{}
-	err := json.Unmarshal(prover, &proverObj)
+	err := json.Unmarshal(dump.SignProverKey, &proverObj)
 
 	if err != nil {
 		return nil, err
@@ -32,11 +33,6 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte, prover []byte)
 	if err != nil {
 		return nil, err
 	}
-
-	// sigBytes, err := json.Marshal(signature)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	return &core.Signature{
 		Signature: signature,

@@ -10,8 +10,8 @@ import (
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
 )
 
-func Sign(message []byte, count int64, signer, gpk, prover []byte, url string) ([]byte, error) {
-	signature, err := coresigner.Sign(message, count, signer, gpk, prover)
+func Sign(message []byte, count int64, signer, gpk []byte, url string) ([]byte, error) {
+	signature, err := coresigner.Sign(message, count, signer, gpk)
 	if err != nil {
 		return nil, err
 	}

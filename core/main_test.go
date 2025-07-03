@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/akakou/zk-ban-system/core/core"
@@ -27,27 +28,12 @@ func TestAll(t *testing.T) {
 	utils.Today = today
 	before := today()
 
-	joinProverBuf, joinVerifyKey, err := core.JoinRequestCircuit()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	signProverBuf, signVerifyKey, err := core.SignCircuit()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	updateProverBuf, updateVerifyKey, err := core.UpdateCircuit(0, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	gsk, gpk, err := witness.RandomGroupKeyPair()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	g, err := gm.Default[string](&gm.DBConfig{
+	g, err := gm.Default[string](gsk.Bytes(), &gm.DBConfig{
 		Type:   "sqlite3",
 		Config: "file::memory:?cache=shared&_fk=1",
 	})
@@ -56,24 +42,13 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	g.GroupPublicKey = gpk.Bytes()
-	g.GroupSecretKey = gsk.Bytes()
-	g.JoinVerifyKey = joinVerifyKey
-
-	emptySize := core.RevocationListSize{
-		NymsNumberPerSession: 0,
-		SessionNumber:        0,
-	}
-
-	k := core.SnarkKey(updateVerifyKey)
-	g.VerifierKeys[emptySize] = &k
+	fmt.Printf("gpk: %v", g.GroupPublicKey)
 
 	v := verifier.Verifier{
 		GroupPublicKey: gpk.Bytes(),
-		SignVerifyKey:  signVerifyKey,
 	}
 
-	reqBody, s, err := signer.RequestJoin(joinProverBuf, "")
+	reqBody, s, err := signer.RequestJoin("")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +80,7 @@ func TestAll(t *testing.T) {
 	}
 
 	m := []byte("test")
-	signature, err := signer.Sign(m, 0, s, gsk.Bytes(), signProverBuf)
+	signature, err := signer.Sign(m, 0, s, gsk.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,7 +97,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	updateReq, err := signer.RequestUpdate(rl, s, gpk.Bytes(), updateProverBuf)
+	updateReq, err := signer.RequestUpdate(rl, s, gpk.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
