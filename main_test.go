@@ -15,6 +15,7 @@ import (
 	"github.com/akakou/zk-ban/highlevel"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 const SLEEP_TIME = 3
@@ -31,14 +32,6 @@ func passDay() {
 
 func TestMain(t *testing.T) {
 	utils.Today = today
-
-	gmDB, err := gm.NewDB(&gm.DBConfig{
-		Type:   "sqlite3",
-		Config: "file::memory:?cache=shared&_fk=1",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	joinProver, joinVerify, err := core.JoinRequestCircuit()
 	if err != nil {
@@ -60,28 +53,34 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	gm.PreparableSnarkVerifierKeys = append(gm.PreparableSnarkVerifierKeys, &gm.PreparableSnarkVerifierKey{
+	g, err := gm.Default[string](&gm.DBConfig{
+		Type:   "sqlite3",
+		Config: "file::memory:?cache=shared&_fk=1",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	g.GroupPublicKey = gpk.Bytes()
+	g.GroupSecretKey = gsk.Bytes()
+	g.JoinVerifyKey = joinVerify
+
+	g.VerifierKeys = append(g.VerifierKeys, &core.SnarkKey{
 		VerifyingKey: updateVerify,
 		Size: &core.RevocationListSize{
 			NymsNumberPerSession: 0, SessionNumber: 0,
 		},
 	})
 
-	g := gm.GroupManager[string]{
-		GroupSecretKey: gsk.Bytes(),
-		GroupPublicKey: gpk.Bytes(),
-		JoinVerifyKey:  joinVerify,
-		DB:             gmDB,
-	}
-
 	gmServ := gmserv.GMServer[string]{
-		GM: &g,
+		GM: g,
 		AuthToken: func(t *core.JoinRequest[string]) (string, error) {
 			return "token", nil
 		},
 	}
 
 	e := echo.New()
+	e.Use(middleware.Logger())
+
 	gmServ.SetupEchoServer(e)
 
 	v := coreverifier.Verifier{
@@ -127,7 +126,7 @@ func TestMain(t *testing.T) {
 	}
 
 	passDay()
-	rlBuf, err := signer.FetchRevocationList("http://localhost:1323/revocation-list")
+	rlBuf, err := signer.FetchRevocationList("http://localhost:1323/revocation-list", s)
 	if err != nil {
 		t.Fatal(err)
 	}

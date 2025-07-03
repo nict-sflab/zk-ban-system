@@ -42,20 +42,12 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	gm.PreparableSnarkVerifierKeys = append(gm.PreparableSnarkVerifierKeys, &gm.PreparableSnarkVerifierKey{
-		VerifyingKey: updateVerifyKey,
-		Size: &core.RevocationListSize{
-			NymsNumberPerSession: 0,
-			SessionNumber:        0,
-		},
-	})
-
 	gsk, gpk, err := witness.RandomGroupKeyPair()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gmDB, err := gm.NewDB(&gm.DBConfig{
+	g, err := gm.Default[string](&gm.DBConfig{
 		Type:   "sqlite3",
 		Config: "file::memory:?cache=shared&_fk=1",
 	})
@@ -64,12 +56,17 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	g := gm.GroupManager[string]{
-		GroupSecretKey: gsk.Bytes(),
-		GroupPublicKey: gpk.Bytes(),
-		JoinVerifyKey:  joinVerifyKey,
-		DB:             gmDB,
-	}
+	g.GroupPublicKey = gpk.Bytes()
+	g.GroupSecretKey = gsk.Bytes()
+	g.JoinVerifyKey = joinVerifyKey
+
+	g.VerifierKeys = append(g.VerifierKeys, &core.SnarkKey{
+		VerifyingKey: updateVerifyKey,
+		Size: &core.RevocationListSize{
+			NymsNumberPerSession: 0,
+			SessionNumber:        0,
+		},
+	})
 
 	v := verifier.Verifier{
 		GroupPublicKey: gpk.Bytes(),

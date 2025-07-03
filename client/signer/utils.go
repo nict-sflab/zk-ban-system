@@ -3,8 +3,12 @@ package signer
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+
+	"github.com/akakou/zk-ban/highlevel"
 )
 
 func FetchGroupPublicKey(url string) ([]byte, error) {
@@ -34,8 +38,23 @@ func FetchGroupPublicKey(url string) ([]byte, error) {
 	return gpk, nil
 }
 
-func FetchRevocationList(url string) ([]byte, error) {
-	res, err := http.Get(url)
+func FetchRevocationList(u string, signer []byte) ([]byte, error) {
+	signerObj := highlevel.HighLevelSigner{}
+	err := json.Unmarshal(signer, &signerObj)
+	if err != nil {
+		return nil, err
+	}
+
+	uu, err := url.Parse(u)
+	if err != nil {
+		return nil, err
+	}
+
+	query := uu.Query()
+	query.Add("before", fmt.Sprintf("%d", signerObj.Period))
+	uu.RawQuery = query.Encode()
+
+	res, err := http.Get(uu.String())
 	if err != nil {
 		return nil, err
 	}

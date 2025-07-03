@@ -7,7 +7,7 @@ import (
 	"github.com/akakou/zk-ban/highlevel"
 )
 
-func (gm *GroupManager[T]) QueryRLAndKey(before, after int64) (*highlevel.HighLevelRevocationList, *PreparableSnarkVerifierKey, error) {
+func (gm *GroupManager[T]) QueryRLAndKey(before, after int64) (*highlevel.HighLevelRevocationList, *corecore.SnarkKey, error) {
 	var v []struct {
 		CountAll     int `json:"count_all"`
 		Count        int `json:"count"`
@@ -39,7 +39,7 @@ func (gm *GroupManager[T]) QueryRLAndKey(before, after int64) (*highlevel.HighLe
 
 	rlDB := query.AllX(*gm.DB.Ctx)
 
-	key := SelectVerifierKeyFromSize(&size)
+	key := QueryProperVerifier(gm.VerifierKeys, &size)
 	rlObj := TranslateRLFromDBToWit(rlDB, key.Size)
 
 	rl := highlevel.HighLevelRevocationList{}

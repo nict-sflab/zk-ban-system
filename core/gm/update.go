@@ -28,11 +28,12 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 
 	after := utils.Today()
 
-	index := DoubleMapKey{
-		First:  int(after),
-		Second: int(req.Before),
+	index := corecore.KeyIndex{
+		First:  after,
+		Second: req.Before,
 	}
-	verifier, hasVerifier := PreparedSnarkVerifiers[index]
+
+	verifier, hasVerifier := gm.PreparedSnarkVerifiers[index]
 
 	if !hasVerifier {
 		rlWit, key, err := gm.QueryRLAndKey(req.Before, after)
@@ -50,7 +51,7 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 			Prepared:    prepared,
 		}
 
-		PreparedSnarkVerifiers[index] = verifier
+		gm.PreparedSnarkVerifiers[index] = verifier
 	}
 
 	err = highlevel.VerifyUpdateRequest(req.Proof, req.UserPublicKey, after, req.Before, gm.GroupPublicKey, verifier.Prepared, verifier.VerifierKey.VerifyingKey)
