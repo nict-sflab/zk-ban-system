@@ -12,8 +12,10 @@ require (
 	github.com/akakou/snark-utils v0.0.2
 	github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
 	github.com/consensys/gnark v0.13.0
+	github.com/consensys/gnark-crypto v0.18.0
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/mattn/go-sqlite3 v1.14.28
+	github.com/stretchr/testify v1.10.0
 )
 
 require (
@@ -24,7 +26,7 @@ require (
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
-	github.com/consensys/gnark-crypto v0.18.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.8.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -38,6 +40,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/ronanh/intcomp v1.1.1 // indirect
 	github.com/rs/zerolog v1.34.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -52,4 +55,5 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
