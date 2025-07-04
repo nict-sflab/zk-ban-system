@@ -38,7 +38,7 @@ func FetchGroupPublicKey(url string) ([]byte, error) {
 	return gpk, nil
 }
 
-func FetchRevocationList(u string, signer []byte) ([]byte, error) {
+func FetchRevocationList(signer []byte, u string) ([]byte, error) {
 	signerObj := highlevel.HighLevelSigner{}
 	err := json.Unmarshal(signer, &signerObj)
 	if err != nil {
