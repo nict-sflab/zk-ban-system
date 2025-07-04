@@ -1,10 +1,11 @@
-package dump
+package load
 
 import (
 	"embed"
 	"fmt"
 
 	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/dump"
 )
 
 //go:embed join_prover.key.json
@@ -59,7 +60,7 @@ func LoadKeyWithRL(format string, fs embed.FS) (core.SnarkKeys, error) {
 }
 
 func LoadUserUpdateKey() (core.SnarkKeys, error) {
-	return LoadKeyWithRL(UpdateProverKeyFileNameFormat, UpdateProverKey)
+	return LoadKeyWithRL(dump.UpdateProverKeyFileNameFormat, UpdateProverKey)
 }
 
 func LoadVerifierKey() []byte {
@@ -67,5 +68,5 @@ func LoadVerifierKey() []byte {
 }
 
 func LoadGroupManagerUpdateKey() (core.SnarkKeys, error) {
-	return LoadKeyWithRL(UpdateVerifierKeyFileNameFormat, UpdateVerifierKey)
+	return LoadKeyWithRL(dump.UpdateVerifierKeyFileNameFormat, UpdateVerifierKey)
 }

@@ -6,12 +6,13 @@ replace github.com/akakou/zk-ban => ../zk-ban
 
 replace github.com/akakou/gnark-precomputes => ../gnark-precomputes
 
+replace github.com/akakou/zk-ban-system/dump => ./dump
+
 require (
 	entgo.io/ent v0.14.4
 	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000
-	github.com/akakou/snark-utils v0.0.2
 	github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
-	github.com/consensys/gnark v0.13.0
+	github.com/akakou/zk-ban-system/dump v0.0.0-00010101000000-000000000000
 	github.com/consensys/gnark-crypto v0.18.0
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/mattn/go-sqlite3 v1.14.28
@@ -21,11 +22,13 @@ require (
 require (
 	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
+	github.com/akakou/snark-utils v0.0.2 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
+	github.com/consensys/gnark v0.13.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.8.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
