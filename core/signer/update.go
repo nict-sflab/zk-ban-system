@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/akakou/zk-ban-system/core/core"
-	"github.com/akakou/zk-ban-system/dump"
+	"github.com/akakou/zk-ban-system/load"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
 )
@@ -18,7 +18,7 @@ func RequestUpdate(rl, signer, gpk []byte) (*core.UpdateRequest, error) {
 		return nil, err
 	}
 
-	provers, err := dump.LoadUserUpdateKey()
+	provers, err := load.LoadUserUpdateKey()
 	if err != nil {
 		return nil, err
 	}
