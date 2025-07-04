@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/akakou/zk-ban-system/core/core"
-	"github.com/akakou/zk-ban-system/dump"
+	"github.com/akakou/zk-ban-system/load"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/highlevel"
 )
@@ -14,7 +14,7 @@ func RequestJoin[T any](option T) ([]byte, []byte, error) {
 	period := utils.Today()
 
 	proverObj := highlevel.HighLevelSnarkProver{}
-	err := json.Unmarshal(dump.JoinProverKey, &proverObj)
+	err := json.Unmarshal(load.JoinProverKey, &proverObj)
 
 	if err != nil {
 		return nil, nil, err
