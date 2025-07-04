@@ -19,9 +19,10 @@ func TranslateRLFromDBToWit(dbEntries []*ent.Revocation, size *corecore.Revocati
 		t := witness.SessionTag(
 			big.NewInt(int64(entry.Count)),
 			big.NewInt(int64(entry.SignedPeriod)))
-		if tag.Cmp(tag) == 0 {
+
+		if tag.Cmp(t) == 0 {
 			n := big.NewInt(0)
-			n.FillBytes(entry.Nym)
+			n.SetBytes(entry.Nym)
 
 			rl[tagIndex].Nyms[nymIndex] = n
 			nymIndex += 1
@@ -29,6 +30,7 @@ func TranslateRLFromDBToWit(dbEntries []*ent.Revocation, size *corecore.Revocati
 			rl[tagIndex].SessionTag = t
 			nymIndex = 0
 			tagIndex += 1
+			tag = t
 		}
 	}
 
