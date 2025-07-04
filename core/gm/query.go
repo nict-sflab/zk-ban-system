@@ -1,6 +1,8 @@
 package gm
 
 import (
+	"fmt"
+
 	"github.com/akakou/zk-ban-system/core/core"
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
@@ -8,20 +10,19 @@ import (
 	"github.com/akakou/zk-ban/highlevel"
 )
 
-func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, error) {
+func (gm *GroupManager[T]) QueryRL(before int64) (*core.RevocationList, error) {
 	var v []struct {
 		CountAll     int `json:"count_all"`
 		Count        int `json:"count"`
 		SignedPeriod int `json:"signed_period"`
 	}
 
-	query := gm.DB.Client.Revocation.Query().
+	gm.DB.Client.Revocation.Query().
 		Where(revocation.And(
 			revocation.RevokedPeriodGTE(int(before)),
 			revocation.SignedPeriodLTE(int(before)),
-		))
-
-	query.GroupBy(revocation.FieldSignedPeriod, revocation.FieldCount).
+		)).
+		GroupBy(revocation.FieldSignedPeriod, revocation.FieldCount).
 		Aggregate(ent.Count()).
 		ScanX(*gm.DB.Ctx, &v)
 
@@ -38,7 +39,15 @@ func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, e
 		SessionNumber:        sessionNum,
 	}
 
-	rlDB := query.AllX(*gm.DB.Ctx)
+	rlDB := gm.DB.Client.Revocation.Query().
+		Where(revocation.And(
+			revocation.RevokedPeriodGTE(int(before)),
+			revocation.SignedPeriodLTE(int(before)),
+		)).
+		Order(ent.Asc(revocation.FieldSignedPeriod, revocation.FieldCount)).
+		AllX(*gm.DB.Ctx)
+
+	fmt.Printf("rldb: %v\n", rlDB)
 
 	rlSize := QueryProperRLWitSize(gm.VerifierKeys, &size)
 	rlObj := TranslateRLFromDBToWit(rlDB, rlSize)
