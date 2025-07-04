@@ -50,7 +50,7 @@ func TestMain(t *testing.T) {
 	gmServ := gmserv.GMServer[string]{
 		GM: g,
 		AuthToken: func(t *core.JoinRequest[string]) (string, error) {
-			return "token", nil
+			return t.Option, nil
 		},
 	}
 
@@ -77,7 +77,12 @@ func TestMain(t *testing.T) {
 
 	time.Sleep(SLEEP_TIME * time.Second)
 
-	s, err := signer.RequestJoin("", "http://localhost:1323/issue-credential")
+	s1, err := signer.RequestJoin("", "http://localhost:1323/issue-credential")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s2, err := signer.RequestJoin("2", "http://localhost:1323/issue-credential")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,30 +93,35 @@ func TestMain(t *testing.T) {
 	}
 
 	ss := highlevel.HighLevelSigner{}
-	json.Unmarshal(s, &ss)
+	json.Unmarshal(s1, &ss)
 
 	gpk2, err := signer.FetchGroupPublicKey("http://localhost:1323/group-public-key")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = signer.Sign([]byte("aaa"), 0, s, gpk2, "http://localhost:1323/verify")
+	_, err = signer.Sign([]byte("aaa"), 0, s1, gpk2, "http://localhost:1323/verify")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	passDay()
-	rlBuf, err := signer.FetchRevocationList("http://localhost:1323/revocation-list", s)
+	rlBuf, err := signer.FetchRevocationList("http://localhost:1323/revocation-list", s1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = signer.RequestUpdate(s, rlBuf, gpk2, "http://localhost:1323/update-credential")
+	_, err = signer.RequestUpdate(s1, rlBuf, gpk2, "http://localhost:1323/update-credential")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ns, err = signer.RequestUpdate(s, rlBuf, gpk2, "http://localhost:1323/update-credential")
+	_, err = signer.RequestUpdate(s2, rlBuf, gpk2, "http://localhost:1323/update-credential")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ns, err = signer.RequestUpdate(s1, rlBuf, gpk2, "http://localhost:1323/update-credential")
 	if err == nil {
 		t.Fatal(ns, err)
 	}
