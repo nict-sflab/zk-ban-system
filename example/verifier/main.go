@@ -29,6 +29,10 @@ func main() {
 
 	e.GET("/period", func(c echo.Context) error {
 		str := c.QueryParam("period")
+		if str == "" {
+			return c.String(200, strconv.Itoa(int(utils.Today())))
+		}
+
 		i, err := strconv.Atoi(str)
 		if err != nil {
 			return err

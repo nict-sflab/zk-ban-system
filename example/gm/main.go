@@ -39,6 +39,10 @@ func main() {
 
 	e.GET("/period", func(c echo.Context) error {
 		str := c.QueryParam("period")
+		if str == "" {
+			return c.String(200, strconv.Itoa(int(utils.Today())))
+		}
+
 		i, err := strconv.Atoi(str)
 		if err != nil {
 			return err
@@ -52,7 +56,7 @@ func main() {
 	})
 
 	e.GET("/revoke", func(c echo.Context) error {
-		revoked := c.QueryParam("revoke")
+		revoked := c.QueryParam("signature")
 
 		var signature corecore.Signature
 		err := json.Unmarshal([]byte(revoked), &signature)
