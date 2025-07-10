@@ -8,7 +8,7 @@ import (
 	"github.com/akakou/zk-ban/highlevel"
 )
 
-func Sign(message []byte, count int64, signer []byte, gpk []byte) (*core.Signature, error) {
+func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error) {
 	proverObj := highlevel.HighLevelSnarkProver{}
 	err := json.Unmarshal(load.SignProverKey, &proverObj)
 
@@ -34,8 +34,15 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte) (*core.Signatu
 		return nil, err
 	}
 
-	return &core.Signature{
+	signatureObj := &core.Signature{
 		Signature: signature,
 		Message:   message,
-	}, err
+	}
+
+	signatureBuf, err := json.Marshal(signatureObj)
+	if err != nil {
+		return nil, err
+	}
+
+	return signatureBuf, nil
 }

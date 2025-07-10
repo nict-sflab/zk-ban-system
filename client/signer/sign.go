@@ -2,7 +2,6 @@ package signer
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	neturl "net/url"
@@ -16,12 +15,7 @@ func Sign(message []byte, count int64, signer, gpk []byte, url string) ([]byte, 
 		return nil, err
 	}
 
-	signatureBuf, err := json.Marshal(signature)
-	if err != nil {
-		return nil, err
-	}
-
-	signatureStr := string(signatureBuf)
+	signatureStr := string(signature)
 
 	parsed, err := neturl.Parse(url)
 	if err != nil {

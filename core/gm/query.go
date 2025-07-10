@@ -1,8 +1,6 @@
 package gm
 
 import (
-	"fmt"
-
 	"github.com/akakou/zk-ban-system/core/core"
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
@@ -46,8 +44,6 @@ func (gm *GroupManager[T]) QueryRL(before int64) (*core.RevocationList, error) {
 		)).
 		Order(ent.Asc(revocation.FieldSignedPeriod, revocation.FieldCount)).
 		AllX(*gm.DB.Ctx)
-
-	fmt.Printf("rldb: %v\n", rlDB)
 
 	rlSize := QueryProperRLWitSize(gm.VerifierKeys, &size)
 	rlObj := TranslateRLFromDBToWit(rlDB, rlSize)

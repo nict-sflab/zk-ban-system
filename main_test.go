@@ -2,6 +2,7 @@ package zkbansystem
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -106,12 +107,12 @@ func TestMain(t *testing.T) {
 	}
 
 	passDay()
-	rlBuf, err := signer.FetchRevocationList("http://localhost:1323/revocation-list", s1)
+	rlBuf, err := signer.FetchRevocationList(s1, "http://localhost:1323/revocation-list")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = signer.RequestUpdate(s1, rlBuf, gpk2, "http://localhost:1323/update-credential")
+	s12, err := signer.RequestUpdate(s1, rlBuf, gpk2, "http://localhost:1323/update-credential")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,5 +125,18 @@ func TestMain(t *testing.T) {
 	ns, err = signer.RequestUpdate(s1, rlBuf, gpk2, "http://localhost:1323/update-credential")
 	if err == nil {
 		t.Fatal(ns, err)
+	}
+
+	passDay()
+	rlBuf3, err := signer.FetchRevocationList(s12, "http://localhost:1323/revocation-list")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("%v", s12)
+
+	_, err = signer.RequestUpdate(s12, rlBuf3, gpk2, "http://localhost:1323/update-credential")
+	if err != nil {
+		t.Fatal(err)
 	}
 }

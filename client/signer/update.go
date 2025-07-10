@@ -3,24 +3,18 @@ package signer
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"net/http"
 
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
 )
 
 func RequestUpdate(signer, rl, gpk []byte, url string) ([]byte, error) {
-	req, err := coresigner.RequestUpdate(rl, signer, gpk)
+	req, newSigner, err := coresigner.RequestUpdate(rl, signer, gpk)
 	if err != nil {
 		return nil, err
 	}
 
-	reqBytes, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := http.Post(url, "application/json", bytes.NewBuffer(reqBytes))
+	res, err := http.Post(url, "application/json", bytes.NewBuffer(req))
 	if err != nil {
 		return nil, err
 	}
@@ -38,10 +32,10 @@ func RequestUpdate(signer, rl, gpk []byte, url string) ([]byte, error) {
 		return nil, err
 	}
 
-	signer, err = coresigner.SetCredential(cred, signer)
+	newSignerFinalized, err := coresigner.SetCredential(cred, newSigner)
 	if err != nil {
 		return nil, err
 	}
 
-	return signer, nil
+	return newSignerFinalized, nil
 }
