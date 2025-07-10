@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"strconv"
 
 	corecore "github.com/akakou/zk-ban-system/core/core"
@@ -48,6 +49,25 @@ func main() {
 		}
 
 		return c.String(200, strconv.Itoa(i))
+	})
+
+	e.GET("/revoke", func(c echo.Context) error {
+		revoked := c.QueryParam("revoke")
+
+		var signature corecore.Signature
+		err := json.Unmarshal([]byte(revoked), &signature)
+		if err != nil {
+			return err
+		}
+
+		gmServ.GM.DB.Client.Revocation.Create().
+			SetCount(int(signature.Signature.Counter)).
+			SetNym(signature.Signature.Nym).
+			SetRevokedPeriod(int(utils.Today())).
+			SetSignedPeriod(int(signature.Signature.Period)).
+			SaveX(*gmServ.GM.DB.Ctx)
+
+		return c.String(200, "ok")
 	})
 
 	gmServ.SetupEchoServer(e)
