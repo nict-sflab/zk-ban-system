@@ -1,10 +1,10 @@
 package main
 
 import (
-	"os"
 	"strconv"
 
 	corecore "github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core/gm"
 	core "github.com/akakou/zk-ban-system/core/gm"
 	serv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/utils"
@@ -13,44 +13,22 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-const JOIN_VERIFIER_PATH = "../../../zk-ban-android/tools/join_verifier.json"
-const UPDATE_VERIFIER_PATH = "../../../zk-ban-android/tools/update_verifier.json"
-
 func main() {
-	gmDB, err := core.NewDB(&core.DBConfig{
+	gsk, _, err := witness.RandomGroupKeyPair()
+	if err != nil {
+		panic(err)
+	}
+
+	g, err := gm.Default[string](gsk.Bytes(), &core.DBConfig{
 		Type:   "sqlite3",
 		Config: "file::memory:?cache=shared&_fk=1",
 	})
-
 	if err != nil {
 		panic(err)
-	}
-
-	joinVerifier, err := os.ReadFile(JOIN_VERIFIER_PATH)
-	if err != nil {
-		panic(err)
-	}
-
-	updateVerifier, err := os.ReadFile(UPDATE_VERIFIER_PATH)
-	if err != nil {
-		panic(err)
-	}
-
-	gsk, gpk, err := witness.RandomGroupKeyPair()
-	if err != nil {
-		panic(err)
-	}
-
-	g := core.GroupManager[string]{
-		GroupSecretKey:  gsk.Bytes(),
-		GroupPublicKey:  gpk.Bytes(),
-		JoinVerifyKey:   joinVerifier,
-		UpdateVerifyKey: updateVerifier,
-		DB:              gmDB,
 	}
 
 	gmServ := serv.GMServer[string]{
-		GM: &g,
+		GM: g,
 		AuthToken: func(t *corecore.JoinRequest[string]) (string, error) {
 			return "token", nil
 		},

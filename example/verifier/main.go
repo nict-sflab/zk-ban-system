@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"strconv"
 
 	signer "github.com/akakou/zk-ban-system/client/signer"
@@ -12,14 +11,9 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-const SIGN_VERIFIER_PATH = "../../../zk-ban-android/tools/sign_verifier.json"
+const SIGN_VERIFIER_PATH = "../../load/sign_verifier.key.json"
 
 func main() {
-	signVerifier, err := os.ReadFile(SIGN_VERIFIER_PATH)
-	if err != nil {
-		panic(err)
-	}
-
 	gpk, err := signer.FetchGroupPublicKey("http://localhost:8080/group-public-key")
 	if err != nil {
 		panic(err)
@@ -27,7 +21,6 @@ func main() {
 
 	verifierServ := serv.VerifierServer{
 		Verifier: &core.Verifier{
-			SignVerifyKey:  signVerifier,
 			GroupPublicKey: gpk,
 		},
 	}
