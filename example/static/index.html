@@ -1,0 +1,44 @@
+<link rel="stylesheet" href="./mvp.css"> 
+<script src="./axios.min.js"></script>
+
+<main>
+    <h1>This is demo of the zk-ban</h1>
+    
+    <h2>Links</h2>
+    <a href="" id="verify-link">Verify</a>
+    <a href="" id="revoke-link">Revoke</a>
+    
+    <h2>Period Setting</h2>
+    <input type="number" id="period"></text>
+    <button onclick="syncPeriod()">Set Period</button>
+
+    <script>
+        const BASE = "http://192.168.137.1"
+        const VERIFIER_PORT = 8000
+        const GM_PORT = 8080
+
+        const CUSTOM_BASE = `zk-ban://zk-ban?callback=${BASE}`
+        
+        function run() {
+            const verifyLinkTag = document.getElementById("verify-link")
+            const revokeLinkTag = document.getElementById("revoke-link")
+
+            verifyLinkTag.href = `${CUSTOM_BASE}:${VERIFIER_PORT}/verify`
+            revokeLinkTag.href = `${CUSTOM_BASE}:${GM_PORT}/revoke`
+        }
+
+        function syncPeriod() {
+            const periodTag = document.getElementById("period")
+            const verifierPeriodURL = `${BASE}:${VERIFIER_PORT}/period?period=${periodTag.value}`
+            const gmPeriodURL = `${BASE}:${GM_PORT}/period?period=${periodTag.value}`
+
+            try {
+                axios.get(verifierPeriodURL, {mode: 'no-cors'})
+                axios.get(gmPeriodURL, {mode: 'no-cors'})
+            }catch(e) {
+                console.log(e)
+            }
+        }
+        run()
+    </script>
+</main>

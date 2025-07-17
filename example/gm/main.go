@@ -1,10 +1,11 @@
 package main
 
 import (
-	"os"
+	"encoding/json"
 	"strconv"
 
 	corecore "github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core/gm"
 	core "github.com/akakou/zk-ban-system/core/gm"
 	serv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/utils"
@@ -13,44 +14,22 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-const JOIN_VERIFIER_PATH = "../../../zk-ban-android/tools/join_verifier.json"
-const UPDATE_VERIFIER_PATH = "../../../zk-ban-android/tools/update_verifier.json"
-
 func main() {
-	gmDB, err := core.NewDB(&core.DBConfig{
+	gsk, _, err := witness.RandomGroupKeyPair()
+	if err != nil {
+		panic(err)
+	}
+
+	g, err := gm.Default[string](gsk.Bytes(), &core.DBConfig{
 		Type:   "sqlite3",
 		Config: "file::memory:?cache=shared&_fk=1",
 	})
-
 	if err != nil {
 		panic(err)
-	}
-
-	joinVerifier, err := os.ReadFile(JOIN_VERIFIER_PATH)
-	if err != nil {
-		panic(err)
-	}
-
-	updateVerifier, err := os.ReadFile(UPDATE_VERIFIER_PATH)
-	if err != nil {
-		panic(err)
-	}
-
-	gsk, gpk, err := witness.RandomGroupKeyPair()
-	if err != nil {
-		panic(err)
-	}
-
-	g := core.GroupManager[string]{
-		GroupSecretKey:  gsk.Bytes(),
-		GroupPublicKey:  gpk.Bytes(),
-		JoinVerifyKey:   joinVerifier,
-		UpdateVerifyKey: updateVerifier,
-		DB:              gmDB,
 	}
 
 	gmServ := serv.GMServer[string]{
-		GM: &g,
+		GM: g,
 		AuthToken: func(t *corecore.JoinRequest[string]) (string, error) {
 			return "token", nil
 		},
@@ -60,6 +39,10 @@ func main() {
 
 	e.GET("/period", func(c echo.Context) error {
 		str := c.QueryParam("period")
+		if str == "" {
+			return c.String(200, strconv.Itoa(int(utils.Today())))
+		}
+
 		i, err := strconv.Atoi(str)
 		if err != nil {
 			return err
@@ -70,6 +53,25 @@ func main() {
 		}
 
 		return c.String(200, strconv.Itoa(i))
+	})
+
+	e.GET("/revoke", func(c echo.Context) error {
+		revoked := c.QueryParam("signature")
+
+		var signature corecore.Signature
+		err := json.Unmarshal([]byte(revoked), &signature)
+		if err != nil {
+			return err
+		}
+
+		gmServ.GM.DB.Client.Revocation.Create().
+			SetCount(int(signature.Signature.Counter)).
+			SetNym(signature.Signature.Nym).
+			SetRevokedPeriod(int(utils.Today())).
+			SetSignedPeriod(int(signature.Signature.Period)).
+			SaveX(*gmServ.GM.DB.Ctx)
+
+		return c.String(200, "ok")
 	})
 
 	gmServ.SetupEchoServer(e)

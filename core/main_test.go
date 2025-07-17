@@ -80,12 +80,18 @@ func TestAll(t *testing.T) {
 	}
 
 	m := []byte("test")
-	signature, err := signer.Sign(m, 0, s, gsk.Bytes())
+	signatureBuf, err := signer.Sign(m, 0, s, gsk.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = v.Verify(signature)
+	var signature core.Signature
+	err = json.Unmarshal(signatureBuf, &signature)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = v.Verify(&signature)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,27 +103,51 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	updateReq, err := signer.RequestUpdate(rl, s, gpk.Bytes())
+	updateReqBuf, newSignerBuf, err := signer.RequestUpdate(rl, s, gpk.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cred, err = g.UpdateCredential(updateReq)
+	var updateReq core.UpdateRequest
+	err = json.Unmarshal(updateReqBuf, &updateReq)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	failCred, err = g.UpdateCredential(updateReq)
+	cred, err = g.UpdateCredential(&updateReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	failCred, err = g.UpdateCredential(&updateReq)
 	if err == nil {
 		t.Fatal(failCred, err)
 	}
 
-	rawCred, err = base64.URLEncoding.DecodeString(cred)
+	rawCred2, err := base64.URLEncoding.DecodeString(cred)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = signer.SetCredential(rawCred, s)
+	newSignerBuf, err = signer.SetCredential(rawCred2, newSignerBuf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	passDay()
+
+	updateReq2Buf, _, err := signer.RequestUpdate(rl, newSignerBuf, gpk.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var updateReq2 core.UpdateRequest
+	err = json.Unmarshal(updateReq2Buf, &updateReq2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = g.UpdateCredential(&updateReq2)
 	if err != nil {
 		t.Fatal(err)
 	}
