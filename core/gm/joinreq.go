@@ -7,7 +7,6 @@ import (
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/utils"
-	"github.com/akakou/zk-ban/highlevel"
 )
 
 var ErrAlreadyRegisterd = errors.New("already account registered")
@@ -27,22 +26,22 @@ func (gm *GroupManager[T]) IssueCredential(identifer string, req *corecore.JoinR
 	}
 	period := utils.Today()
 
-	err = highlevel.VerifyJoinReq(req.Proof, req.UserPublicKey, period, gm.JoinVerifyKey)
+	err = req.JoinRequest.Verify(period, gm.JoinVerifyKey)
 	if err != nil {
 		return "", err
 	}
 
-	cred, err := highlevel.IssueCredential(period, req.UserPublicKey, gm.GroupSecretKey)
+	cred, err := gm.GroupSecretKey.IssueCredential(&req.UserPublicKey)
 	if err != nil {
 		return "", err
 	}
 
 	gm.DB.Client.Credential.Create().
-		SetCredential(cred).
-		SetPublicKey(req.UserPublicKey).
+		SetCredential(cred.Signature).
+		SetPublicKey(req.UserPublicKey.Bytes()).
 		SetIdentifier(identifer).
 		SaveX(*gm.DB.Ctx)
 
-	resp := base64.URLEncoding.EncodeToString(cred)
+	resp := base64.URLEncoding.EncodeToString(cred.Signature)
 	return resp, nil
 }

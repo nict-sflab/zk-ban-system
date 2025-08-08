@@ -1,8 +1,8 @@
 package core
 
+import zkban "github.com/akakou/zk-ban"
+
 type UpdateRequest struct {
 	Before        int64
-	After         int64
-	UserPublicKey []byte
-	Proof         []byte
+	UpdateRequest *zkban.UpdateRequest
 }

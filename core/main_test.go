@@ -14,7 +14,7 @@ import (
 	"github.com/akakou/zk-ban/witness"
 )
 
-var period = 1
+var period = int64(1)
 
 func today() int64 {
 	return int64(period)
@@ -45,7 +45,7 @@ func TestAll(t *testing.T) {
 	fmt.Printf("gpk: %v", g.GroupPublicKey)
 
 	v := verifier.Verifier{
-		GroupPublicKey: gpk.Bytes(),
+		GroupPublicKey: gpk,
 	}
 
 	reqBody, s, err := signer.RequestJoin("")
@@ -91,7 +91,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = v.Verify(&signature)
+	err = v.Verify(&signature, period)
 	if err != nil {
 		t.Fatal(err)
 	}

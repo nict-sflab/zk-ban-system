@@ -7,6 +7,7 @@ import (
 	core "github.com/akakou/zk-ban-system/core/verifier"
 	serv "github.com/akakou/zk-ban-system/serv/verifier"
 	"github.com/akakou/zk-ban-system/utils"
+	zkbanw "github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -14,7 +15,12 @@ import (
 const SIGN_VERIFIER_PATH = "../../load/sign_verifier.key.json"
 
 func main() {
-	gpk, err := signer.FetchGroupPublicKey("http://localhost:8080/group-public-key")
+	gpkBuf, err := signer.FetchGroupPublicKey("http://localhost:8080/group-public-key")
+	if err != nil {
+		panic(err)
+	}
+
+	gpk, err := zkbanw.GroupPublicKeyFromBytes(gpkBuf)
 	if err != nil {
 		panic(err)
 	}

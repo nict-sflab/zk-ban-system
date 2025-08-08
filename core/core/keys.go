@@ -6,14 +6,12 @@ import (
 
 var UpdateRequestVerifyingKeys []gnarkprecomputes.PreparableCircuit
 
-type Witness = any
-type Prepared = any
-type Proof = any
-
-type SnarkKey []byte
-
 type KeyIndex struct {
 	First, Second int64
 }
 
-type SnarkKeys map[RevocationListSize]*SnarkKey
+type ProvingKey SnarkProver
+type ProvingKeys map[RevocationListSize]SnarkProver
+
+type VerifyingKey VerifyKey
+type VerifyingKeys map[RevocationListSize]VerifyingKey

@@ -3,11 +3,11 @@ package core
 import (
 	"math"
 
-	"github.com/akakou/zk-ban/highlevel"
+	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 type RevocationList struct {
-	List *highlevel.HighLevelRevocationList
+	List *zkbanw.RevocationList
 	Size *RevocationListSize
 }
 

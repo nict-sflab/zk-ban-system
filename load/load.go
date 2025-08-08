@@ -2,6 +2,7 @@ package load
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 
 	"github.com/akakou/zk-ban-system/core/core"
@@ -26,13 +27,13 @@ var SignVerifierKey []byte
 //go:embed all:update_verifier-*-*.key.json
 var UpdateVerifierKey embed.FS
 
-func LoadKeyWithRL(format string, fs embed.FS) (core.SnarkKeys, error) {
+func LoadKeyWithRL[T any](format string, fs embed.FS) (map[core.RevocationListSize]T, error) {
 	files, err := fs.ReadDir(".")
 	if err != nil {
 		return nil, err
 	}
 
-	keys := make(core.SnarkKeys)
+	keys := new(map[core.RevocationListSize]T)
 	for _, f := range files {
 		name := f.Name()
 
@@ -51,22 +52,24 @@ func LoadKeyWithRL(format string, fs embed.FS) (core.SnarkKeys, error) {
 			return nil, err
 		}
 
-		k := core.SnarkKey(buf)
-		keys[index] = &k
+		var key *T
+		err = json.Unmarshal(buf, key)
+
+		if err != nil {
+			return nil, err
+		}
+
+		(*keys)[index] = *key
 	}
 
-	return keys, nil
+	return *keys, nil
 
 }
 
-func LoadUserUpdateKey() (core.SnarkKeys, error) {
-	return LoadKeyWithRL(dump.UpdateProverKeyFileNameFormat, UpdateProverKey)
+func LoadUserUpdateKey() (core.ProvingKeys, error) {
+	return LoadKeyWithRL[core.SnarkProver](dump.UpdateProverKeyFileNameFormat, UpdateProverKey)
 }
 
-func LoadVerifierKey() []byte {
-	return SignVerifierKey
-}
-
-func LoadGroupManagerUpdateKey() (core.SnarkKeys, error) {
-	return LoadKeyWithRL(dump.UpdateVerifierKeyFileNameFormat, UpdateVerifierKey)
+func LoadGroupManagerUpdateKey() (core.VerifyingKeys, error) {
+	return LoadKeyWithRL[core.VerifyingKey](dump.UpdateVerifierKeyFileNameFormat, UpdateVerifierKey)
 }

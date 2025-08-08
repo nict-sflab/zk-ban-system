@@ -1,7 +1,6 @@
 package zkbansystem
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -13,7 +12,6 @@ import (
 	gmserv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/serv/verifier"
 	"github.com/akakou/zk-ban-system/utils"
-	"github.com/akakou/zk-ban/highlevel"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -61,7 +59,7 @@ func TestMain(t *testing.T) {
 	gmServ.SetupEchoServer(e)
 
 	v := coreverifier.Verifier{
-		GroupPublicKey: g.GroupPublicKey,
+		GroupPublicKey: &g.GroupPublicKey,
 	}
 
 	verifierServ := verifier.VerifierServer{
@@ -92,9 +90,6 @@ func TestMain(t *testing.T) {
 	if err == nil {
 		t.Fatal(ns, err)
 	}
-
-	ss := highlevel.HighLevelSigner{}
-	json.Unmarshal(s1, &ss)
 
 	gpk2, err := signer.FetchGroupPublicKey("http://localhost:1323/group-public-key")
 	if err != nil {

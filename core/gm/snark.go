@@ -4,14 +4,18 @@ import (
 	"math"
 
 	corecore "github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban/precomputes"
+	curve_bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381"
+	fr_bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381/fr"
+	groth16_bls12381 "github.com/consensys/gnark/backend/groth16/bls12-381"
 )
 
 type PreparedSnarkVerifier struct {
-	VerifierKey *corecore.SnarkKey
-	Prepared    []byte
+	VerifierKey *precomputes.PreparedUpdateRequestVerifyingKey[fr_bls12381.Vector, *curve_bls12381.G1Jac, *groth16_bls12381.Proof]
+	Prepared    *curve_bls12381.G1Jac
 }
 
-func QueryProperRLWitSize(verifierKeys corecore.SnarkKeys, size *corecore.RevocationListSize) *corecore.RevocationListSize {
+func QueryProperRLWitSize(verifierKeys corecore.VerifyingKeys, size *corecore.RevocationListSize) *corecore.RevocationListSize {
 	distance := math.MaxFloat64
 	var result *corecore.RevocationListSize = nil
 

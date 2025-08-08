@@ -17,20 +17,20 @@ func TranslateRLFromDBToWit(dbEntries []*ent.Revocation, size *corecore.Revocati
 
 	for _, entry := range dbEntries {
 		t := witness.SessionTag(
-			big.NewInt(int64(entry.Count)),
-			big.NewInt(int64(entry.SignedPeriod)))
+			int64(entry.Count),
+			int64(entry.SignedPeriod))
 
-		if tag.Cmp(t) == 0 {
+		if tag.Cmp(&t.Int) == 0 {
 			n := big.NewInt(0)
 			n.SetBytes(entry.Nym)
 
 			rl[tagIndex].Nyms[nymIndex] = n
 			nymIndex += 1
 		} else {
-			rl[tagIndex].SessionTag = t
+			rl[tagIndex].SessionTag = &t.Int
 			nymIndex = 0
 			tagIndex += 1
-			tag = t
+			tag = &t.Int
 		}
 	}
 

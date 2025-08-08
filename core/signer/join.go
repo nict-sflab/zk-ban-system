@@ -2,32 +2,32 @@ package signer
 
 import (
 	"encoding/json"
-	"math/big"
 
+	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/load"
 	"github.com/akakou/zk-ban-system/utils"
-	"github.com/akakou/zk-ban/highlevel"
+	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 func RequestJoin[T any](option T) ([]byte, []byte, error) {
 	period := utils.Today()
 
-	proverObj := highlevel.HighLevelSnarkProver{}
+	proverObj := core.SnarkProver{}
 	err := json.Unmarshal(load.JoinProverKey, &proverObj)
 
 	if err != nil {
 		return nil, nil, err
 	}
 
-	proof, reqObj, assign, err := highlevel.JoinRequest(period, &proverObj)
+	proof, usk, err := zkban.RequestJoin(period, proverObj.CoreKey())
 	if err != nil {
 		return nil, nil, err
 	}
 
-	signer := highlevel.HighLevelSigner{
-		Secret:        assign.UserSecretKey.(*big.Int).Bytes(),
-		UserPublicKey: reqObj.UserPublicKey,
+	signer := zkbanw.Signer{
+		UserSecretKey: usk,
+		Credential:    nil,
 		Period:        period,
 	}
 
@@ -37,10 +37,9 @@ func RequestJoin[T any](option T) ([]byte, []byte, error) {
 	}
 
 	req := core.JoinRequest[T]{
-		Period:        reqObj.Period,
-		UserPublicKey: reqObj.UserPublicKey,
-		Proof:         proof,
-		Option:        option,
+		Period:      period,
+		JoinRequest: proof,
+		Option:      option,
 	}
 
 	reqBytes, err := json.Marshal(req)
@@ -53,14 +52,14 @@ func RequestJoin[T any](option T) ([]byte, []byte, error) {
 }
 
 func SetCredential(cred []byte, signer []byte) ([]byte, error) {
-	signerObj := highlevel.HighLevelSigner{}
+	signerObj := zkbanw.Signer{}
 	err := json.Unmarshal(signer, &signerObj)
 
 	if err != nil {
 		return nil, err
 	}
 
-	signerObj.Credential = cred
+	signerObj.Credential.Signature = cred
 
 	signerBytes, err := json.Marshal(signerObj)
 	if err != nil {

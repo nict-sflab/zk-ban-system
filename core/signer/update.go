@@ -3,10 +3,11 @@ package signer
 import (
 	"encoding/json"
 
+	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/load"
 	"github.com/akakou/zk-ban-system/utils"
-	"github.com/akakou/zk-ban/highlevel"
+	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 func RequestUpdate(rl, signer, gpk []byte) ([]byte, []byte, error) {
@@ -25,29 +26,22 @@ func RequestUpdate(rl, signer, gpk []byte) ([]byte, []byte, error) {
 
 	prover := provers[*rlObj.Size]
 
-	var proverObj highlevel.HighLevelSnarkProver
-	err = json.Unmarshal(*prover, &proverObj)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var signerObj highlevel.HighLevelSigner
+	var signerObj zkbanw.Signer
 	err = json.Unmarshal(signer, &signerObj)
-
 	if err != nil {
 		return nil, nil, err
 	}
 
-	updatedSigner, proof, err := highlevel.UpdateRequest(today, &signerObj, *rlObj.List, gpk, &proverObj)
+	gpkObj, err := zkbanw.GroupPublicKeyFromBytes(gpk)
+
+	coreReq, err := zkban.RequestUpdate(today, &signerObj, *rlObj.List, gpkObj, prover.CoreKey())
 	if err != nil {
 		return nil, nil, err
 	}
 
 	req := core.UpdateRequest{
-		After:         updatedSigner.Period,
 		Before:        signerObj.Period,
-		UserPublicKey: updatedSigner.UserPublicKey,
-		Proof:         proof,
+		UpdateRequest: coreReq,
 	}
 
 	reqBytes, err := json.Marshal(req)
@@ -55,7 +49,9 @@ func RequestUpdate(rl, signer, gpk []byte) ([]byte, []byte, error) {
 		return nil, nil, err
 	}
 
-	updatedSignerBytes, err := json.Marshal(updatedSigner)
+	signerObj.Period = today
+
+	updatedSignerBytes, err := json.Marshal(signerObj)
 	if err != nil {
 		return nil, nil, err
 	}

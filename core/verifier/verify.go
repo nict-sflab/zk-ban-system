@@ -2,12 +2,16 @@ package verifier
 
 import (
 	corecore "github.com/akakou/zk-ban-system/core/core"
-	"github.com/akakou/zk-ban-system/load"
-	"github.com/akakou/zk-ban/highlevel"
+	"github.com/akakou/zk-ban/primitives"
 )
 
-func (verifier *Verifier) Verify(signature *corecore.Signature) error {
-	err := highlevel.Verify(signature.Signature, signature.Message, verifier.GroupPublicKey, load.SignVerifierKey)
+func (verifier *Verifier) Verify(signature *corecore.Signature, period int64) error {
+	err := signature.Signature.Verify(
+		primitives.BigIntFromBytes(signature.Message),
+		signature.Count,
+		period,
+		verifier.GroupPublicKey,
+		verifier.VerifyingKey)
 	if err != nil {
 		return err
 	}

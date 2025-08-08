@@ -5,7 +5,6 @@ import (
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
 	"github.com/akakou/zk-ban-system/core/gm/ent/revocation"
-	"github.com/akakou/zk-ban/highlevel"
 )
 
 func (gm *GroupManager[T]) QueryRL(before int64) (*core.RevocationList, error) {
@@ -48,11 +47,8 @@ func (gm *GroupManager[T]) QueryRL(before int64) (*core.RevocationList, error) {
 	rlSize := QueryProperRLWitSize(gm.VerifierKeys, &size)
 	rlObj := TranslateRLFromDBToWit(rlDB, rlSize)
 
-	rl := highlevel.HighLevelRevocationList{}
-	rl.FromRevocationList(&rlObj)
-
 	return &core.RevocationList{
-		List: &rl,
+		List: &rlObj,
 		Size: rlSize,
 	}, nil
 }

@@ -1,17 +1,19 @@
 package gm
 
 import (
-	eddsa_bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381/twistededwards/eddsa"
+	"encoding/json"
 
+	"github.com/akakou/zk-ban-system/core/core"
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/load"
+	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 type GroupManager[T any] struct {
-	GroupSecretKey         []byte
-	GroupPublicKey         []byte
-	JoinVerifyKey          []byte
-	VerifierKeys           corecore.SnarkKeys
+	GroupSecretKey         zkbanw.GroupSecretKey
+	GroupPublicKey         zkbanw.GroupPublicKey
+	JoinVerifyKey          corecore.VerifyingKey
+	VerifierKeys           corecore.VerifyingKeys
 	PreparedSnarkVerifiers map[corecore.KeyIndex]*PreparedSnarkVerifier
 	DB                     *DB
 }
@@ -27,18 +29,23 @@ func Default[T any](gsk []byte, dbConfig *DBConfig) (*GroupManager[T], error) {
 		return nil, err
 	}
 
-	gskw := eddsa_bls12381.PrivateKey{}
-	_, err = gskw.SetBytes(gsk)
+	gskw, err := zkbanw.GroupSecretKeyFromBytes(gsk)
 	if err != nil {
 		return nil, err
 	}
 
 	gpk := gskw.Public()
 
+	var joinVerifierKey core.VerifyingKey
+	err = json.Unmarshal(load.JoinVerifierKey, joinVerifierKey)
+	if err != nil {
+		return nil, err
+	}
+
 	g := GroupManager[T]{
-		GroupSecretKey:         gsk,
-		GroupPublicKey:         gpk.Bytes(),
-		JoinVerifyKey:          load.JoinVerifierKey,
+		GroupSecretKey:         zkbanw.GroupSecretKey{gskw},
+		GroupPublicKey:         zkbanw.GroupPublicKey{gpk},
+		JoinVerifyKey:          joinVerifierKey,
 		VerifierKeys:           u,
 		PreparedSnarkVerifiers: make(map[corecore.KeyIndex]*PreparedSnarkVerifier),
 		DB:                     db,

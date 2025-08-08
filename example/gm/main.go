@@ -57,6 +57,7 @@ func main() {
 
 	e.GET("/revoke", func(c echo.Context) error {
 		revoked := c.QueryParam("signature")
+		period := c.QueryParam("period")
 
 		var signature corecore.Signature
 		err := json.Unmarshal([]byte(revoked), &signature)
@@ -64,11 +65,16 @@ func main() {
 			return err
 		}
 
+		p, err := strconv.Atoi(period)
+		if err != nil {
+			return err
+		}
+
 		gmServ.GM.DB.Client.Revocation.Create().
-			SetCount(int(signature.Signature.Counter)).
-			SetNym(signature.Signature.Nym).
+			SetCount(int(signature.Count)).
+			SetNym(signature.Signature.Commit.Nym.Bytes()).
 			SetRevokedPeriod(int(utils.Today())).
-			SetSignedPeriod(int(signature.Signature.Period)).
+			SetSignedPeriod(p).
 			SaveX(*gmServ.GM.DB.Ctx)
 
 		return c.String(200, "ok")

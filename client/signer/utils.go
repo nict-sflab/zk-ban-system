@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/akakou/zk-ban/highlevel"
+	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 func FetchGroupPublicKey(url string) ([]byte, error) {
@@ -39,7 +39,7 @@ func FetchGroupPublicKey(url string) ([]byte, error) {
 }
 
 func FetchRevocationList(signer []byte, u string) ([]byte, error) {
-	signerObj := highlevel.HighLevelSigner{}
+	signerObj := zkbanw.Signer{}
 	err := json.Unmarshal(signer, &signerObj)
 	if err != nil {
 		return nil, err

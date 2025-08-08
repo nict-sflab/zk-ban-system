@@ -1,8 +1,11 @@
 package core
 
-import "github.com/akakou/zk-ban/highlevel"
+import (
+	zkban "github.com/akakou/zk-ban"
+)
 
 type Signature struct {
-	Signature *highlevel.Signature
+	Signature *zkban.Signature
+	Count     int64
 	Message   []byte
 }
