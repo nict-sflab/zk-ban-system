@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/akakou/snark-utils/encode"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm"
 	"github.com/akakou/zk-ban-system/core/signer"
 	"github.com/akakou/zk-ban-system/core/verifier"
+	"github.com/akakou/zk-ban-system/load"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/witness"
 )
@@ -44,8 +46,14 @@ func TestAll(t *testing.T) {
 
 	fmt.Printf("gpk: %v", g.GroupPublicKey)
 
+	verifierKey, err := encode.DecodeVerifierKey(load.SignVerifierKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	v := verifier.Verifier{
 		GroupPublicKey: gpk,
+		VerifyingKey:   verifierKey,
 	}
 
 	reqBody, s, err := signer.RequestJoin("")
@@ -53,11 +61,15 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	fmt.Printf("hello: %v\n", string(reqBody))
+
 	var req core.JoinRequest[string]
 	err = json.Unmarshal(reqBody, &req)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	fmt.Printf("hello: %v\n", req.JoinRequest)
 
 	cred, err := g.IssueCredential("", &req)
 	if err != nil {
@@ -107,6 +119,8 @@ func TestAll(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	fmt.Printf("aaaaaaaaaaaaaaa is %v:\n", string(updateReqBuf))
 
 	var updateReq core.UpdateRequest
 	err = json.Unmarshal(updateReqBuf, &updateReq)

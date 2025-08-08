@@ -3,6 +3,7 @@ package gm
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
@@ -26,19 +27,20 @@ func (gm *GroupManager[T]) IssueCredential(identifer string, req *corecore.JoinR
 	}
 	period := utils.Today()
 
+	fmt.Printf("a: %v, b: %v, c: %v", period, gm.JoinVerifyKey, req.JoinRequest)
 	err = req.JoinRequest.Verify(period, gm.JoinVerifyKey)
 	if err != nil {
 		return "", err
 	}
 
-	cred, err := gm.GroupSecretKey.IssueCredential(&req.UserPublicKey)
+	cred, err := gm.GroupSecretKey.IssueCredential(req.JoinRequest.UserPublicKey)
 	if err != nil {
 		return "", err
 	}
 
 	gm.DB.Client.Credential.Create().
 		SetCredential(cred.Signature).
-		SetPublicKey(req.UserPublicKey.Bytes()).
+		SetPublicKey(req.JoinRequest.UserPublicKey.Number.Bytes()).
 		SetIdentifier(identifer).
 		SaveX(*gm.DB.Ctx)
 

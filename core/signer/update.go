@@ -33,8 +33,11 @@ func RequestUpdate(rl, signer, gpk []byte) ([]byte, []byte, error) {
 	}
 
 	gpkObj, err := zkbanw.GroupPublicKeyFromBytes(gpk)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	coreReq, err := zkban.RequestUpdate(today, &signerObj, *rlObj.List, gpkObj, prover.CoreKey())
+	coreReq, err := zkban.RequestUpdate(today, &signerObj, *rlObj.List, gpkObj, prover)
 	if err != nil {
 		return nil, nil, err
 	}

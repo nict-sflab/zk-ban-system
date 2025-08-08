@@ -15,7 +15,7 @@ var ErrAlreadyIssueCredential = errors.New("already issue credential")
 func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string, error) {
 	exist, err := gm.DB.Client.Credential.
 		Query().
-		Where(credential.PublicKey(req.UpdateRequest.PublicKey.Bytes())).
+		Where(credential.PublicKey(req.UpdateRequest.PublicKey.Number.Bytes())).
 		Exist(*gm.DB.Ctx)
 
 	if err != nil {
@@ -69,7 +69,7 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 
 	gm.DB.Client.Credential.Create().
 		SetCredential(cred.Signature).
-		SetPublicKey(req.UpdateRequest.PublicKey.Bytes()).
+		SetPublicKey(req.UpdateRequest.PublicKey.Number.Bytes()).
 		SaveX(*gm.DB.Ctx)
 
 	resp := base64.URLEncoding.EncodeToString(cred.Signature)

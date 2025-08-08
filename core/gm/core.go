@@ -1,9 +1,7 @@
 package gm
 
 import (
-	"encoding/json"
-
-	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/snark-utils/encode"
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/load"
 	zkbanw "github.com/akakou/zk-ban/witness"
@@ -36,8 +34,7 @@ func Default[T any](gsk []byte, dbConfig *DBConfig) (*GroupManager[T], error) {
 
 	gpk := gskw.Public()
 
-	var joinVerifierKey core.VerifyingKey
-	err = json.Unmarshal(load.JoinVerifierKey, joinVerifierKey)
+	joinVerifierKey, err := encode.DecodeVerifierKey(load.JoinVerifierKey)
 	if err != nil {
 		return nil, err
 	}

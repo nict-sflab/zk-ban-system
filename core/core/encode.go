@@ -1,129 +1,121 @@
 package core
 
-import (
-	"bytes"
+// type Proof struct{ groth16.Proof }
+// type ConstraintSystem struct{ constraint.ConstraintSystem }
+// type ProveKey struct{ groth16.ProvingKey }
+// type VerifyKey struct{ groth16.VerifyingKey }
 
-	"github.com/akakou/zk-ban/snark"
-	"github.com/consensys/gnark/backend/groth16"
-	"github.com/consensys/gnark/constraint"
-)
+// type SnarkProver struct {
+// 	ConstraintSystem ConstraintSystem
+// 	ProveKey         ProveKey
+// }
 
-type Proof struct{ groth16.Proof }
-type ConstraintSystem struct{ constraint.ConstraintSystem }
-type ProveKey struct{ groth16.ProvingKey }
-type VerifyKey struct{ groth16.VerifyingKey }
+// func (prover *SnarkProver) CoreKey() *snark.SnarkProver {
+// 	return &snark.SnarkProver{
+// 		ConstraintSystem: prover.ConstraintSystem.ConstraintSystem,
+// 		ProveKey:         prover.ProveKey.ProvingKey,
+// 	}
+// }
 
-type SnarkProver struct {
-	ConstraintSystem ConstraintSystem
-	ProveKey         ProveKey
-}
+// func (proof Proof) MarshalJSON() ([]byte, error) {
+// 	var buffer bytes.Buffer
+// 	_, err := proof.WriteTo(&buffer)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return buffer.Bytes(), nil
+// }
 
-func (prover *SnarkProver) CoreKey() *snark.SnarkProver {
-	return &snark.SnarkProver{
-		ConstraintSystem: prover.ConstraintSystem.ConstraintSystem,
-		ProveKey:         prover.ProveKey.ProvingKey,
-	}
-}
+// func (proof *Proof) UnmarshalJSON(buf []byte) error {
+// 	if string(buf) == "null" {
+// 		return nil
+// 	}
 
-func (proof Proof) MarshalJSON() ([]byte, error) {
-	var buffer bytes.Buffer
-	_, err := proof.WriteTo(&buffer)
-	if err != nil {
-		return nil, err
-	}
-	return buffer.Bytes(), nil
-}
+// 	var z groth16.Proof
+// 	reader := bytes.NewReader(buf)
+// 	_, err := z.ReadFrom(reader)
 
-func (proof *Proof) UnmarshalJSON(buf []byte) error {
-	if string(buf) == "null" {
-		return nil
-	}
+// 	if err != nil {
+// 		proof.Proof = z
+// 	}
 
-	var z groth16.Proof
-	reader := bytes.NewReader(buf)
-	_, err := z.ReadFrom(reader)
+// 	return err
+// }
 
-	if err != nil {
-		proof.Proof = z
-	}
+// func (ccs ConstraintSystem) MarshalJSON() ([]byte, error) {
+// 	var buffer bytes.Buffer
+// 	_, err := ccs.WriteTo(&buffer)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return buffer.Bytes(), nil
+// }
 
-	return err
-}
+// func (ccs *ConstraintSystem) UnmarshalJSON(buf []byte) error {
+// 	if string(buf) == "null" {
+// 		return nil
+// 	}
 
-func (ccs ConstraintSystem) MarshalJSON() ([]byte, error) {
-	var buffer bytes.Buffer
-	_, err := ccs.WriteTo(&buffer)
-	if err != nil {
-		return nil, err
-	}
-	return buffer.Bytes(), nil
-}
+// 	var z constraint.ConstraintSystem
+// 	reader := bytes.NewReader(buf)
+// 	_, err := z.ReadFrom(reader)
 
-func (ccs *ConstraintSystem) UnmarshalJSON(buf []byte) error {
-	if string(buf) == "null" {
-		return nil
-	}
+// 	if err != nil {
+// 		ccs.ConstraintSystem = z
+// 	}
 
-	var z constraint.ConstraintSystem
-	reader := bytes.NewReader(buf)
-	_, err := z.ReadFrom(reader)
+// 	return err
+// }
 
-	if err != nil {
-		ccs.ConstraintSystem = z
-	}
+// func (pk ProveKey) MarshalJSON() ([]byte, error) {
+// 	var buffer bytes.Buffer
+// 	_, err := pk.WriteTo(&buffer)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return buffer.Bytes(), nil
+// }
 
-	return err
-}
+// func (pk *ProveKey) UnmarshalJSON(buf []byte) error {
+// 	if string(buf) == "null" {
+// 		return nil
+// 	}
 
-func (pk ProveKey) MarshalJSON() ([]byte, error) {
-	var buffer bytes.Buffer
-	_, err := pk.WriteTo(&buffer)
-	if err != nil {
-		return nil, err
-	}
-	return buffer.Bytes(), nil
-}
+// 	var z groth16.ProvingKey
+// 	reader := bytes.NewReader(buf)
+// 	_, err := z.ReadFrom(reader)
 
-func (pk *ProveKey) UnmarshalJSON(buf []byte) error {
-	if string(buf) == "null" {
-		return nil
-	}
+// 	if err != nil {
+// 		pk.ProvingKey = z
+// 	}
 
-	var z groth16.ProvingKey
-	reader := bytes.NewReader(buf)
-	_, err := z.ReadFrom(reader)
+// 	return err
+// }
 
-	if err != nil {
-		pk.ProvingKey = z
-	}
+// func (vk VerifyKey) MarshalJSON() ([]byte, error) {
+// 	var buffer bytes.Buffer
+// 	_, err := vk.WriteTo(&buffer)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return buffer.Bytes(), nil
+// }
 
-	return err
-}
+// func (pk *VerifyKey) UnmarshalJSON(buf []byte) error {
+// 	if string(buf) == "null" {
+// 		return nil
+// 	}
 
-func (vk VerifyKey) MarshalJSON() ([]byte, error) {
-	var buffer bytes.Buffer
-	_, err := vk.WriteTo(&buffer)
-	if err != nil {
-		return nil, err
-	}
-	return buffer.Bytes(), nil
-}
+// 	var z groth16.VerifyingKey
+// 	reader := bytes.NewReader(buf)
+// 	_, err := z.ReadFrom(reader)
 
-func (pk *VerifyKey) UnmarshalJSON(buf []byte) error {
-	if string(buf) == "null" {
-		return nil
-	}
+// 	if err != nil {
+// 		pk.VerifyingKey = z
+// 	}
 
-	var z groth16.VerifyingKey
-	reader := bytes.NewReader(buf)
-	_, err := z.ReadFrom(reader)
-
-	if err != nil {
-		pk.VerifyingKey = z
-	}
-
-	return err
-}
+// 	return err
+// }
 
 // func EncodeCircuit(circuit constraint.ConstraintSystem) ([]byte, error) {
 // 	return encode.EncodeWithWriteTo(circuit)

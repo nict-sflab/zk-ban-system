@@ -5,8 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/akakou/snark-utils/encode"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/dump"
+	"github.com/akakou/zk-ban/snark"
+	"github.com/consensys/gnark/backend/groth16"
 )
 
 //go:embed join_prover.key.json
@@ -27,13 +30,13 @@ var SignVerifierKey []byte
 //go:embed all:update_verifier-*-*.key.json
 var UpdateVerifierKey embed.FS
 
-func LoadKeyWithRL[T any](format string, fs embed.FS) (map[core.RevocationListSize]T, error) {
+func LoadKeyWithRL[T any](format string, fs embed.FS, fun func([]byte) (T, error)) (map[core.RevocationListSize]T, error) {
 	files, err := fs.ReadDir(".")
 	if err != nil {
 		return nil, err
 	}
 
-	keys := new(map[core.RevocationListSize]T)
+	keys := make(map[core.RevocationListSize]T)
 	for _, f := range files {
 		name := f.Name()
 
@@ -52,24 +55,44 @@ func LoadKeyWithRL[T any](format string, fs embed.FS) (map[core.RevocationListSi
 			return nil, err
 		}
 
-		var key *T
-		err = json.Unmarshal(buf, key)
-
-		if err != nil {
-			return nil, err
-		}
-
-		(*keys)[index] = *key
+		key, err := fun(buf)
+		keys[index] = key
 	}
 
-	return *keys, nil
+	return keys, nil
 
 }
 
-func LoadUserUpdateKey() (core.ProvingKeys, error) {
-	return LoadKeyWithRL[core.SnarkProver](dump.UpdateProverKeyFileNameFormat, UpdateProverKey)
+func DocodeProver(buf []byte) (*snark.SnarkProver, error) {
+	prover := encode.HighLevelSnarkProver{}
+
+	err := json.Unmarshal(buf, &prover)
+	if err != nil {
+		return nil, err
+	}
+
+	prover2, err := prover.ToSnarkProver()
+	if err != nil {
+		return nil, err
+	}
+
+	res := snark.SnarkProver{
+		ConstraintSystem: prover2.ConstraintSystem,
+		ProveKey:         prover2.ProveKey,
+	}
+
+	return &res, nil
+
 }
 
-func LoadGroupManagerUpdateKey() (core.VerifyingKeys, error) {
-	return LoadKeyWithRL[core.VerifyingKey](dump.UpdateVerifierKeyFileNameFormat, UpdateVerifierKey)
+func LoadUserUpdateKey() (map[core.RevocationListSize]*snark.SnarkProver, error) {
+	return LoadKeyWithRL(dump.UpdateProverKeyFileNameFormat, UpdateProverKey, DocodeProver)
+}
+
+func LoadGroupManagerUpdateKey() (map[core.RevocationListSize]groth16.VerifyingKey, error) {
+	keys, err := LoadKeyWithRL(dump.UpdateVerifierKeyFileNameFormat, UpdateVerifierKey, encode.DecodeVerifierKey)
+	if err != nil {
+		return nil, err
+	}
+	return keys, nil
 }

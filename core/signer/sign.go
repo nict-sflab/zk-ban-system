@@ -3,17 +3,23 @@ package signer
 import (
 	"encoding/json"
 
+	"github.com/akakou/snark-utils/encode"
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/load"
 	"github.com/akakou/zk-ban/primitives"
+	"github.com/akakou/zk-ban/snark"
 	zkbanw "github.com/akakou/zk-ban/witness"
-	"github.com/consensys/gnark-crypto/signature"
 )
 
 func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error) {
-	proverObj := core.SnarkProver{}
+	proverObj := encode.HighLevelSnarkProver{}
 	err := json.Unmarshal(load.SignProverKey, &proverObj)
+	if err != nil {
+		return nil, err
+	}
+
+	prover, err := proverObj.ToSnarkProver()
 
 	if err != nil {
 		return nil, err
@@ -25,8 +31,8 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error
 		return nil, err
 	}
 
-	var gpkObj signature.PublicKey
-	_, err = gpkObj.SetBytes(signer)
+	_, gpkObj, _ := zkbanw.RandomGroupKeyPair()
+	_, err = gpkObj.SetBytes(gpk)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +42,10 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error
 		count,
 		&signerObj,
 		&zkbanw.GroupPublicKey{PublicKey: gpkObj},
-		proverObj.CoreKey(),
+		&snark.SnarkProver{
+			prover.ConstraintSystem,
+			prover.ProveKey,
+		},
 	)
 	if err != nil {
 		return nil, err
