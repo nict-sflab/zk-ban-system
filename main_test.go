@@ -5,10 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/akakou/snark-utils/encode"
 	"github.com/akakou/zk-ban-system/client/signer"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm"
 	coreverifier "github.com/akakou/zk-ban-system/core/verifier"
+	"github.com/akakou/zk-ban-system/load"
 	gmserv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/serv/verifier"
 	"github.com/akakou/zk-ban-system/utils"
@@ -58,8 +60,13 @@ func TestMain(t *testing.T) {
 
 	gmServ.SetupEchoServer(e)
 
+	verifierKey, err := encode.DecodeVerifierKey(load.SignVerifierKey)
+	if err != nil {
+		t.Fatal(err)
+	}
 	v := coreverifier.Verifier{
 		GroupPublicKey: &g.GroupPublicKey,
+		VerifyingKey:   verifierKey,
 	}
 
 	verifierServ := verifier.VerifierServer{
