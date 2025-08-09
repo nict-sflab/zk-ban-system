@@ -12,4 +12,4 @@ func today() int64 {
 	return today
 }
 
-var Today = today
+var Period = today

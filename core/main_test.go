@@ -25,7 +25,7 @@ func passDay() {
 }
 
 func TestAll(t *testing.T) {
-	utils.Today = today
+	utils.Period = today
 	before := today()
 
 	gsk, gpk, err := witness.RandomGroupKeyPair()

@@ -36,7 +36,7 @@ func main() {
 	e.GET("/period", func(c echo.Context) error {
 		str := c.QueryParam("period")
 		if str == "" {
-			return c.String(200, strconv.Itoa(int(utils.Today())))
+			return c.String(200, strconv.Itoa(int(utils.Period())))
 		}
 
 		i, err := strconv.Atoi(str)
@@ -44,7 +44,7 @@ func main() {
 			return err
 		}
 
-		utils.Today = func() int64 {
+		utils.Period = func() int64 {
 			return int64(i)
 		}
 

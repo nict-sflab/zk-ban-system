@@ -11,7 +11,7 @@ import (
 )
 
 func RequestUpdate(rl, signer, gpk []byte) ([]byte, []byte, error) {
-	today := utils.Today()
+	today := utils.Period()
 
 	var rlObj core.RevocationList
 	err := json.Unmarshal(rl, &rlObj)

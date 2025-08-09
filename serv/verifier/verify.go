@@ -11,7 +11,7 @@ import (
 func (serv *VerifierServer) VerifyEndpoint() func(c echo.Context) error {
 	return func(c echo.Context) error {
 		sigString := c.QueryParam("signature")
-		period := utils.Today()
+		period := utils.Period()
 
 		var signature core.Signature
 		err := json.Unmarshal([]byte(sigString), &signature)

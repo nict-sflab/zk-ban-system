@@ -27,7 +27,7 @@ func TestQuery(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	utils.Today = today
+	utils.Period = today
 
 	for range 100 {
 		g.DB.Client.Revocation.Create().

@@ -24,7 +24,7 @@ func (gm *GroupManager[T]) IssueCredential(identifer string, req *corecore.JoinR
 	if exist {
 		return "", ErrAlreadyRegisterd
 	}
-	period := utils.Today()
+	period := utils.Period()
 
 	err = req.JoinRequest.Verify(period, gm.JoinVerifyKey.VerifyingKey)
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 )
 
 func RequestJoin[T any](option T) ([]byte, []byte, error) {
-	period := utils.Today()
+	period := utils.Period()
 
 	proverObj, err := load.DocodeProver(load.JoinProverKey)
 	if err != nil {

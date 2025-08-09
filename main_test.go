@@ -30,7 +30,7 @@ func passDay() {
 }
 
 func TestMain(t *testing.T) {
-	utils.Today = today
+	utils.Period = today
 
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {

@@ -26,7 +26,7 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 		return "", ErrAlreadyIssueCredential
 	}
 
-	after := utils.Today()
+	after := utils.Period()
 
 	index := corecore.KeyIndex{
 		First:  after,

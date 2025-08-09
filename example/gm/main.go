@@ -40,7 +40,7 @@ func main() {
 	e.GET("/period", func(c echo.Context) error {
 		str := c.QueryParam("period")
 		if str == "" {
-			return c.String(200, strconv.Itoa(int(utils.Today())))
+			return c.String(200, strconv.Itoa(int(utils.Period())))
 		}
 
 		i, err := strconv.Atoi(str)
@@ -48,7 +48,7 @@ func main() {
 			return err
 		}
 
-		utils.Today = func() int64 {
+		utils.Period = func() int64 {
 			return int64(i)
 		}
 
@@ -73,7 +73,7 @@ func main() {
 		gmServ.GM.DB.Client.Revocation.Create().
 			SetCount(int(signature.Count)).
 			SetNym(signature.Signature.Commit.Nym.Bytes()).
-			SetRevokedPeriod(int(utils.Today())).
+			SetRevokedPeriod(int(utils.Period())).
 			SetSignedPeriod(p).
 			SaveX(*gmServ.GM.DB.Ctx)
 
