@@ -1,7 +1,9 @@
 package verifier
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
 
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/utils"
@@ -19,8 +21,8 @@ func (serv *VerifierServer) VerifyEndpoint() func(c echo.Context) error {
 			return err
 		}
 
-		// nym := base64.URLEncoding.EncodeToString(signature.Signature.Commit.Nym)
-		// fmt.Printf("%v\n%v\n", nym, signature.Count)
+		nym := base64.URLEncoding.EncodeToString(signature.Signature.Commit.Nym.Bytes())
+		fmt.Printf("%v\n%v\n", nym, signature.Count)
 
 		err = serv.Verifier.Verify(&signature, period)
 		if err != nil {
