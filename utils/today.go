@@ -12,4 +12,12 @@ func today() int64 {
 	return today
 }
 
-var Period = today
+func shortPeriod() int64 {
+	t := time.Now()
+	halfMinutes := time.Second * 30
+
+	today := t.UnixNano() / int64(halfMinutes)
+	return today
+}
+
+var Period = shortPeriod
