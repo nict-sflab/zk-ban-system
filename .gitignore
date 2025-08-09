@@ -26,3 +26,5 @@ go.work.sum
 prepare/tools/main
 *.key.json
 dump/tools/tools
+example/signer/signer.json
+example/signer/gpk.bin
