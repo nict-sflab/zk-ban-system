@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"math/big"
 
-	snark "github.com/akakou/snark-utils"
-	snarkencode "github.com/akakou/snark-utils/encode"
+	gnarkserializable "github.com/akakou/gnark-serializable"
+	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban/circuit"
 	"github.com/akakou/zk-ban/precomputes"
+	"github.com/akakou/zk-ban/snark"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/consensys/gnark/frontend"
 )
@@ -18,24 +19,14 @@ func Prepare[T frontend.Circuit](c T) ([]byte, []byte, error) {
 		return nil, nil, err
 	}
 
-	encodedProveKey, err := snarkencode.EncodeProverKey(cc.ProveKey)
+	verifierBuf, err := json.Marshal(&gnarkserializable.VerifyingKey{cc.VerifyKey})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	encodedVerifyKey, err := snarkencode.EncodeVerifierKey(cc.VerifyKey)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	encodedCircuit, err := snarkencode.EncodeCircuit(cc.ConstraintSystem)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	prover := snarkencode.HighLevelSnarkProver{
-		ConstraintSystem: encodedCircuit,
-		ProveKey:         encodedProveKey,
+	prover := core.SnarkProver{
+		ConstraintSystem: &gnarkserializable.ConstraintSystem{cc.ConstraintSystem},
+		ProveKey:         &gnarkserializable.ProvingKey{cc.ProveKey},
 	}
 
 	proverBuf, err := json.Marshal(&prover)
@@ -43,7 +34,7 @@ func Prepare[T frontend.Circuit](c T) ([]byte, []byte, error) {
 		return nil, nil, err
 	}
 
-	return proverBuf, encodedVerifyKey, nil
+	return proverBuf, verifierBuf, nil
 }
 
 func JoinRequestCircuit() ([]byte, []byte, error) {

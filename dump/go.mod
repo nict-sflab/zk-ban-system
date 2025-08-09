@@ -8,14 +8,18 @@ replace github.com/akakou/zk-ban => ../../zk-ban
 
 replace github.com/akakou/gnark-precomputes => ../../gnark-precomputes
 
+replace github.com/akakou/gnark-serializable => ../../gnark-serializable
+
 require (
 	github.com/akakou/snark-utils v0.0.2
 	github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
+	github.com/akakou/zk-ban-system v0.0.0-00010101000000-000000000000
 	github.com/consensys/gnark v0.13.0
 )
 
 require (
 	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000 // indirect
+	github.com/akakou/gnark-serializable v0.0.0-00010101000000-000000000000 // indirect
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/consensys/gnark-crypto v0.18.0 // indirect

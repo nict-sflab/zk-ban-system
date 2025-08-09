@@ -1,11 +1,9 @@
 package zkbansystem
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/akakou/snark-utils/encode"
 	"github.com/akakou/zk-ban-system/client/signer"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm"
@@ -60,7 +58,7 @@ func TestMain(t *testing.T) {
 
 	gmServ.SetupEchoServer(e)
 
-	verifierKey, err := encode.DecodeVerifierKey(load.SignVerifierKey)
+	verifierKey, err := load.DocodeVerifyingKey(load.SignVerifierKey)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,8 +132,6 @@ func TestMain(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	fmt.Printf("%v", s12)
 
 	_, err = signer.RequestUpdate(s12, rlBuf3, gpk2, "http://localhost:1323/update-credential")
 	if err != nil {

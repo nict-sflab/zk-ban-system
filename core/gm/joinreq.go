@@ -3,7 +3,6 @@ package gm
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
@@ -27,8 +26,7 @@ func (gm *GroupManager[T]) IssueCredential(identifer string, req *corecore.JoinR
 	}
 	period := utils.Today()
 
-	fmt.Printf("a: %v, b: %v, c: %v", period, gm.JoinVerifyKey, req.JoinRequest)
-	err = req.JoinRequest.Verify(period, gm.JoinVerifyKey)
+	err = req.JoinRequest.Verify(period, gm.JoinVerifyKey.VerifyingKey)
 	if err != nil {
 		return "", err
 	}

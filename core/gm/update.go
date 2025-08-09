@@ -43,7 +43,7 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 
 		gk := gm.VerifierKeys[*rl.Size]
 
-		vk, err := precomputes.NewUpdateVerificationKeyBLS12381(gk)
+		vk, err := precomputes.NewUpdateVerificationKeyBLS12381(gk.VerifyingKey)
 		prepared, err := vk.PrecomputeVerify(*rl.List, &gm.GroupPublicKey)
 		if err != nil {
 			return "", err

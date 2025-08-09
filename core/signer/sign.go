@@ -3,24 +3,16 @@ package signer
 import (
 	"encoding/json"
 
-	"github.com/akakou/snark-utils/encode"
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/load"
 	"github.com/akakou/zk-ban/primitives"
-	"github.com/akakou/zk-ban/snark"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error) {
-	proverObj := encode.HighLevelSnarkProver{}
+	proverObj := core.SnarkProver{}
 	err := json.Unmarshal(load.SignProverKey, &proverObj)
-	if err != nil {
-		return nil, err
-	}
-
-	prover, err := proverObj.ToSnarkProver()
-
 	if err != nil {
 		return nil, err
 	}
@@ -42,10 +34,7 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error
 		count,
 		&signerObj,
 		&zkbanw.GroupPublicKey{PublicKey: gpkObj},
-		&snark.SnarkProver{
-			prover.ConstraintSystem,
-			prover.ProveKey,
-		},
+		proverObj.CoreKey(),
 	)
 	if err != nil {
 		return nil, err

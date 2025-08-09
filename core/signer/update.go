@@ -37,7 +37,7 @@ func RequestUpdate(rl, signer, gpk []byte) ([]byte, []byte, error) {
 		return nil, nil, err
 	}
 
-	coreReq, err := zkban.RequestUpdate(today, &signerObj, *rlObj.List, gpkObj, prover)
+	coreReq, err := zkban.RequestUpdate(today, &signerObj, *rlObj.List, gpkObj, prover.CoreKey())
 	if err != nil {
 		return nil, nil, err
 	}

@@ -2,39 +2,23 @@ package signer
 
 import (
 	"encoding/json"
-	"fmt"
 
-	"github.com/akakou/snark-utils/encode"
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/load"
 	"github.com/akakou/zk-ban-system/utils"
-	"github.com/akakou/zk-ban/snark"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 func RequestJoin[T any](option T) ([]byte, []byte, error) {
 	period := utils.Today()
 
-	proverObj := encode.HighLevelSnarkProver{}
-	err := json.Unmarshal(load.JoinProverKey, &proverObj)
-
+	proverObj, err := load.DocodeProver(load.JoinProverKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// todo:
-	tmp, err := proverObj.ToSnarkProver()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	prover := snark.SnarkProver{
-		ConstraintSystem: tmp.ConstraintSystem,
-		ProveKey:         tmp.ProveKey,
-	}
-
-	proof, usk, err := zkban.RequestJoin(period, &prover)
+	proof, usk, err := zkban.RequestJoin(period, proverObj.CoreKey())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -51,7 +35,6 @@ func RequestJoin[T any](option T) ([]byte, []byte, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Printf("aaa %v\n", string(signerBytes))
 
 	req := core.JoinRequest[T]{
 		Period:      period,
@@ -63,8 +46,6 @@ func RequestJoin[T any](option T) ([]byte, []byte, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Printf("bbb %v\n", string(reqBytes))
-	fmt.Printf("bbb %x\n", req.JoinRequest.UserPublicKey)
 
 	return reqBytes, signerBytes, nil
 

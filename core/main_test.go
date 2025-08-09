@@ -3,10 +3,8 @@ package core
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"testing"
 
-	"github.com/akakou/snark-utils/encode"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/core/gm"
 	"github.com/akakou/zk-ban-system/core/signer"
@@ -44,9 +42,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("gpk: %v", g.GroupPublicKey)
-
-	verifierKey, err := encode.DecodeVerifierKey(load.SignVerifierKey)
+	verifierKey, err := load.DocodeVerifyingKey(load.SignVerifierKey)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,15 +57,11 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("hello: %v\n", string(reqBody))
-
 	var req core.JoinRequest[string]
 	err = json.Unmarshal(reqBody, &req)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	fmt.Printf("hello: %v\n", req.JoinRequest)
 
 	cred, err := g.IssueCredential("", &req)
 	if err != nil {
@@ -119,8 +111,6 @@ func TestAll(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	fmt.Printf("aaaaaaaaaaaaaaa is %v:\n", string(updateReqBuf))
 
 	var updateReq core.UpdateRequest
 	err = json.Unmarshal(updateReqBuf, &updateReq)

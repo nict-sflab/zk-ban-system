@@ -1,20 +1,17 @@
 package verifier
 
 import (
-	"fmt"
-
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban/primitives"
 )
 
 func (verifier *Verifier) Verify(signature *corecore.Signature, period int64) error {
-	fmt.Printf("verifier: %v", verifier.VerifyingKey)
 	err := signature.Signature.Verify(
 		primitives.BigIntFromBytes(signature.Message),
 		signature.Count,
 		period,
 		verifier.GroupPublicKey,
-		verifier.VerifyingKey)
+		verifier.VerifyingKey.VerifyingKey)
 	if err != nil {
 		return err
 	}

@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/akakou/snark-utils/encode"
+	gnarkserializable "github.com/akakou/gnark-serializable"
 	"github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/dump"
-	"github.com/akakou/zk-ban/snark"
-	"github.com/consensys/gnark/backend/groth16"
 )
 
 //go:embed join_prover.key.json
@@ -56,6 +54,10 @@ func LoadKeyWithRL[T any](format string, fs embed.FS, fun func([]byte) (T, error
 		}
 
 		key, err := fun(buf)
+		if err != nil {
+			return nil, err
+		}
+
 		keys[index] = key
 	}
 
@@ -63,36 +65,29 @@ func LoadKeyWithRL[T any](format string, fs embed.FS, fun func([]byte) (T, error
 
 }
 
-func DocodeProver(buf []byte) (*snark.SnarkProver, error) {
-	prover := encode.HighLevelSnarkProver{}
+func DocodeProver(buf []byte) (*core.SnarkProver, error) {
+	prover := core.SnarkProver{}
 
 	err := json.Unmarshal(buf, &prover)
-	if err != nil {
-		return nil, err
-	}
-
-	prover2, err := prover.ToSnarkProver()
-	if err != nil {
-		return nil, err
-	}
-
-	res := snark.SnarkProver{
-		ConstraintSystem: prover2.ConstraintSystem,
-		ProveKey:         prover2.ProveKey,
-	}
-
-	return &res, nil
-
+	return &prover, err
 }
 
-func LoadUserUpdateKey() (map[core.RevocationListSize]*snark.SnarkProver, error) {
+func DocodeVerifyingKey(buf []byte) (*gnarkserializable.VerifyingKey, error) {
+	verifyingKey := gnarkserializable.VerifyingKey{}
+
+	err := json.Unmarshal(buf, &verifyingKey)
+	return &verifyingKey, err
+}
+
+func LoadUserUpdateKey() (map[core.RevocationListSize]*core.SnarkProver, error) {
 	return LoadKeyWithRL(dump.UpdateProverKeyFileNameFormat, UpdateProverKey, DocodeProver)
 }
 
-func LoadGroupManagerUpdateKey() (map[core.RevocationListSize]groth16.VerifyingKey, error) {
-	keys, err := LoadKeyWithRL(dump.UpdateVerifierKeyFileNameFormat, UpdateVerifierKey, encode.DecodeVerifierKey)
+func LoadGroupManagerUpdateKey() (map[core.RevocationListSize]*gnarkserializable.VerifyingKey, error) {
+	keys, err := LoadKeyWithRL(dump.UpdateVerifierKeyFileNameFormat, UpdateVerifierKey, DocodeVerifyingKey)
 	if err != nil {
 		return nil, err
 	}
+
 	return keys, nil
 }

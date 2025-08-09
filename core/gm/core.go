@@ -1,7 +1,7 @@
 package gm
 
 import (
-	"github.com/akakou/snark-utils/encode"
+	gnarkserializable "github.com/akakou/gnark-serializable"
 	corecore "github.com/akakou/zk-ban-system/core/core"
 	"github.com/akakou/zk-ban-system/load"
 	zkbanw "github.com/akakou/zk-ban/witness"
@@ -10,7 +10,7 @@ import (
 type GroupManager[T any] struct {
 	GroupSecretKey         zkbanw.GroupSecretKey
 	GroupPublicKey         zkbanw.GroupPublicKey
-	JoinVerifyKey          corecore.VerifyingKey
+	JoinVerifyKey          *gnarkserializable.VerifyingKey
 	VerifierKeys           corecore.VerifyingKeys
 	PreparedSnarkVerifiers map[corecore.KeyIndex]*PreparedSnarkVerifier
 	DB                     *DB
@@ -22,7 +22,12 @@ func Default[T any](gsk []byte, dbConfig *DBConfig) (*GroupManager[T], error) {
 		return nil, err
 	}
 
-	u, err := load.LoadGroupManagerUpdateKey()
+	joinVerifierKey, err := load.DocodeVerifyingKey(load.JoinVerifierKey)
+	if err != nil {
+		return nil, err
+	}
+
+	updateVerifierKeys, err := load.LoadGroupManagerUpdateKey()
 	if err != nil {
 		return nil, err
 	}
@@ -34,16 +39,11 @@ func Default[T any](gsk []byte, dbConfig *DBConfig) (*GroupManager[T], error) {
 
 	gpk := gskw.Public()
 
-	joinVerifierKey, err := encode.DecodeVerifierKey(load.JoinVerifierKey)
-	if err != nil {
-		return nil, err
-	}
-
 	g := GroupManager[T]{
 		GroupSecretKey:         zkbanw.GroupSecretKey{gskw},
 		GroupPublicKey:         zkbanw.GroupPublicKey{gpk},
 		JoinVerifyKey:          joinVerifierKey,
-		VerifierKeys:           u,
+		VerifierKeys:           updateVerifierKeys,
 		PreparedSnarkVerifiers: make(map[corecore.KeyIndex]*PreparedSnarkVerifier),
 		DB:                     db,
 	}

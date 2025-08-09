@@ -12,6 +12,5 @@ func main() {
 	// dump.DumpUpdateKeys(130, 135)
 	// dump.DumpUpdateKeys(75, 135)
 	// dump.DumpUpdateKeys(32, 135)
-	dump.DumpUpdateKeys(75, 65)
-	dump.DumpUpdateKeys(32, 65)
+	dump.DumpUpdateKeys(5, 5)
 }

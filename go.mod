@@ -8,9 +8,12 @@ replace github.com/akakou/gnark-precomputes => ../gnark-precomputes
 
 replace github.com/akakou/zk-ban-system/dump => ./dump
 
+replace github.com/akakou/gnark-serializable => ../gnark-serializable
+
 require (
 	entgo.io/ent v0.14.4
 	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000
+	github.com/akakou/gnark-serializable v0.0.0-00010101000000-000000000000
 	github.com/akakou/snark-utils v0.0.2
 	github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
 	github.com/akakou/zk-ban-system/dump v0.0.0-00010101000000-000000000000
