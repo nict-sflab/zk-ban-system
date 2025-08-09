@@ -7,6 +7,7 @@ import (
 	snark "github.com/akakou/snark-utils"
 	snarkencode "github.com/akakou/snark-utils/encode"
 	"github.com/akakou/zk-ban/circuit"
+	"github.com/akakou/zk-ban/precomputes"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/consensys/gnark/frontend"
 )
@@ -64,7 +65,9 @@ func UpdateCircuit(nymsNumberPerSession, sessionNumber int) ([]byte, []byte, err
 		rlWit = append(rlWit, rns)
 	}
 
-	return Prepare(&circuit.UpdateCircuit{
-		RevocationList: circuit.NewRevocationListWitness(rlWit),
+	return Prepare(&precomputes.UpdateCircuit{
+		UpdateCircuit: &circuit.UpdateCircuit{
+			RevocationList: circuit.NewRevocationListWitness(rlWit),
+		},
 	})
 }

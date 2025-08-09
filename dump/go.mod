@@ -15,6 +15,7 @@ require (
 )
 
 require (
+	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000 // indirect
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/consensys/gnark-crypto v0.18.0 // indirect
