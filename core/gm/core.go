@@ -2,7 +2,7 @@ package gm
 
 import (
 	gnarkserializable "github.com/akakou/gnark-serializable"
-	corecore "github.com/akakou/zk-ban-system/core/core"
+	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/load"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )

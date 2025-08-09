@@ -3,7 +3,7 @@ package verifier
 import (
 	"encoding/json"
 
-	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/labstack/echo/v4"
 )

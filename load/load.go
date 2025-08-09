@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	gnarkserializable "github.com/akakou/gnark-serializable"
-	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/dump"
 )
 

@@ -1,7 +1,7 @@
 package gm
 
 import (
-	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core"
 	coregm "github.com/akakou/zk-ban-system/core/gm"
 )
 

@@ -1,11 +1,11 @@
-package core
+package core_test
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	"testing"
 
-	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm"
 	"github.com/akakou/zk-ban-system/core/signer"
 	"github.com/akakou/zk-ban-system/core/verifier"

@@ -1,8 +1,8 @@
 package gm
 
 import (
-	"github.com/akakou/zk-ban-system/core/core"
-	corecore "github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core"
+	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
 	"github.com/akakou/zk-ban-system/core/gm/ent/revocation"
 )

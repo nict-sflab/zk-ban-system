@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	gnarkserializable "github.com/akakou/gnark-serializable"
-	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban/circuit"
 	"github.com/akakou/zk-ban/precomputes"
 	"github.com/akakou/zk-ban/snark"

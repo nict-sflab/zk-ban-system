@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	zkban "github.com/akakou/zk-ban"
-	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/load"
 	"github.com/akakou/zk-ban/primitives"
 	zkbanw "github.com/akakou/zk-ban/witness"

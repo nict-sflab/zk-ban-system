@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 
-	corecore "github.com/akakou/zk-ban-system/core/core"
+	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/precomputes"

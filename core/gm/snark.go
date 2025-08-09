@@ -3,7 +3,7 @@ package gm
 import (
 	"math"
 
-	corecore "github.com/akakou/zk-ban-system/core/core"
+	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban/precomputes"
 	curve_bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381"
 	fr_bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381/fr"

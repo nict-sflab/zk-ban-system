@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	corecore "github.com/akakou/zk-ban-system/core/core"
+	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm"
 	core "github.com/akakou/zk-ban-system/core/gm"
 	serv "github.com/akakou/zk-ban-system/serv/gm"

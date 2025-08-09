@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/akakou/zk-ban-system/client/signer"
-	"github.com/akakou/zk-ban-system/core/core"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm"
 	coreverifier "github.com/akakou/zk-ban-system/core/verifier"
 	"github.com/akakou/zk-ban-system/load"

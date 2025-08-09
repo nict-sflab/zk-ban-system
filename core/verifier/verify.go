@@ -1,7 +1,7 @@
 package verifier
 
 import (
-	corecore "github.com/akakou/zk-ban-system/core/core"
+	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban/primitives"
 )
 
