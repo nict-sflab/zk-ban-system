@@ -3,7 +3,6 @@ package signer
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
@@ -44,8 +43,6 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("periods: %v %v\n", now, signerObj.Period)
 
 	req := core.UpdateRequest{
 		Before:        signerObj.Period,

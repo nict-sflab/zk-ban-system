@@ -3,7 +3,6 @@ package gm
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 
 	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
@@ -13,7 +12,6 @@ import (
 var ErrAlreadyIssueCredential = errors.New("already issue credential")
 
 func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after int64) (string, error) {
-	fmt.Printf("period: %v\n", after)
 	if after == req.Before {
 		return "", errors.New("no update")
 	}

@@ -3,7 +3,6 @@ package signer
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"net/http"
 
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
@@ -41,6 +40,5 @@ func RequestUpdate(signer, rl, gpk []byte, url string) ([]byte, error) {
 		return nil, err
 	}
 
-	fmt.Printf("next: %v\n", string(newSignerFinalized))
 	return newSignerFinalized, nil
 }
