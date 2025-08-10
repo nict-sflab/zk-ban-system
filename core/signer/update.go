@@ -56,17 +56,3 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 
 	return reqBytes, nil
 }
-
-// func UpdateCredential(a signer) ([]byte, []byte, error) {
-
-// 	signerObj.UserPublicKey = upk
-// 	signerObj.Credential = cred
-// 	signerObj.Period = period
-
-// 	signerBytes, err := json.Marshal(signerObj)
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
-
-// 	return signerBytes, nil
-// }
