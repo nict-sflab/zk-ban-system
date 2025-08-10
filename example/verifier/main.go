@@ -1,19 +1,14 @@
 package main
 
 import (
-	"strconv"
-
 	signer "github.com/akakou/zk-ban-system/client/signer"
 	core "github.com/akakou/zk-ban-system/core/verifier"
 	"github.com/akakou/zk-ban-system/load"
 	serv "github.com/akakou/zk-ban-system/serv/verifier"
-	"github.com/akakou/zk-ban-system/utils"
 	zkbanw "github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
-
-const SIGN_VERIFIER_PATH = "../../load/sign_verifier.key.json"
 
 func main() {
 	gpkBuf, err := signer.FetchGroupPublicKey("http://localhost:8080/group-public-key")
@@ -40,23 +35,23 @@ func main() {
 
 	e := echo.New()
 
-	e.GET("/period", func(c echo.Context) error {
-		str := c.QueryParam("period")
-		if str == "" {
-			return c.String(200, strconv.Itoa(int(utils.Period())))
-		}
+	// e.GET("/period", func(c echo.Context) error {
+	// 	str := c.QueryParam("period")
+	// 	if str == "" {
+	// 		return c.String(200, strconv.Itoa(int(utils.Period())))
+	// 	}
 
-		i, err := strconv.Atoi(str)
-		if err != nil {
-			return err
-		}
+	// 	i, err := strconv.Atoi(str)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		utils.Period = func() int64 {
-			return int64(i)
-		}
+	// 	utils.Period = func() int64 {
+	// 		return int64(i)
+	// 	}
 
-		return c.String(200, strconv.Itoa(i))
-	})
+	// 	return c.String(200, strconv.Itoa(i))
+	// })
 
 	verifierServ.SetupEchoServer(e)
 	e.Debug = true
