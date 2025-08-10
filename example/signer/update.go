@@ -34,6 +34,6 @@ var updateCmd = &cobra.Command{
 		}
 
 		fmt.Print(string(res))
-		writeFile(config, SIGNER_PATH)
+		writeFile(res, SIGNER_PATH)
 	},
 }
