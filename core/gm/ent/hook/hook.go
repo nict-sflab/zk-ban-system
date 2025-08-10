@@ -9,16 +9,16 @@ import (
 	"github.com/akakou/zk-ban-system/core/gm/ent"
 )
 
-// The CredentialFunc type is an adapter to allow the use of ordinary
-// function as Credential mutator.
-type CredentialFunc func(context.Context, *ent.CredentialMutation) (ent.Value, error)
+// The IDTokenFunc type is an adapter to allow the use of ordinary
+// function as IDToken mutator.
+type IDTokenFunc func(context.Context, *ent.IDTokenMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f CredentialFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.CredentialMutation); ok {
+func (f IDTokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.IDTokenMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CredentialMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IDTokenMutation", m)
 }
 
 // The RevocationFunc type is an adapter to allow the use of ordinary
@@ -31,6 +31,18 @@ func (f RevocationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RevocationMutation", m)
+}
+
+// The UpdateTicketFunc type is an adapter to allow the use of ordinary
+// function as UpdateTicket mutator.
+type UpdateTicketFunc func(context.Context, *ent.UpdateTicketMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UpdateTicketFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UpdateTicketMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UpdateTicketMutation", m)
 }
 
 // Condition is a hook condition function.

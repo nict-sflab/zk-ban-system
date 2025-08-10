@@ -8,18 +8,16 @@ import (
 )
 
 var (
-	// CredentialsColumns holds the columns for the "credentials" table.
-	CredentialsColumns = []*schema.Column{
+	// IDTokensColumns holds the columns for the "id_tokens" table.
+	IDTokensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "credential", Type: field.TypeBytes},
-		{Name: "public_key", Type: field.TypeBytes},
-		{Name: "identifier", Type: field.TypeString, Nullable: true},
+		{Name: "id_token", Type: field.TypeString},
 	}
-	// CredentialsTable holds the schema information for the "credentials" table.
-	CredentialsTable = &schema.Table{
-		Name:       "credentials",
-		Columns:    CredentialsColumns,
-		PrimaryKey: []*schema.Column{CredentialsColumns[0]},
+	// IDTokensTable holds the schema information for the "id_tokens" table.
+	IDTokensTable = &schema.Table{
+		Name:       "id_tokens",
+		Columns:    IDTokensColumns,
+		PrimaryKey: []*schema.Column{IDTokensColumns[0]},
 	}
 	// RevocationsColumns holds the columns for the "revocations" table.
 	RevocationsColumns = []*schema.Column{
@@ -35,10 +33,22 @@ var (
 		Columns:    RevocationsColumns,
 		PrimaryKey: []*schema.Column{RevocationsColumns[0]},
 	}
+	// UpdateTicketsColumns holds the columns for the "update_tickets" table.
+	UpdateTicketsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "ticket", Type: field.TypeBytes},
+	}
+	// UpdateTicketsTable holds the schema information for the "update_tickets" table.
+	UpdateTicketsTable = &schema.Table{
+		Name:       "update_tickets",
+		Columns:    UpdateTicketsColumns,
+		PrimaryKey: []*schema.Column{UpdateTicketsColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		CredentialsTable,
+		IDTokensTable,
 		RevocationsTable,
+		UpdateTicketsTable,
 	}
 )
 

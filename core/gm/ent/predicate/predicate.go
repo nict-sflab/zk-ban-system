@@ -6,8 +6,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Credential is the predicate function for credential builders.
-type Credential func(*sql.Selector)
+// IDToken is the predicate function for idtoken builders.
+type IDToken func(*sql.Selector)
 
 // Revocation is the predicate function for revocation builders.
 type Revocation func(*sql.Selector)
+
+// UpdateTicket is the predicate function for updateticket builders.
+type UpdateTicket func(*sql.Selector)

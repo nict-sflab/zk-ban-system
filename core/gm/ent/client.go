@@ -14,8 +14,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
-	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
+	"github.com/akakou/zk-ban-system/core/gm/ent/idtoken"
 	"github.com/akakou/zk-ban-system/core/gm/ent/revocation"
+	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 )
 
 // Client is the client that holds all ent builders.
@@ -23,10 +24,12 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// Credential is the client for interacting with the Credential builders.
-	Credential *CredentialClient
+	// IDToken is the client for interacting with the IDToken builders.
+	IDToken *IDTokenClient
 	// Revocation is the client for interacting with the Revocation builders.
 	Revocation *RevocationClient
+	// UpdateTicket is the client for interacting with the UpdateTicket builders.
+	UpdateTicket *UpdateTicketClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -38,8 +41,9 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.Credential = NewCredentialClient(c.config)
+	c.IDToken = NewIDTokenClient(c.config)
 	c.Revocation = NewRevocationClient(c.config)
+	c.UpdateTicket = NewUpdateTicketClient(c.config)
 }
 
 type (
@@ -130,10 +134,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		Credential: NewCredentialClient(cfg),
-		Revocation: NewRevocationClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		IDToken:      NewIDTokenClient(cfg),
+		Revocation:   NewRevocationClient(cfg),
+		UpdateTicket: NewUpdateTicketClient(cfg),
 	}, nil
 }
 
@@ -151,17 +156,18 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		Credential: NewCredentialClient(cfg),
-		Revocation: NewRevocationClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		IDToken:      NewIDTokenClient(cfg),
+		Revocation:   NewRevocationClient(cfg),
+		UpdateTicket: NewUpdateTicketClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Credential.
+//		IDToken.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -183,130 +189,134 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Credential.Use(hooks...)
+	c.IDToken.Use(hooks...)
 	c.Revocation.Use(hooks...)
+	c.UpdateTicket.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Credential.Intercept(interceptors...)
+	c.IDToken.Intercept(interceptors...)
 	c.Revocation.Intercept(interceptors...)
+	c.UpdateTicket.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *CredentialMutation:
-		return c.Credential.mutate(ctx, m)
+	case *IDTokenMutation:
+		return c.IDToken.mutate(ctx, m)
 	case *RevocationMutation:
 		return c.Revocation.mutate(ctx, m)
+	case *UpdateTicketMutation:
+		return c.UpdateTicket.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
 }
 
-// CredentialClient is a client for the Credential schema.
-type CredentialClient struct {
+// IDTokenClient is a client for the IDToken schema.
+type IDTokenClient struct {
 	config
 }
 
-// NewCredentialClient returns a client for the Credential from the given config.
-func NewCredentialClient(c config) *CredentialClient {
-	return &CredentialClient{config: c}
+// NewIDTokenClient returns a client for the IDToken from the given config.
+func NewIDTokenClient(c config) *IDTokenClient {
+	return &IDTokenClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `credential.Hooks(f(g(h())))`.
-func (c *CredentialClient) Use(hooks ...Hook) {
-	c.hooks.Credential = append(c.hooks.Credential, hooks...)
+// A call to `Use(f, g, h)` equals to `idtoken.Hooks(f(g(h())))`.
+func (c *IDTokenClient) Use(hooks ...Hook) {
+	c.hooks.IDToken = append(c.hooks.IDToken, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `credential.Intercept(f(g(h())))`.
-func (c *CredentialClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Credential = append(c.inters.Credential, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `idtoken.Intercept(f(g(h())))`.
+func (c *IDTokenClient) Intercept(interceptors ...Interceptor) {
+	c.inters.IDToken = append(c.inters.IDToken, interceptors...)
 }
 
-// Create returns a builder for creating a Credential entity.
-func (c *CredentialClient) Create() *CredentialCreate {
-	mutation := newCredentialMutation(c.config, OpCreate)
-	return &CredentialCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a IDToken entity.
+func (c *IDTokenClient) Create() *IDTokenCreate {
+	mutation := newIDTokenMutation(c.config, OpCreate)
+	return &IDTokenCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Credential entities.
-func (c *CredentialClient) CreateBulk(builders ...*CredentialCreate) *CredentialCreateBulk {
-	return &CredentialCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of IDToken entities.
+func (c *IDTokenClient) CreateBulk(builders ...*IDTokenCreate) *IDTokenCreateBulk {
+	return &IDTokenCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *CredentialClient) MapCreateBulk(slice any, setFunc func(*CredentialCreate, int)) *CredentialCreateBulk {
+func (c *IDTokenClient) MapCreateBulk(slice any, setFunc func(*IDTokenCreate, int)) *IDTokenCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &CredentialCreateBulk{err: fmt.Errorf("calling to CredentialClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &IDTokenCreateBulk{err: fmt.Errorf("calling to IDTokenClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*CredentialCreate, rv.Len())
+	builders := make([]*IDTokenCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &CredentialCreateBulk{config: c.config, builders: builders}
+	return &IDTokenCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Credential.
-func (c *CredentialClient) Update() *CredentialUpdate {
-	mutation := newCredentialMutation(c.config, OpUpdate)
-	return &CredentialUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for IDToken.
+func (c *IDTokenClient) Update() *IDTokenUpdate {
+	mutation := newIDTokenMutation(c.config, OpUpdate)
+	return &IDTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CredentialClient) UpdateOne(cr *Credential) *CredentialUpdateOne {
-	mutation := newCredentialMutation(c.config, OpUpdateOne, withCredential(cr))
-	return &CredentialUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *IDTokenClient) UpdateOne(it *IDToken) *IDTokenUpdateOne {
+	mutation := newIDTokenMutation(c.config, OpUpdateOne, withIDToken(it))
+	return &IDTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CredentialClient) UpdateOneID(id int) *CredentialUpdateOne {
-	mutation := newCredentialMutation(c.config, OpUpdateOne, withCredentialID(id))
-	return &CredentialUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *IDTokenClient) UpdateOneID(id int) *IDTokenUpdateOne {
+	mutation := newIDTokenMutation(c.config, OpUpdateOne, withIDTokenID(id))
+	return &IDTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Credential.
-func (c *CredentialClient) Delete() *CredentialDelete {
-	mutation := newCredentialMutation(c.config, OpDelete)
-	return &CredentialDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for IDToken.
+func (c *IDTokenClient) Delete() *IDTokenDelete {
+	mutation := newIDTokenMutation(c.config, OpDelete)
+	return &IDTokenDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CredentialClient) DeleteOne(cr *Credential) *CredentialDeleteOne {
-	return c.DeleteOneID(cr.ID)
+func (c *IDTokenClient) DeleteOne(it *IDToken) *IDTokenDeleteOne {
+	return c.DeleteOneID(it.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CredentialClient) DeleteOneID(id int) *CredentialDeleteOne {
-	builder := c.Delete().Where(credential.ID(id))
+func (c *IDTokenClient) DeleteOneID(id int) *IDTokenDeleteOne {
+	builder := c.Delete().Where(idtoken.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &CredentialDeleteOne{builder}
+	return &IDTokenDeleteOne{builder}
 }
 
-// Query returns a query builder for Credential.
-func (c *CredentialClient) Query() *CredentialQuery {
-	return &CredentialQuery{
+// Query returns a query builder for IDToken.
+func (c *IDTokenClient) Query() *IDTokenQuery {
+	return &IDTokenQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeCredential},
+		ctx:    &QueryContext{Type: TypeIDToken},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Credential entity by its id.
-func (c *CredentialClient) Get(ctx context.Context, id int) (*Credential, error) {
-	return c.Query().Where(credential.ID(id)).Only(ctx)
+// Get returns a IDToken entity by its id.
+func (c *IDTokenClient) Get(ctx context.Context, id int) (*IDToken, error) {
+	return c.Query().Where(idtoken.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CredentialClient) GetX(ctx context.Context, id int) *Credential {
+func (c *IDTokenClient) GetX(ctx context.Context, id int) *IDToken {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -315,27 +325,27 @@ func (c *CredentialClient) GetX(ctx context.Context, id int) *Credential {
 }
 
 // Hooks returns the client hooks.
-func (c *CredentialClient) Hooks() []Hook {
-	return c.hooks.Credential
+func (c *IDTokenClient) Hooks() []Hook {
+	return c.hooks.IDToken
 }
 
 // Interceptors returns the client interceptors.
-func (c *CredentialClient) Interceptors() []Interceptor {
-	return c.inters.Credential
+func (c *IDTokenClient) Interceptors() []Interceptor {
+	return c.inters.IDToken
 }
 
-func (c *CredentialClient) mutate(ctx context.Context, m *CredentialMutation) (Value, error) {
+func (c *IDTokenClient) mutate(ctx context.Context, m *IDTokenMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&CredentialCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&IDTokenCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&CredentialUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&IDTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&CredentialUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&IDTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&CredentialDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&IDTokenDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Credential mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown IDToken mutation op: %q", m.Op())
 	}
 }
 
@@ -472,12 +482,145 @@ func (c *RevocationClient) mutate(ctx context.Context, m *RevocationMutation) (V
 	}
 }
 
+// UpdateTicketClient is a client for the UpdateTicket schema.
+type UpdateTicketClient struct {
+	config
+}
+
+// NewUpdateTicketClient returns a client for the UpdateTicket from the given config.
+func NewUpdateTicketClient(c config) *UpdateTicketClient {
+	return &UpdateTicketClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `updateticket.Hooks(f(g(h())))`.
+func (c *UpdateTicketClient) Use(hooks ...Hook) {
+	c.hooks.UpdateTicket = append(c.hooks.UpdateTicket, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `updateticket.Intercept(f(g(h())))`.
+func (c *UpdateTicketClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UpdateTicket = append(c.inters.UpdateTicket, interceptors...)
+}
+
+// Create returns a builder for creating a UpdateTicket entity.
+func (c *UpdateTicketClient) Create() *UpdateTicketCreate {
+	mutation := newUpdateTicketMutation(c.config, OpCreate)
+	return &UpdateTicketCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UpdateTicket entities.
+func (c *UpdateTicketClient) CreateBulk(builders ...*UpdateTicketCreate) *UpdateTicketCreateBulk {
+	return &UpdateTicketCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UpdateTicketClient) MapCreateBulk(slice any, setFunc func(*UpdateTicketCreate, int)) *UpdateTicketCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UpdateTicketCreateBulk{err: fmt.Errorf("calling to UpdateTicketClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UpdateTicketCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UpdateTicketCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UpdateTicket.
+func (c *UpdateTicketClient) Update() *UpdateTicketUpdate {
+	mutation := newUpdateTicketMutation(c.config, OpUpdate)
+	return &UpdateTicketUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UpdateTicketClient) UpdateOne(ut *UpdateTicket) *UpdateTicketUpdateOne {
+	mutation := newUpdateTicketMutation(c.config, OpUpdateOne, withUpdateTicket(ut))
+	return &UpdateTicketUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UpdateTicketClient) UpdateOneID(id int) *UpdateTicketUpdateOne {
+	mutation := newUpdateTicketMutation(c.config, OpUpdateOne, withUpdateTicketID(id))
+	return &UpdateTicketUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UpdateTicket.
+func (c *UpdateTicketClient) Delete() *UpdateTicketDelete {
+	mutation := newUpdateTicketMutation(c.config, OpDelete)
+	return &UpdateTicketDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UpdateTicketClient) DeleteOne(ut *UpdateTicket) *UpdateTicketDeleteOne {
+	return c.DeleteOneID(ut.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UpdateTicketClient) DeleteOneID(id int) *UpdateTicketDeleteOne {
+	builder := c.Delete().Where(updateticket.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UpdateTicketDeleteOne{builder}
+}
+
+// Query returns a query builder for UpdateTicket.
+func (c *UpdateTicketClient) Query() *UpdateTicketQuery {
+	return &UpdateTicketQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUpdateTicket},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UpdateTicket entity by its id.
+func (c *UpdateTicketClient) Get(ctx context.Context, id int) (*UpdateTicket, error) {
+	return c.Query().Where(updateticket.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UpdateTicketClient) GetX(ctx context.Context, id int) *UpdateTicket {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UpdateTicketClient) Hooks() []Hook {
+	return c.hooks.UpdateTicket
+}
+
+// Interceptors returns the client interceptors.
+func (c *UpdateTicketClient) Interceptors() []Interceptor {
+	return c.inters.UpdateTicket
+}
+
+func (c *UpdateTicketClient) mutate(ctx context.Context, m *UpdateTicketMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UpdateTicketCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UpdateTicketUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UpdateTicketUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UpdateTicketDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UpdateTicket mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Credential, Revocation []ent.Hook
+		IDToken, Revocation, UpdateTicket []ent.Hook
 	}
 	inters struct {
-		Credential, Revocation []ent.Interceptor
+		IDToken, Revocation, UpdateTicket []ent.Interceptor
 	}
 )
