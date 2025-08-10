@@ -52,7 +52,7 @@ func TestAll(t *testing.T) {
 		VerifyingKey:   verifierKey,
 	}
 
-	reqBody, s, err := signer.RequestJoin("")
+	reqBody, s, err := signer.RequestJoin(period, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,12 +63,12 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cred, err := g.IssueCredential("", &req)
+	cred, err := g.IssueCredential("", &req, utils.Period())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	failCred, err := g.IssueCredential("", &req)
+	failCred, err := g.IssueCredential("", &req, utils.Period())
 	if err == nil {
 		t.Fatal(failCred, err)
 	}
@@ -78,7 +78,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	s, err = signer.SetCredential(rawCred, s)
+	s, err = signer.SetCredential(rawCred, utils.Period(), s)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	updateReqBuf, newSignerBuf, err := signer.RequestUpdate(rl, s, gpk.Bytes())
+	updateReqBuf, err := signer.RequestUpdate(rl, s, period, gpk.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,12 +118,12 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cred, err = g.UpdateCredential(&updateReq)
+	cred, err = g.UpdateCredential(&updateReq, utils.Period())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	failCred, err = g.UpdateCredential(&updateReq)
+	failCred, err = g.UpdateCredential(&updateReq, utils.Period())
 	if err == nil {
 		t.Fatal(failCred, err)
 	}
@@ -133,14 +133,13 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	newSignerBuf, err = signer.SetCredential(rawCred2, newSignerBuf)
+	newSignerBuf, err := signer.SetCredential(rawCred2, utils.Period(), s)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	passDay()
-
-	updateReq2Buf, _, err := signer.RequestUpdate(rl, newSignerBuf, gpk.Bytes())
+	updateReq2Buf, err := signer.RequestUpdate(rl, newSignerBuf, utils.Period(), gpk.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,7 +150,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = g.UpdateCredential(&updateReq2)
+	_, err = g.UpdateCredential(&updateReq2, utils.Period())
 	if err != nil {
 		t.Fatal(err)
 	}

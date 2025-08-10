@@ -5,16 +5,15 @@ import (
 	"errors"
 
 	corecore "github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
-	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban-system/core/gm/ent/idtoken"
 )
 
 var ErrAlreadyRegisterd = errors.New("already account registered")
 
-func (gm *GroupManager[T]) IssueCredential(identifer string, req *corecore.JoinRequest[T]) (string, error) {
-	exist, err := gm.DB.Client.Credential.
+func (gm *GroupManager[T]) IssueCredential(identifer string, req *corecore.JoinRequest[T], period int64) (string, error) {
+	exist, err := gm.DB.Client.IDToken.
 		Query().
-		Where(credential.Identifier(identifer)).
+		Where(idtoken.IdTokenEQ(identifer)).
 		Exist(*gm.DB.Ctx)
 
 	if err != nil {
@@ -24,7 +23,6 @@ func (gm *GroupManager[T]) IssueCredential(identifer string, req *corecore.JoinR
 	if exist {
 		return "", ErrAlreadyRegisterd
 	}
-	period := utils.Period()
 
 	err = req.JoinRequest.Verify(period, gm.JoinVerifyKey.VerifyingKey)
 	if err != nil {
@@ -36,10 +34,8 @@ func (gm *GroupManager[T]) IssueCredential(identifer string, req *corecore.JoinR
 		return "", err
 	}
 
-	gm.DB.Client.Credential.Create().
-		SetCredential(cred.Signature).
-		SetPublicKey(req.JoinRequest.UserPublicKey.Number.Bytes()).
-		SetIdentifier(identifer).
+	gm.DB.Client.IDToken.Create().
+		SetIdToken(identifer).
 		SaveX(*gm.DB.Ctx)
 
 	resp := base64.URLEncoding.EncodeToString(cred.Signature)

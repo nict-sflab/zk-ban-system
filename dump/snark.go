@@ -57,7 +57,7 @@ func UpdateCircuit(nymsNumberPerSession, sessionNumber int) ([]byte, []byte, err
 	}
 
 	return Prepare(&precomputes.UpdateCircuit{
-		UpdateCircuit: &circuit.UpdateCircuit{
+		UpdateCircuit: circuit.UpdateCircuit{
 			RevocationList: circuit.NewRevocationListWitness(rlWit),
 		},
 	})

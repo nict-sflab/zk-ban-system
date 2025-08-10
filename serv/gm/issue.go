@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/akakou/zk-ban-system/core"
+	"github.com/akakou/zk-ban-system/utils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,7 +27,7 @@ func (serv *GMServer[T]) IssueCredentialEndpoint() func(c echo.Context) error {
 			return err
 		}
 
-		resp, err := serv.GM.IssueCredential(identifer, &req)
+		resp, err := serv.GM.IssueCredential(identifer, &req, utils.Period())
 		if err != nil {
 			return err
 		}

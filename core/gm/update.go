@@ -3,19 +3,24 @@ package gm
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 
 	corecore "github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
-	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 	"github.com/akakou/zk-ban/precomputes"
 )
 
 var ErrAlreadyIssueCredential = errors.New("already issue credential")
 
-func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string, error) {
-	exist, err := gm.DB.Client.Credential.
+func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after int64) (string, error) {
+	fmt.Printf("period: %v\n", after)
+	if after == req.Before {
+		return "", errors.New("no update")
+	}
+
+	exist, err := gm.DB.Client.UpdateTicket.
 		Query().
-		Where(credential.PublicKey(req.UpdateRequest.PublicKey.Number.Bytes())).
+		Where(updateticket.Ticket(req.UpdateRequest.UpdateTicket.Number.Bytes())).
 		Exist(*gm.DB.Ctx)
 
 	if err != nil {
@@ -25,8 +30,6 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 	if exist {
 		return "", ErrAlreadyIssueCredential
 	}
-
-	after := utils.Period()
 
 	index := corecore.KeyIndex{
 		First:  after,
@@ -44,6 +47,10 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 		gk := gm.VerifierKeys[*rl.Size]
 
 		vk, err := precomputes.NewUpdateVerificationKeyBLS12381(gk.VerifyingKey)
+		if err != nil {
+			return "", err
+		}
+
 		prepared, err := vk.PrecomputeVerify(*rl.List, &gm.GroupPublicKey)
 		if err != nil {
 			return "", err
@@ -67,9 +74,8 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest) (string
 		return "", err
 	}
 
-	gm.DB.Client.Credential.Create().
-		SetCredential(cred.Signature).
-		SetPublicKey(req.UpdateRequest.PublicKey.Number.Bytes()).
+	gm.DB.Client.UpdateTicket.Create().
+		SetTicket(req.UpdateRequest.UpdateTicket.Number.Bytes()).
 		SaveX(*gm.DB.Ctx)
 
 	resp := base64.URLEncoding.EncodeToString(cred.Signature)

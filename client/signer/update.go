@@ -3,13 +3,17 @@ package signer
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
+	"github.com/akakou/zk-ban-system/utils"
 )
 
 func RequestUpdate(signer, rl, gpk []byte, url string) ([]byte, error) {
-	req, newSigner, err := coresigner.RequestUpdate(rl, signer, gpk)
+	now := utils.Period()
+
+	req, err := coresigner.RequestUpdate(rl, signer, now, gpk)
 	if err != nil {
 		return nil, err
 	}
@@ -32,10 +36,11 @@ func RequestUpdate(signer, rl, gpk []byte, url string) ([]byte, error) {
 		return nil, err
 	}
 
-	newSignerFinalized, err := coresigner.SetCredential(cred, newSigner)
+	newSignerFinalized, err := coresigner.SetCredential(cred, now, signer)
 	if err != nil {
 		return nil, err
 	}
 
+	fmt.Printf("next: %v\n", string(newSignerFinalized))
 	return newSignerFinalized, nil
 }

@@ -2,26 +2,25 @@ package signer
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/load"
-	"github.com/akakou/zk-ban-system/utils"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
-func RequestUpdate(rl, signer, gpk []byte) ([]byte, []byte, error) {
-	today := utils.Period()
-
+func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 	var rlObj core.RevocationList
 	err := json.Unmarshal(rl, &rlObj)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	provers, err := load.LoadUserUpdateKey()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	prover := provers[*rlObj.Size]
@@ -29,18 +28,24 @@ func RequestUpdate(rl, signer, gpk []byte) ([]byte, []byte, error) {
 	var signerObj zkbanw.Signer
 	err = json.Unmarshal(signer, &signerObj)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
+	}
+
+	if now == signerObj.Period {
+		return nil, errors.New("no update")
 	}
 
 	gpkObj, err := zkbanw.GroupPublicKeyFromBytes(gpk)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	coreReq, err := zkban.RequestUpdate(today, &signerObj, *rlObj.List, gpkObj, prover.CoreKey())
+	coreReq, err := zkban.RequestUpdate(now, &signerObj, *rlObj.List, gpkObj, prover.CoreKey())
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
+	fmt.Printf("periods: %v %v\n", now, signerObj.Period)
 
 	req := core.UpdateRequest{
 		Before:        signerObj.Period,
@@ -49,26 +54,13 @@ func RequestUpdate(rl, signer, gpk []byte) ([]byte, []byte, error) {
 
 	reqBytes, err := json.Marshal(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	signerObj.Period = today
-
-	updatedSignerBytes, err := json.Marshal(signerObj)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return reqBytes, updatedSignerBytes, nil
+	return reqBytes, nil
 }
 
-// func UpdateCredential(upk, cred []byte, period int64, signer []byte) ([]byte, []byte, error) {
-// 	signerObj := highlevel.HighLevelSigner{}
-// 	err := json.Unmarshal(signer, &signerObj)
-
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
+// func UpdateCredential(a signer) ([]byte, []byte, error) {
 
 // 	signerObj.UserPublicKey = upk
 // 	signerObj.Credential = cred

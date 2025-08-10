@@ -6,10 +6,12 @@ import (
 	"net/http"
 
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
+	"github.com/akakou/zk-ban-system/utils"
 )
 
 func RequestJoin(idToken string, url string) ([]byte, error) {
-	requestBytes, signer, err := coresigner.RequestJoin(idToken)
+	now := utils.Period()
+	requestBytes, signer, err := coresigner.RequestJoin(now, idToken)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +34,7 @@ func RequestJoin(idToken string, url string) ([]byte, error) {
 		return nil, err
 	}
 
-	signer, err = coresigner.SetCredential(cred, signer)
+	signer, err = coresigner.SetCredential(cred, now, signer)
 	if err != nil {
 		return nil, err
 	}
