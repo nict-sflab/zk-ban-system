@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/core/gm/ent/idtoken"
 	"github.com/akakou/zk-ban-system/core/gm/ent/revocation"
@@ -333,22 +332,6 @@ func (c *CredentialClient) GetX(ctx context.Context, id int) *Credential {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryUpdateTicket queries the updateTicket edge of a Credential.
-func (c *CredentialClient) QueryUpdateTicket(cr *Credential) *UpdateTicketQuery {
-	query := (&UpdateTicketClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(credential.Table, credential.FieldID, id),
-			sqlgraph.To(updateticket.Table, updateticket.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, credential.UpdateTicketTable, credential.UpdateTicketColumn),
-		)
-		fromV = sqlgraph.Neighbors(cr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.
@@ -748,22 +731,6 @@ func (c *UpdateTicketClient) GetX(ctx context.Context, id int) *UpdateTicket {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryCredential queries the credential edge of a UpdateTicket.
-func (c *UpdateTicketClient) QueryCredential(ut *UpdateTicket) *CredentialQuery {
-	query := (&CredentialClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ut.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(updateticket.Table, updateticket.FieldID, id),
-			sqlgraph.To(credential.Table, credential.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, updateticket.CredentialTable, updateticket.CredentialColumn),
-		)
-		fromV = sqlgraph.Neighbors(ut.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.

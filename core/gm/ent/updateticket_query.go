@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/core/gm/ent/predicate"
 	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 )
@@ -20,11 +18,10 @@ import (
 // UpdateTicketQuery is the builder for querying UpdateTicket entities.
 type UpdateTicketQuery struct {
 	config
-	ctx            *QueryContext
-	order          []updateticket.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.UpdateTicket
-	withCredential *CredentialQuery
+	ctx        *QueryContext
+	order      []updateticket.OrderOption
+	inters     []Interceptor
+	predicates []predicate.UpdateTicket
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -59,28 +56,6 @@ func (utq *UpdateTicketQuery) Unique(unique bool) *UpdateTicketQuery {
 func (utq *UpdateTicketQuery) Order(o ...updateticket.OrderOption) *UpdateTicketQuery {
 	utq.order = append(utq.order, o...)
 	return utq
-}
-
-// QueryCredential chains the current query on the "credential" edge.
-func (utq *UpdateTicketQuery) QueryCredential() *CredentialQuery {
-	query := (&CredentialClient{config: utq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := utq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := utq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(updateticket.Table, updateticket.FieldID, selector),
-			sqlgraph.To(credential.Table, credential.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, updateticket.CredentialTable, updateticket.CredentialColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(utq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first UpdateTicket entity from the query.
@@ -270,27 +245,15 @@ func (utq *UpdateTicketQuery) Clone() *UpdateTicketQuery {
 		return nil
 	}
 	return &UpdateTicketQuery{
-		config:         utq.config,
-		ctx:            utq.ctx.Clone(),
-		order:          append([]updateticket.OrderOption{}, utq.order...),
-		inters:         append([]Interceptor{}, utq.inters...),
-		predicates:     append([]predicate.UpdateTicket{}, utq.predicates...),
-		withCredential: utq.withCredential.Clone(),
+		config:     utq.config,
+		ctx:        utq.ctx.Clone(),
+		order:      append([]updateticket.OrderOption{}, utq.order...),
+		inters:     append([]Interceptor{}, utq.inters...),
+		predicates: append([]predicate.UpdateTicket{}, utq.predicates...),
 		// clone intermediate query.
 		sql:  utq.sql.Clone(),
 		path: utq.path,
 	}
-}
-
-// WithCredential tells the query-builder to eager-load the nodes that are connected to
-// the "credential" edge. The optional arguments are used to configure the query builder of the edge.
-func (utq *UpdateTicketQuery) WithCredential(opts ...func(*CredentialQuery)) *UpdateTicketQuery {
-	query := (&CredentialClient{config: utq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	utq.withCredential = query
-	return utq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -369,11 +332,8 @@ func (utq *UpdateTicketQuery) prepareQuery(ctx context.Context) error {
 
 func (utq *UpdateTicketQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*UpdateTicket, error) {
 	var (
-		nodes       = []*UpdateTicket{}
-		_spec       = utq.querySpec()
-		loadedTypes = [1]bool{
-			utq.withCredential != nil,
-		}
+		nodes = []*UpdateTicket{}
+		_spec = utq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*UpdateTicket).scanValues(nil, columns)
@@ -381,7 +341,6 @@ func (utq *UpdateTicketQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &UpdateTicket{config: utq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -393,46 +352,7 @@ func (utq *UpdateTicketQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := utq.withCredential; query != nil {
-		if err := utq.loadCredential(ctx, query, nodes,
-			func(n *UpdateTicket) { n.Edges.Credential = []*Credential{} },
-			func(n *UpdateTicket, e *Credential) { n.Edges.Credential = append(n.Edges.Credential, e) }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
-}
-
-func (utq *UpdateTicketQuery) loadCredential(ctx context.Context, query *CredentialQuery, nodes []*UpdateTicket, init func(*UpdateTicket), assign func(*UpdateTicket, *Credential)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*UpdateTicket)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Credential(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(updateticket.CredentialColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.update_ticket_credential
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "update_ticket_credential" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "update_ticket_credential" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
 }
 
 func (utq *UpdateTicketQuery) sqlCount(ctx context.Context) (int, error) {

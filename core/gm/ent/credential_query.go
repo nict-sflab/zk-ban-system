@@ -13,18 +13,15 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/core/gm/ent/predicate"
-	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 )
 
 // CredentialQuery is the builder for querying Credential entities.
 type CredentialQuery struct {
 	config
-	ctx              *QueryContext
-	order            []credential.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.Credential
-	withUpdateTicket *UpdateTicketQuery
-	withFKs          bool
+	ctx        *QueryContext
+	order      []credential.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Credential
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -59,28 +56,6 @@ func (cq *CredentialQuery) Unique(unique bool) *CredentialQuery {
 func (cq *CredentialQuery) Order(o ...credential.OrderOption) *CredentialQuery {
 	cq.order = append(cq.order, o...)
 	return cq
-}
-
-// QueryUpdateTicket chains the current query on the "updateTicket" edge.
-func (cq *CredentialQuery) QueryUpdateTicket() *UpdateTicketQuery {
-	query := (&UpdateTicketClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(credential.Table, credential.FieldID, selector),
-			sqlgraph.To(updateticket.Table, updateticket.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, credential.UpdateTicketTable, credential.UpdateTicketColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Credential entity from the query.
@@ -270,27 +245,15 @@ func (cq *CredentialQuery) Clone() *CredentialQuery {
 		return nil
 	}
 	return &CredentialQuery{
-		config:           cq.config,
-		ctx:              cq.ctx.Clone(),
-		order:            append([]credential.OrderOption{}, cq.order...),
-		inters:           append([]Interceptor{}, cq.inters...),
-		predicates:       append([]predicate.Credential{}, cq.predicates...),
-		withUpdateTicket: cq.withUpdateTicket.Clone(),
+		config:     cq.config,
+		ctx:        cq.ctx.Clone(),
+		order:      append([]credential.OrderOption{}, cq.order...),
+		inters:     append([]Interceptor{}, cq.inters...),
+		predicates: append([]predicate.Credential{}, cq.predicates...),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
-}
-
-// WithUpdateTicket tells the query-builder to eager-load the nodes that are connected to
-// the "updateTicket" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CredentialQuery) WithUpdateTicket(opts ...func(*UpdateTicketQuery)) *CredentialQuery {
-	query := (&UpdateTicketClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withUpdateTicket = query
-	return cq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -369,26 +332,15 @@ func (cq *CredentialQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *CredentialQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Credential, error) {
 	var (
-		nodes       = []*Credential{}
-		withFKs     = cq.withFKs
-		_spec       = cq.querySpec()
-		loadedTypes = [1]bool{
-			cq.withUpdateTicket != nil,
-		}
+		nodes = []*Credential{}
+		_spec = cq.querySpec()
 	)
-	if cq.withUpdateTicket != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, credential.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Credential).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Credential{config: cq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -400,46 +352,7 @@ func (cq *CredentialQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withUpdateTicket; query != nil {
-		if err := cq.loadUpdateTicket(ctx, query, nodes, nil,
-			func(n *Credential, e *UpdateTicket) { n.Edges.UpdateTicket = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
-}
-
-func (cq *CredentialQuery) loadUpdateTicket(ctx context.Context, query *UpdateTicketQuery, nodes []*Credential, init func(*Credential), assign func(*Credential, *UpdateTicket)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Credential)
-	for i := range nodes {
-		if nodes[i].update_ticket_credential == nil {
-			continue
-		}
-		fk := *nodes[i].update_ticket_credential
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(updateticket.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "update_ticket_credential" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (cq *CredentialQuery) sqlCount(ctx context.Context) (int, error) {

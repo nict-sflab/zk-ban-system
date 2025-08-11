@@ -4,7 +4,6 @@ package credential
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/akakou/zk-ban-system/core/gm/ent/predicate"
 )
 
@@ -58,6 +57,11 @@ func Credential(v []byte) predicate.Credential {
 	return predicate.Credential(sql.FieldEQ(FieldCredential, v))
 }
 
+// PublicKey applies equality check predicate on the "public_key" field. It's identical to PublicKeyEQ.
+func PublicKey(v []byte) predicate.Credential {
+	return predicate.Credential(sql.FieldEQ(FieldPublicKey, v))
+}
+
 // CredentialEQ applies the EQ predicate on the "credential" field.
 func CredentialEQ(v []byte) predicate.Credential {
 	return predicate.Credential(sql.FieldEQ(FieldCredential, v))
@@ -98,27 +102,44 @@ func CredentialLTE(v []byte) predicate.Credential {
 	return predicate.Credential(sql.FieldLTE(FieldCredential, v))
 }
 
-// HasUpdateTicket applies the HasEdge predicate on the "updateTicket" edge.
-func HasUpdateTicket() predicate.Credential {
-	return predicate.Credential(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UpdateTicketTable, UpdateTicketColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
+// PublicKeyEQ applies the EQ predicate on the "public_key" field.
+func PublicKeyEQ(v []byte) predicate.Credential {
+	return predicate.Credential(sql.FieldEQ(FieldPublicKey, v))
 }
 
-// HasUpdateTicketWith applies the HasEdge predicate on the "updateTicket" edge with a given conditions (other predicates).
-func HasUpdateTicketWith(preds ...predicate.UpdateTicket) predicate.Credential {
-	return predicate.Credential(func(s *sql.Selector) {
-		step := newUpdateTicketStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// PublicKeyNEQ applies the NEQ predicate on the "public_key" field.
+func PublicKeyNEQ(v []byte) predicate.Credential {
+	return predicate.Credential(sql.FieldNEQ(FieldPublicKey, v))
+}
+
+// PublicKeyIn applies the In predicate on the "public_key" field.
+func PublicKeyIn(vs ...[]byte) predicate.Credential {
+	return predicate.Credential(sql.FieldIn(FieldPublicKey, vs...))
+}
+
+// PublicKeyNotIn applies the NotIn predicate on the "public_key" field.
+func PublicKeyNotIn(vs ...[]byte) predicate.Credential {
+	return predicate.Credential(sql.FieldNotIn(FieldPublicKey, vs...))
+}
+
+// PublicKeyGT applies the GT predicate on the "public_key" field.
+func PublicKeyGT(v []byte) predicate.Credential {
+	return predicate.Credential(sql.FieldGT(FieldPublicKey, v))
+}
+
+// PublicKeyGTE applies the GTE predicate on the "public_key" field.
+func PublicKeyGTE(v []byte) predicate.Credential {
+	return predicate.Credential(sql.FieldGTE(FieldPublicKey, v))
+}
+
+// PublicKeyLT applies the LT predicate on the "public_key" field.
+func PublicKeyLT(v []byte) predicate.Credential {
+	return predicate.Credential(sql.FieldLT(FieldPublicKey, v))
+}
+
+// PublicKeyLTE applies the LTE predicate on the "public_key" field.
+func PublicKeyLTE(v []byte) predicate.Credential {
+	return predicate.Credential(sql.FieldLTE(FieldPublicKey, v))
 }
 
 // And groups predicates with the AND operator between them.

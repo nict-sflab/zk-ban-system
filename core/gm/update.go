@@ -12,14 +12,13 @@ import (
 
 var ErrAlreadyIssueCredential = errors.New("already issue credential")
 var ErrCredentialNotFound = errors.New("ent: credential not found")
+var ErrTicketAlreadyUsed = errors.New("ticket already has benn used")
 
 func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after int64) (string, error) {
-	existCred, err := gm.DB.Client.Credential.Query().Where(
-		credential.Or(
-			credential.HasUpdateTicketWith(
-				updateticket.TicketEQ(req.UpdateRequest.PublicKey.Number.Bytes()),
-			),
-		)).Only(*gm.DB.Ctx)
+	existCred, err := gm.DB.Client.Credential.Query().
+		Where(
+			credential.PublicKey(req.UpdateRequest.PublicKey.Number.Bytes()),
+		).Only(*gm.DB.Ctx)
 
 	if err == nil {
 		resp := base64.URLEncoding.EncodeToString(existCred.Credential)
@@ -30,6 +29,14 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 
 	if after == req.Before {
 		return "", errors.New("no update")
+	}
+
+	ticketExist := gm.DB.Client.UpdateTicket.Query().
+		Where(updateticket.Ticket(req.UpdateRequest.PublicKey.Number.Bytes())).
+		ExistX(*gm.DB.Ctx)
+
+	if ticketExist {
+		return "", ErrTicketAlreadyUsed
 	}
 
 	index := corecore.KeyIndex{
@@ -75,13 +82,13 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 		return "", err
 	}
 
-	updateTicket := gm.DB.Client.UpdateTicket.Create().
+	gm.DB.Client.UpdateTicket.Create().
 		SetTicket(req.UpdateRequest.UpdateTicket.Number.Bytes()).
 		SaveX(*gm.DB.Ctx)
 
 	gm.DB.Client.Credential.Create().
 		SetCredential(cred.Signature).
-		SetUpdateTicket(updateTicket).
+		SetPublicKey(req.UpdateRequest.PublicKey.Number.Bytes()).
 		SaveX(*gm.DB.Ctx)
 
 	resp := base64.URLEncoding.EncodeToString(cred.Signature)
