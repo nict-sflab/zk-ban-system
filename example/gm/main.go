@@ -33,7 +33,7 @@ func main() {
 	gmServ := serv.GMServer[string]{
 		GM: g,
 		AuthToken: func(t *corecore.JoinRequest[string]) (string, error) {
-			return "token", nil
+			return t.Option, nil
 		},
 	}
 
