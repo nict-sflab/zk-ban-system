@@ -21,7 +21,12 @@ func FetchBinaryWithPOST(request []byte, url string) ([]byte, error) {
 		return nil, err
 	}
 
-	return buf.Bytes(), nil
+	result := buf.Bytes()
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("status code is %v, not 200\n%s", res.StatusCode, result)
+	}
+
+	return result, nil
 }
 
 func FetchBase64WithPOST(request []byte, url string) ([]byte, error) {

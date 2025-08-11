@@ -24,7 +24,7 @@ func FetchBinaryWithGET(url string) ([]byte, error) {
 	result := buf.Bytes()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("status code is %v, not 200\n%v\n%v", res.StatusCode, res, string(result))
+		return nil, fmt.Errorf("status code is %v, not 200\n%s", res.StatusCode, result)
 	}
 
 	return result, nil
