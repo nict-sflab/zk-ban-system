@@ -3,9 +3,7 @@ package gm
 import (
 	gnarkserializable "github.com/akakou/gnark-serializable"
 	corecore "github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/core/gm/ent"
 	"github.com/akakou/zk-ban-system/load"
-	"github.com/akakou/zk-ban/witness"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
@@ -52,6 +50,3 @@ func Default[T any](gsk []byte, dbConfig *DBConfig) (*GroupManager[T], error) {
 
 	return &g, nil
 }
-
-var JoinCallbackX = func(cred *witness.Credential, idToken *ent.IDToken, db *DB) {}
-var UpdateCallbackX = func(cred *witness.Credential, updateTicket *ent.UpdateTicket, db *DB) {}
