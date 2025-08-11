@@ -38,7 +38,7 @@ func FetchBase64WithGET(url string) ([]byte, error) {
 
 	result, err := base64.URLEncoding.DecodeString(string(buf))
 	if err != nil {
-		return nil, fmt.Errorf("%e binary is %s", err, buf)
+		return nil, fmt.Errorf("%s\nmessage is `%s`", err.Error(), buf)
 	}
 
 	return result, nil
