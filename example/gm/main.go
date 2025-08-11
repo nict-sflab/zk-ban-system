@@ -82,6 +82,8 @@ func main() {
 		return c.String(200, "ok")
 	})
 
+	e.Static("/", "./static")
+
 	gmServ.SetupEchoServer(e)
 	e.Debug = true
 	e.Use(middleware.Logger())

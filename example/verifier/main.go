@@ -41,23 +41,7 @@ func main() {
 
 	e := echo.New()
 
-	// e.GET("/period", func(c echo.Context) error {
-	// 	str := c.QueryParam("period")
-	// 	if str == "" {
-	// 		return c.String(200, strconv.Itoa(int(utils.Period())))
-	// 	}
-
-	// 	i, err := strconv.Atoi(str)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// 	utils.Period = func() int64 {
-	// 		return int64(i)
-	// 	}
-
-	// 	return c.String(200, strconv.Itoa(i))
-	// })
+	e.Static("/", "./static")
 
 	verifierServ.SetupEchoServer(e)
 	e.Debug = true
