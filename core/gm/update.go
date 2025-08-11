@@ -12,6 +12,7 @@ import (
 
 var ErrAlreadyIssueCredential = errors.New("already issue credential")
 var ErrCredentialNotFound = errors.New("ent: credential not found")
+var ErrTicketAlreadyUsed = errors.New("ticket already has benn used")
 
 func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after int64) (string, error) {
 	existCred, err := gm.DB.Client.Credential.Query().Where(
@@ -30,6 +31,14 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 
 	if after == req.Before {
 		return "", errors.New("no update")
+	}
+
+	ticketExist := gm.DB.Client.UpdateTicket.Query().
+		Where(updateticket.Ticket(req.UpdateRequest.PublicKey.Number.Bytes())).
+		ExistX(*gm.DB.Ctx)
+
+	if ticketExist {
+		return "", ErrTicketAlreadyUsed
 	}
 
 	index := corecore.KeyIndex{
