@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func FetchBinary(url string) ([]byte, error) {
+func FetchBinaryWithGET(url string) ([]byte, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -30,11 +30,16 @@ func FetchBinary(url string) ([]byte, error) {
 	return result, nil
 }
 
-func FetchBase64(url string) ([]byte, error) {
-	buf, err := FetchBinary(url)
+func FetchBase64WithGET(url string) ([]byte, error) {
+	buf, err := FetchBinaryWithGET(url)
 	if err != nil {
 		return nil, err
 	}
 
-	return base64.URLEncoding.DecodeString(string(buf))
+	result, err := base64.URLEncoding.DecodeString(string(buf))
+	if err != nil {
+		return nil, fmt.Errorf("%e binary is %s", err, buf)
+	}
+
+	return result, nil
 }

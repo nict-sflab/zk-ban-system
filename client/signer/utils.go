@@ -10,7 +10,7 @@ import (
 )
 
 func FetchGroupPublicKey(url string) ([]byte, error) {
-	return utils.FetchBase64(url)
+	return utils.FetchBase64WithGET(url)
 }
 
 func FetchRevocationList(signer []byte, u string) ([]byte, error) {
@@ -29,5 +29,5 @@ func FetchRevocationList(signer []byte, u string) ([]byte, error) {
 	query.Add("before", fmt.Sprintf("%d", signerObj.Period))
 	uu.RawQuery = query.Encode()
 
-	return utils.FetchBinary(uu.String())
+	return utils.FetchBinaryWithGET(uu.String())
 }
