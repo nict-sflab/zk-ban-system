@@ -8,6 +8,26 @@ import (
 )
 
 var (
+	// CredentialsColumns holds the columns for the "credentials" table.
+	CredentialsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "credential", Type: field.TypeBytes},
+		{Name: "update_ticket_credential", Type: field.TypeInt, Nullable: true},
+	}
+	// CredentialsTable holds the schema information for the "credentials" table.
+	CredentialsTable = &schema.Table{
+		Name:       "credentials",
+		Columns:    CredentialsColumns,
+		PrimaryKey: []*schema.Column{CredentialsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "credentials_update_tickets_credential",
+				Columns:    []*schema.Column{CredentialsColumns[2]},
+				RefColumns: []*schema.Column{UpdateTicketsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// IDTokensColumns holds the columns for the "id_tokens" table.
 	IDTokensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -46,6 +66,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		CredentialsTable,
 		IDTokensTable,
 		RevocationsTable,
 		UpdateTicketsTable,
@@ -53,4 +74,5 @@ var (
 )
 
 func init() {
+	CredentialsTable.ForeignKeys[0].RefTable = UpdateTicketsTable
 }

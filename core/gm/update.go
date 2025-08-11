@@ -2,31 +2,34 @@ package gm
 
 import (
 	"encoding/base64"
-	"errors"
 
 	corecore "github.com/akakou/zk-ban-system/core"
+	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 	"github.com/akakou/zk-ban/precomputes"
+	"github.com/cockroachdb/errors"
 )
 
 var ErrAlreadyIssueCredential = errors.New("already issue credential")
+var ErrCredentialNotFound = errors.New("ent: credential not found")
 
 func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after int64) (string, error) {
-	if after == req.Before {
-		return "", errors.New("no update")
-	}
+	existCred, err := gm.DB.Client.Credential.Query().Where(
+		credential.Or(
+			credential.HasUpdateTicketWith(
+				updateticket.TicketEQ(req.UpdateRequest.PublicKey.Number.Bytes()),
+			),
+		)).Only(*gm.DB.Ctx)
 
-	exist, err := gm.DB.Client.UpdateTicket.
-		Query().
-		Where(updateticket.Ticket(req.UpdateRequest.UpdateTicket.Number.Bytes())).
-		Exist(*gm.DB.Ctx)
-
-	if err != nil {
+	if err == nil {
+		resp := base64.URLEncoding.EncodeToString(existCred.Credential)
+		return resp, nil
+	} else if err.Error() != ErrCredentialNotFound.Error() {
 		return "", err
 	}
 
-	if exist {
-		return "", ErrAlreadyIssueCredential
+	if after == req.Before {
+		return "", errors.New("no update")
 	}
 
 	index := corecore.KeyIndex{
@@ -72,8 +75,13 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 		return "", err
 	}
 
-	gm.DB.Client.UpdateTicket.Create().
+	updateTicket := gm.DB.Client.UpdateTicket.Create().
 		SetTicket(req.UpdateRequest.UpdateTicket.Number.Bytes()).
+		SaveX(*gm.DB.Ctx)
+
+	gm.DB.Client.Credential.Create().
+		SetCredential(cred.Signature).
+		SetUpdateTicket(updateTicket).
 		SaveX(*gm.DB.Ctx)
 
 	resp := base64.URLEncoding.EncodeToString(cred.Signature)

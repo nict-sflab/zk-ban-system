@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/core/gm/ent/idtoken"
 	"github.com/akakou/zk-ban-system/core/gm/ent/revocation"
 	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
@@ -75,6 +76,7 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			credential.Table:   credential.ValidColumn,
 			idtoken.Table:      idtoken.ValidColumn,
 			revocation.Table:   revocation.ValidColumn,
 			updateticket.Table: updateticket.ValidColumn,

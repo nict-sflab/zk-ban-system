@@ -1,6 +1,7 @@
 package zkbansystem
 
 import (
+	"bytes"
 	"testing"
 	"time"
 
@@ -123,8 +124,12 @@ func TestMain(t *testing.T) {
 	}
 
 	ns, err = signer.RequestUpdate(s1, rlBuf, gpk2, "http://localhost:1323/update-credential")
-	if err == nil {
+	if err != nil {
 		t.Fatal(ns, err)
+	}
+
+	if !bytes.Equal(s12, ns) {
+		t.Fatal(ns, s12, ns)
 	}
 
 	passDay()

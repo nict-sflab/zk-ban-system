@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Credential is the client for interacting with the Credential builders.
+	Credential *CredentialClient
 	// IDToken is the client for interacting with the IDToken builders.
 	IDToken *IDTokenClient
 	// Revocation is the client for interacting with the Revocation builders.
@@ -149,6 +151,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Credential = NewCredentialClient(tx.config)
 	tx.IDToken = NewIDTokenClient(tx.config)
 	tx.Revocation = NewRevocationClient(tx.config)
 	tx.UpdateTicket = NewUpdateTicketClient(tx.config)
@@ -161,7 +164,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: IDToken.QueryXXX(), the query will be executed
+// applies a query, for example: Credential.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

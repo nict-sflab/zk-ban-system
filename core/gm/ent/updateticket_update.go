@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/core/gm/ent/predicate"
 	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 )
@@ -33,9 +34,45 @@ func (utu *UpdateTicketUpdate) SetTicket(b []byte) *UpdateTicketUpdate {
 	return utu
 }
 
+// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+func (utu *UpdateTicketUpdate) AddCredentialIDs(ids ...int) *UpdateTicketUpdate {
+	utu.mutation.AddCredentialIDs(ids...)
+	return utu
+}
+
+// AddCredential adds the "credential" edges to the Credential entity.
+func (utu *UpdateTicketUpdate) AddCredential(c ...*Credential) *UpdateTicketUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return utu.AddCredentialIDs(ids...)
+}
+
 // Mutation returns the UpdateTicketMutation object of the builder.
 func (utu *UpdateTicketUpdate) Mutation() *UpdateTicketMutation {
 	return utu.mutation
+}
+
+// ClearCredential clears all "credential" edges to the Credential entity.
+func (utu *UpdateTicketUpdate) ClearCredential() *UpdateTicketUpdate {
+	utu.mutation.ClearCredential()
+	return utu
+}
+
+// RemoveCredentialIDs removes the "credential" edge to Credential entities by IDs.
+func (utu *UpdateTicketUpdate) RemoveCredentialIDs(ids ...int) *UpdateTicketUpdate {
+	utu.mutation.RemoveCredentialIDs(ids...)
+	return utu
+}
+
+// RemoveCredential removes "credential" edges to Credential entities.
+func (utu *UpdateTicketUpdate) RemoveCredential(c ...*Credential) *UpdateTicketUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return utu.RemoveCredentialIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -77,6 +114,51 @@ func (utu *UpdateTicketUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := utu.mutation.Ticket(); ok {
 		_spec.SetField(updateticket.FieldTicket, field.TypeBytes, value)
 	}
+	if utu.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   updateticket.CredentialTable,
+			Columns: []string{updateticket.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := utu.mutation.RemovedCredentialIDs(); len(nodes) > 0 && !utu.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   updateticket.CredentialTable,
+			Columns: []string{updateticket.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := utu.mutation.CredentialIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   updateticket.CredentialTable,
+			Columns: []string{updateticket.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, utu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{updateticket.Label}
@@ -103,9 +185,45 @@ func (utuo *UpdateTicketUpdateOne) SetTicket(b []byte) *UpdateTicketUpdateOne {
 	return utuo
 }
 
+// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+func (utuo *UpdateTicketUpdateOne) AddCredentialIDs(ids ...int) *UpdateTicketUpdateOne {
+	utuo.mutation.AddCredentialIDs(ids...)
+	return utuo
+}
+
+// AddCredential adds the "credential" edges to the Credential entity.
+func (utuo *UpdateTicketUpdateOne) AddCredential(c ...*Credential) *UpdateTicketUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return utuo.AddCredentialIDs(ids...)
+}
+
 // Mutation returns the UpdateTicketMutation object of the builder.
 func (utuo *UpdateTicketUpdateOne) Mutation() *UpdateTicketMutation {
 	return utuo.mutation
+}
+
+// ClearCredential clears all "credential" edges to the Credential entity.
+func (utuo *UpdateTicketUpdateOne) ClearCredential() *UpdateTicketUpdateOne {
+	utuo.mutation.ClearCredential()
+	return utuo
+}
+
+// RemoveCredentialIDs removes the "credential" edge to Credential entities by IDs.
+func (utuo *UpdateTicketUpdateOne) RemoveCredentialIDs(ids ...int) *UpdateTicketUpdateOne {
+	utuo.mutation.RemoveCredentialIDs(ids...)
+	return utuo
+}
+
+// RemoveCredential removes "credential" edges to Credential entities.
+func (utuo *UpdateTicketUpdateOne) RemoveCredential(c ...*Credential) *UpdateTicketUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return utuo.RemoveCredentialIDs(ids...)
 }
 
 // Where appends a list predicates to the UpdateTicketUpdate builder.
@@ -176,6 +294,51 @@ func (utuo *UpdateTicketUpdateOne) sqlSave(ctx context.Context) (_node *UpdateTi
 	}
 	if value, ok := utuo.mutation.Ticket(); ok {
 		_spec.SetField(updateticket.FieldTicket, field.TypeBytes, value)
+	}
+	if utuo.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   updateticket.CredentialTable,
+			Columns: []string{updateticket.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := utuo.mutation.RemovedCredentialIDs(); len(nodes) > 0 && !utuo.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   updateticket.CredentialTable,
+			Columns: []string{updateticket.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := utuo.mutation.CredentialIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   updateticket.CredentialTable,
+			Columns: []string{updateticket.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &UpdateTicket{config: utuo.config}
 	_spec.Assign = _node.assignValues

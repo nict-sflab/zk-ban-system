@@ -124,7 +124,11 @@ func TestAll(t *testing.T) {
 	}
 
 	failCred, err = g.UpdateCredential(&updateReq, utils.Period())
-	if err == nil {
+	if err != nil {
+		t.Fatal(string(failCred), err)
+	}
+
+	if failCred != cred {
 		t.Fatal(failCred, err)
 	}
 

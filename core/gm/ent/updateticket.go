@@ -17,8 +17,29 @@ type UpdateTicket struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Ticket holds the value of the "ticket" field.
-	Ticket       []byte `json:"ticket,omitempty"`
+	Ticket []byte `json:"ticket,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UpdateTicketQuery when eager-loading is set.
+	Edges        UpdateTicketEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UpdateTicketEdges holds the relations/edges for other nodes in the graph.
+type UpdateTicketEdges struct {
+	// Credential holds the value of the credential edge.
+	Credential []*Credential `json:"credential,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// CredentialOrErr returns the Credential value or an error if the edge
+// was not loaded in eager-loading.
+func (e UpdateTicketEdges) CredentialOrErr() ([]*Credential, error) {
+	if e.loadedTypes[0] {
+		return e.Credential, nil
+	}
+	return nil, &NotLoadedError{edge: "credential"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -68,6 +89,11 @@ func (ut *UpdateTicket) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (ut *UpdateTicket) Value(name string) (ent.Value, error) {
 	return ut.selectValues.Get(name)
+}
+
+// QueryCredential queries the "credential" edge of the UpdateTicket entity.
+func (ut *UpdateTicket) QueryCredential() *CredentialQuery {
+	return NewUpdateTicketClient(ut.config).QueryCredential(ut)
 }
 
 // Update returns a builder for updating this UpdateTicket.

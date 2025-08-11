@@ -1,41 +1,16 @@
 package signer
 
 import (
-	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 
+	"github.com/akakou/zk-ban-system/client/utils"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 func FetchGroupPublicKey(url string) ([]byte, error) {
-	res, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	buf := new(bytes.Buffer)
-	_, err = buf.ReadFrom(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	text := buf.String()
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("status code is %v, not 200\n%v", res.StatusCode, text)
-	}
-
-	gpk, err := base64.URLEncoding.DecodeString(text)
-	if err != nil {
-		return nil, err
-	}
-
-	return gpk, nil
+	return utils.FetchBase64(url)
 }
 
 func FetchRevocationList(signer []byte, u string) ([]byte, error) {
@@ -54,23 +29,5 @@ func FetchRevocationList(signer []byte, u string) ([]byte, error) {
 	query.Add("before", fmt.Sprintf("%d", signerObj.Period))
 	uu.RawQuery = query.Encode()
 
-	res, err := http.Get(uu.String())
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	buf := new(bytes.Buffer)
-	_, err = buf.ReadFrom(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	text := buf.String()
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("status code is %v, not 200\n%v", res.StatusCode, text)
-	}
-
-	return buf.Bytes(), nil
+	return utils.FetchBinary(uu.String())
 }

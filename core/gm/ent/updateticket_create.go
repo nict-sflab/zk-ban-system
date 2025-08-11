@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 )
 
@@ -23,6 +24,21 @@ type UpdateTicketCreate struct {
 func (utc *UpdateTicketCreate) SetTicket(b []byte) *UpdateTicketCreate {
 	utc.mutation.SetTicket(b)
 	return utc
+}
+
+// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+func (utc *UpdateTicketCreate) AddCredentialIDs(ids ...int) *UpdateTicketCreate {
+	utc.mutation.AddCredentialIDs(ids...)
+	return utc
+}
+
+// AddCredential adds the "credential" edges to the Credential entity.
+func (utc *UpdateTicketCreate) AddCredential(c ...*Credential) *UpdateTicketCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return utc.AddCredentialIDs(ids...)
 }
 
 // Mutation returns the UpdateTicketMutation object of the builder.
@@ -91,6 +107,22 @@ func (utc *UpdateTicketCreate) createSpec() (*UpdateTicket, *sqlgraph.CreateSpec
 	if value, ok := utc.mutation.Ticket(); ok {
 		_spec.SetField(updateticket.FieldTicket, field.TypeBytes, value)
 		_node.Ticket = value
+	}
+	if nodes := utc.mutation.CredentialIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   updateticket.CredentialTable,
+			Columns: []string{updateticket.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

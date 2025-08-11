@@ -2,7 +2,6 @@ package signer
 
 import (
 	"encoding/json"
-	"errors"
 
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
@@ -28,10 +27,6 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 	err = json.Unmarshal(signer, &signerObj)
 	if err != nil {
 		return nil, err
-	}
-
-	if now == signerObj.Period {
-		return nil, errors.New("no update")
 	}
 
 	gpkObj, err := zkbanw.GroupPublicKeyFromBytes(gpk)

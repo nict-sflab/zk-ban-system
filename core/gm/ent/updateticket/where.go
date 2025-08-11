@@ -4,6 +4,7 @@ package updateticket
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/akakou/zk-ban-system/core/gm/ent/predicate"
 )
 
@@ -95,6 +96,29 @@ func TicketLT(v []byte) predicate.UpdateTicket {
 // TicketLTE applies the LTE predicate on the "ticket" field.
 func TicketLTE(v []byte) predicate.UpdateTicket {
 	return predicate.UpdateTicket(sql.FieldLTE(FieldTicket, v))
+}
+
+// HasCredential applies the HasEdge predicate on the "credential" edge.
+func HasCredential() predicate.UpdateTicket {
+	return predicate.UpdateTicket(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CredentialTable, CredentialColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCredentialWith applies the HasEdge predicate on the "credential" edge with a given conditions (other predicates).
+func HasCredentialWith(preds ...predicate.Credential) predicate.UpdateTicket {
+	return predicate.UpdateTicket(func(s *sql.Selector) {
+		step := newCredentialStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.
