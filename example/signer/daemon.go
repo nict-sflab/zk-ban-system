@@ -12,6 +12,7 @@ import (
 )
 
 var periodLength int64
+var sleepShoter = 10
 
 var daemonCmd = &cobra.Command{
 	Use:   "daemon",
@@ -25,7 +26,7 @@ var daemonCmd = &cobra.Command{
 				continue
 			}
 
-			sleep := time.Duration(r.Int64())
+			sleep := time.Duration(r.Int64() / int64(sleepShoter))
 			fmt.Printf("wait %s...\n", sleep)
 			time.Sleep(sleep)
 			err = update()
