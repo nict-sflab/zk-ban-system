@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
-	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 )
 
 // CredentialCreate is the builder for creating a Credential entity.
@@ -26,23 +25,10 @@ func (cc *CredentialCreate) SetCredential(b []byte) *CredentialCreate {
 	return cc
 }
 
-// SetUpdateTicketID sets the "updateTicket" edge to the UpdateTicket entity by ID.
-func (cc *CredentialCreate) SetUpdateTicketID(id int) *CredentialCreate {
-	cc.mutation.SetUpdateTicketID(id)
+// SetPublicKey sets the "public_key" field.
+func (cc *CredentialCreate) SetPublicKey(b []byte) *CredentialCreate {
+	cc.mutation.SetPublicKey(b)
 	return cc
-}
-
-// SetNillableUpdateTicketID sets the "updateTicket" edge to the UpdateTicket entity by ID if the given value is not nil.
-func (cc *CredentialCreate) SetNillableUpdateTicketID(id *int) *CredentialCreate {
-	if id != nil {
-		cc = cc.SetUpdateTicketID(*id)
-	}
-	return cc
-}
-
-// SetUpdateTicket sets the "updateTicket" edge to the UpdateTicket entity.
-func (cc *CredentialCreate) SetUpdateTicket(u *UpdateTicket) *CredentialCreate {
-	return cc.SetUpdateTicketID(u.ID)
 }
 
 // Mutation returns the CredentialMutation object of the builder.
@@ -82,6 +68,9 @@ func (cc *CredentialCreate) check() error {
 	if _, ok := cc.mutation.Credential(); !ok {
 		return &ValidationError{Name: "credential", err: errors.New(`ent: missing required field "Credential.credential"`)}
 	}
+	if _, ok := cc.mutation.PublicKey(); !ok {
+		return &ValidationError{Name: "public_key", err: errors.New(`ent: missing required field "Credential.public_key"`)}
+	}
 	return nil
 }
 
@@ -112,22 +101,9 @@ func (cc *CredentialCreate) createSpec() (*Credential, *sqlgraph.CreateSpec) {
 		_spec.SetField(credential.FieldCredential, field.TypeBytes, value)
 		_node.Credential = value
 	}
-	if nodes := cc.mutation.UpdateTicketIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   credential.UpdateTicketTable,
-			Columns: []string{credential.UpdateTicketColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(updateticket.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.update_ticket_credential = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := cc.mutation.PublicKey(); ok {
+		_spec.SetField(credential.FieldPublicKey, field.TypeBytes, value)
+		_node.PublicKey = value
 	}
 	return _node, _spec
 }

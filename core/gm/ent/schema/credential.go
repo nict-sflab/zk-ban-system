@@ -2,7 +2,6 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -15,12 +14,11 @@ type Credential struct {
 func (Credential) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bytes("credential"),
+		field.Bytes("public_key"),
 	}
 }
 
 // Edges of the Credential.
 func (Credential) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("updateTicket", UpdateTicket.Type).Ref("credential").Unique(),
-	}
+	return nil
 }

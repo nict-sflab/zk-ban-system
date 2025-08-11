@@ -9,7 +9,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
-	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 )
 
 // Credential is the model entity for the Credential schema.
@@ -19,31 +18,9 @@ type Credential struct {
 	ID int `json:"id,omitempty"`
 	// Credential holds the value of the "credential" field.
 	Credential []byte `json:"credential,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the CredentialQuery when eager-loading is set.
-	Edges                    CredentialEdges `json:"edges"`
-	update_ticket_credential *int
-	selectValues             sql.SelectValues
-}
-
-// CredentialEdges holds the relations/edges for other nodes in the graph.
-type CredentialEdges struct {
-	// UpdateTicket holds the value of the updateTicket edge.
-	UpdateTicket *UpdateTicket `json:"updateTicket,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-}
-
-// UpdateTicketOrErr returns the UpdateTicket value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CredentialEdges) UpdateTicketOrErr() (*UpdateTicket, error) {
-	if e.UpdateTicket != nil {
-		return e.UpdateTicket, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: updateticket.Label}
-	}
-	return nil, &NotLoadedError{edge: "updateTicket"}
+	// PublicKey holds the value of the "public_key" field.
+	PublicKey    []byte `json:"public_key,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -51,11 +28,9 @@ func (*Credential) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case credential.FieldCredential:
+		case credential.FieldCredential, credential.FieldPublicKey:
 			values[i] = new([]byte)
 		case credential.FieldID:
-			values[i] = new(sql.NullInt64)
-		case credential.ForeignKeys[0]: // update_ticket_credential
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -84,12 +59,11 @@ func (c *Credential) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				c.Credential = *value
 			}
-		case credential.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field update_ticket_credential", value)
-			} else if value.Valid {
-				c.update_ticket_credential = new(int)
-				*c.update_ticket_credential = int(value.Int64)
+		case credential.FieldPublicKey:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field public_key", values[i])
+			} else if value != nil {
+				c.PublicKey = *value
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -102,11 +76,6 @@ func (c *Credential) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (c *Credential) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
-}
-
-// QueryUpdateTicket queries the "updateTicket" edge of the Credential entity.
-func (c *Credential) QueryUpdateTicket() *UpdateTicketQuery {
-	return NewCredentialClient(c.config).QueryUpdateTicket(c)
 }
 
 // Update returns a builder for updating this Credential.
@@ -134,6 +103,9 @@ func (c *Credential) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
 	builder.WriteString("credential=")
 	builder.WriteString(fmt.Sprintf("%v", c.Credential))
+	builder.WriteString(", ")
+	builder.WriteString("public_key=")
+	builder.WriteString(fmt.Sprintf("%v", c.PublicKey))
 	builder.WriteByte(')')
 	return builder.String()
 }

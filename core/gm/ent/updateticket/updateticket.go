@@ -4,7 +4,6 @@ package updateticket
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -14,17 +13,8 @@ const (
 	FieldID = "id"
 	// FieldTicket holds the string denoting the ticket field in the database.
 	FieldTicket = "ticket"
-	// EdgeCredential holds the string denoting the credential edge name in mutations.
-	EdgeCredential = "credential"
 	// Table holds the table name of the updateticket in the database.
 	Table = "update_tickets"
-	// CredentialTable is the table that holds the credential relation/edge.
-	CredentialTable = "credentials"
-	// CredentialInverseTable is the table name for the Credential entity.
-	// It exists in this package in order to avoid circular dependency with the "credential" package.
-	CredentialInverseTable = "credentials"
-	// CredentialColumn is the table column denoting the credential relation/edge.
-	CredentialColumn = "update_ticket_credential"
 )
 
 // Columns holds all SQL columns for updateticket fields.
@@ -49,25 +39,4 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByCredentialCount orders the results by credential count.
-func ByCredentialCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCredentialStep(), opts...)
-	}
-}
-
-// ByCredential orders the results by credential terms.
-func ByCredential(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCredentialStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newCredentialStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CredentialInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, CredentialTable, CredentialColumn),
-	)
 }

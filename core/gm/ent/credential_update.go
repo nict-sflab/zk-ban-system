@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
 	"github.com/akakou/zk-ban-system/core/gm/ent/predicate"
-	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
 )
 
 // CredentialUpdate is the builder for updating Credential entities.
@@ -34,34 +33,15 @@ func (cu *CredentialUpdate) SetCredential(b []byte) *CredentialUpdate {
 	return cu
 }
 
-// SetUpdateTicketID sets the "updateTicket" edge to the UpdateTicket entity by ID.
-func (cu *CredentialUpdate) SetUpdateTicketID(id int) *CredentialUpdate {
-	cu.mutation.SetUpdateTicketID(id)
+// SetPublicKey sets the "public_key" field.
+func (cu *CredentialUpdate) SetPublicKey(b []byte) *CredentialUpdate {
+	cu.mutation.SetPublicKey(b)
 	return cu
-}
-
-// SetNillableUpdateTicketID sets the "updateTicket" edge to the UpdateTicket entity by ID if the given value is not nil.
-func (cu *CredentialUpdate) SetNillableUpdateTicketID(id *int) *CredentialUpdate {
-	if id != nil {
-		cu = cu.SetUpdateTicketID(*id)
-	}
-	return cu
-}
-
-// SetUpdateTicket sets the "updateTicket" edge to the UpdateTicket entity.
-func (cu *CredentialUpdate) SetUpdateTicket(u *UpdateTicket) *CredentialUpdate {
-	return cu.SetUpdateTicketID(u.ID)
 }
 
 // Mutation returns the CredentialMutation object of the builder.
 func (cu *CredentialUpdate) Mutation() *CredentialMutation {
 	return cu.mutation
-}
-
-// ClearUpdateTicket clears the "updateTicket" edge to the UpdateTicket entity.
-func (cu *CredentialUpdate) ClearUpdateTicket() *CredentialUpdate {
-	cu.mutation.ClearUpdateTicket()
-	return cu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -103,34 +83,8 @@ func (cu *CredentialUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Credential(); ok {
 		_spec.SetField(credential.FieldCredential, field.TypeBytes, value)
 	}
-	if cu.mutation.UpdateTicketCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   credential.UpdateTicketTable,
-			Columns: []string{credential.UpdateTicketColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(updateticket.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.UpdateTicketIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   credential.UpdateTicketTable,
-			Columns: []string{credential.UpdateTicketColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(updateticket.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := cu.mutation.PublicKey(); ok {
+		_spec.SetField(credential.FieldPublicKey, field.TypeBytes, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -158,34 +112,15 @@ func (cuo *CredentialUpdateOne) SetCredential(b []byte) *CredentialUpdateOne {
 	return cuo
 }
 
-// SetUpdateTicketID sets the "updateTicket" edge to the UpdateTicket entity by ID.
-func (cuo *CredentialUpdateOne) SetUpdateTicketID(id int) *CredentialUpdateOne {
-	cuo.mutation.SetUpdateTicketID(id)
+// SetPublicKey sets the "public_key" field.
+func (cuo *CredentialUpdateOne) SetPublicKey(b []byte) *CredentialUpdateOne {
+	cuo.mutation.SetPublicKey(b)
 	return cuo
-}
-
-// SetNillableUpdateTicketID sets the "updateTicket" edge to the UpdateTicket entity by ID if the given value is not nil.
-func (cuo *CredentialUpdateOne) SetNillableUpdateTicketID(id *int) *CredentialUpdateOne {
-	if id != nil {
-		cuo = cuo.SetUpdateTicketID(*id)
-	}
-	return cuo
-}
-
-// SetUpdateTicket sets the "updateTicket" edge to the UpdateTicket entity.
-func (cuo *CredentialUpdateOne) SetUpdateTicket(u *UpdateTicket) *CredentialUpdateOne {
-	return cuo.SetUpdateTicketID(u.ID)
 }
 
 // Mutation returns the CredentialMutation object of the builder.
 func (cuo *CredentialUpdateOne) Mutation() *CredentialMutation {
 	return cuo.mutation
-}
-
-// ClearUpdateTicket clears the "updateTicket" edge to the UpdateTicket entity.
-func (cuo *CredentialUpdateOne) ClearUpdateTicket() *CredentialUpdateOne {
-	cuo.mutation.ClearUpdateTicket()
-	return cuo
 }
 
 // Where appends a list predicates to the CredentialUpdate builder.
@@ -257,34 +192,8 @@ func (cuo *CredentialUpdateOne) sqlSave(ctx context.Context) (_node *Credential,
 	if value, ok := cuo.mutation.Credential(); ok {
 		_spec.SetField(credential.FieldCredential, field.TypeBytes, value)
 	}
-	if cuo.mutation.UpdateTicketCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   credential.UpdateTicketTable,
-			Columns: []string{credential.UpdateTicketColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(updateticket.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.UpdateTicketIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   credential.UpdateTicketTable,
-			Columns: []string{credential.UpdateTicketColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(updateticket.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := cuo.mutation.PublicKey(); ok {
+		_spec.SetField(credential.FieldPublicKey, field.TypeBytes, value)
 	}
 	_node = &Credential{config: cuo.config}
 	_spec.Assign = _node.assignValues

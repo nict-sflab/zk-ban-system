@@ -35,16 +35,15 @@ const (
 // CredentialMutation represents an operation that mutates the Credential nodes in the graph.
 type CredentialMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	credential          *[]byte
-	clearedFields       map[string]struct{}
-	updateTicket        *int
-	clearedupdateTicket bool
-	done                bool
-	oldValue            func(context.Context) (*Credential, error)
-	predicates          []predicate.Credential
+	op            Op
+	typ           string
+	id            *int
+	credential    *[]byte
+	public_key    *[]byte
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Credential, error)
+	predicates    []predicate.Credential
 }
 
 var _ ent.Mutation = (*CredentialMutation)(nil)
@@ -181,43 +180,40 @@ func (m *CredentialMutation) ResetCredential() {
 	m.credential = nil
 }
 
-// SetUpdateTicketID sets the "updateTicket" edge to the UpdateTicket entity by id.
-func (m *CredentialMutation) SetUpdateTicketID(id int) {
-	m.updateTicket = &id
+// SetPublicKey sets the "public_key" field.
+func (m *CredentialMutation) SetPublicKey(b []byte) {
+	m.public_key = &b
 }
 
-// ClearUpdateTicket clears the "updateTicket" edge to the UpdateTicket entity.
-func (m *CredentialMutation) ClearUpdateTicket() {
-	m.clearedupdateTicket = true
-}
-
-// UpdateTicketCleared reports if the "updateTicket" edge to the UpdateTicket entity was cleared.
-func (m *CredentialMutation) UpdateTicketCleared() bool {
-	return m.clearedupdateTicket
-}
-
-// UpdateTicketID returns the "updateTicket" edge ID in the mutation.
-func (m *CredentialMutation) UpdateTicketID() (id int, exists bool) {
-	if m.updateTicket != nil {
-		return *m.updateTicket, true
+// PublicKey returns the value of the "public_key" field in the mutation.
+func (m *CredentialMutation) PublicKey() (r []byte, exists bool) {
+	v := m.public_key
+	if v == nil {
+		return
 	}
-	return
+	return *v, true
 }
 
-// UpdateTicketIDs returns the "updateTicket" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UpdateTicketID instead. It exists only for internal usage by the builders.
-func (m *CredentialMutation) UpdateTicketIDs() (ids []int) {
-	if id := m.updateTicket; id != nil {
-		ids = append(ids, *id)
+// OldPublicKey returns the old "public_key" field's value of the Credential entity.
+// If the Credential object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CredentialMutation) OldPublicKey(ctx context.Context) (v []byte, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPublicKey is only allowed on UpdateOne operations")
 	}
-	return
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPublicKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPublicKey: %w", err)
+	}
+	return oldValue.PublicKey, nil
 }
 
-// ResetUpdateTicket resets all changes to the "updateTicket" edge.
-func (m *CredentialMutation) ResetUpdateTicket() {
-	m.updateTicket = nil
-	m.clearedupdateTicket = false
+// ResetPublicKey resets all changes to the "public_key" field.
+func (m *CredentialMutation) ResetPublicKey() {
+	m.public_key = nil
 }
 
 // Where appends a list predicates to the CredentialMutation builder.
@@ -254,9 +250,12 @@ func (m *CredentialMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CredentialMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
 	if m.credential != nil {
 		fields = append(fields, credential.FieldCredential)
+	}
+	if m.public_key != nil {
+		fields = append(fields, credential.FieldPublicKey)
 	}
 	return fields
 }
@@ -268,6 +267,8 @@ func (m *CredentialMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case credential.FieldCredential:
 		return m.Credential()
+	case credential.FieldPublicKey:
+		return m.PublicKey()
 	}
 	return nil, false
 }
@@ -279,6 +280,8 @@ func (m *CredentialMutation) OldField(ctx context.Context, name string) (ent.Val
 	switch name {
 	case credential.FieldCredential:
 		return m.OldCredential(ctx)
+	case credential.FieldPublicKey:
+		return m.OldPublicKey(ctx)
 	}
 	return nil, fmt.Errorf("unknown Credential field %s", name)
 }
@@ -294,6 +297,13 @@ func (m *CredentialMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCredential(v)
+		return nil
+	case credential.FieldPublicKey:
+		v, ok := value.([]byte)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPublicKey(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Credential field %s", name)
@@ -347,34 +357,28 @@ func (m *CredentialMutation) ResetField(name string) error {
 	case credential.FieldCredential:
 		m.ResetCredential()
 		return nil
+	case credential.FieldPublicKey:
+		m.ResetPublicKey()
+		return nil
 	}
 	return fmt.Errorf("unknown Credential field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CredentialMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.updateTicket != nil {
-		edges = append(edges, credential.EdgeUpdateTicket)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *CredentialMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case credential.EdgeUpdateTicket:
-		if id := m.updateTicket; id != nil {
-			return []ent.Value{*id}
-		}
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CredentialMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 0)
 	return edges
 }
 
@@ -386,42 +390,25 @@ func (m *CredentialMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CredentialMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedupdateTicket {
-		edges = append(edges, credential.EdgeUpdateTicket)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *CredentialMutation) EdgeCleared(name string) bool {
-	switch name {
-	case credential.EdgeUpdateTicket:
-		return m.clearedupdateTicket
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *CredentialMutation) ClearEdge(name string) error {
-	switch name {
-	case credential.EdgeUpdateTicket:
-		m.ClearUpdateTicket()
-		return nil
-	}
 	return fmt.Errorf("unknown Credential unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *CredentialMutation) ResetEdge(name string) error {
-	switch name {
-	case credential.EdgeUpdateTicket:
-		m.ResetUpdateTicket()
-		return nil
-	}
 	return fmt.Errorf("unknown Credential edge %s", name)
 }
 
@@ -1344,17 +1331,14 @@ func (m *RevocationMutation) ResetEdge(name string) error {
 // UpdateTicketMutation represents an operation that mutates the UpdateTicket nodes in the graph.
 type UpdateTicketMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *int
-	ticket            *[]byte
-	clearedFields     map[string]struct{}
-	credential        map[int]struct{}
-	removedcredential map[int]struct{}
-	clearedcredential bool
-	done              bool
-	oldValue          func(context.Context) (*UpdateTicket, error)
-	predicates        []predicate.UpdateTicket
+	op            Op
+	typ           string
+	id            *int
+	ticket        *[]byte
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*UpdateTicket, error)
+	predicates    []predicate.UpdateTicket
 }
 
 var _ ent.Mutation = (*UpdateTicketMutation)(nil)
@@ -1491,60 +1475,6 @@ func (m *UpdateTicketMutation) ResetTicket() {
 	m.ticket = nil
 }
 
-// AddCredentialIDs adds the "credential" edge to the Credential entity by ids.
-func (m *UpdateTicketMutation) AddCredentialIDs(ids ...int) {
-	if m.credential == nil {
-		m.credential = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.credential[ids[i]] = struct{}{}
-	}
-}
-
-// ClearCredential clears the "credential" edge to the Credential entity.
-func (m *UpdateTicketMutation) ClearCredential() {
-	m.clearedcredential = true
-}
-
-// CredentialCleared reports if the "credential" edge to the Credential entity was cleared.
-func (m *UpdateTicketMutation) CredentialCleared() bool {
-	return m.clearedcredential
-}
-
-// RemoveCredentialIDs removes the "credential" edge to the Credential entity by IDs.
-func (m *UpdateTicketMutation) RemoveCredentialIDs(ids ...int) {
-	if m.removedcredential == nil {
-		m.removedcredential = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.credential, ids[i])
-		m.removedcredential[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedCredential returns the removed IDs of the "credential" edge to the Credential entity.
-func (m *UpdateTicketMutation) RemovedCredentialIDs() (ids []int) {
-	for id := range m.removedcredential {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// CredentialIDs returns the "credential" edge IDs in the mutation.
-func (m *UpdateTicketMutation) CredentialIDs() (ids []int) {
-	for id := range m.credential {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetCredential resets all changes to the "credential" edge.
-func (m *UpdateTicketMutation) ResetCredential() {
-	m.credential = nil
-	m.clearedcredential = false
-	m.removedcredential = nil
-}
-
 // Where appends a list predicates to the UpdateTicketMutation builder.
 func (m *UpdateTicketMutation) Where(ps ...predicate.UpdateTicket) {
 	m.predicates = append(m.predicates, ps...)
@@ -1678,84 +1608,48 @@ func (m *UpdateTicketMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UpdateTicketMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.credential != nil {
-		edges = append(edges, updateticket.EdgeCredential)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *UpdateTicketMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case updateticket.EdgeCredential:
-		ids := make([]ent.Value, 0, len(m.credential))
-		for id := range m.credential {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UpdateTicketMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.removedcredential != nil {
-		edges = append(edges, updateticket.EdgeCredential)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *UpdateTicketMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case updateticket.EdgeCredential:
-		ids := make([]ent.Value, 0, len(m.removedcredential))
-		for id := range m.removedcredential {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UpdateTicketMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedcredential {
-		edges = append(edges, updateticket.EdgeCredential)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *UpdateTicketMutation) EdgeCleared(name string) bool {
-	switch name {
-	case updateticket.EdgeCredential:
-		return m.clearedcredential
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *UpdateTicketMutation) ClearEdge(name string) error {
-	switch name {
-	}
 	return fmt.Errorf("unknown UpdateTicket unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *UpdateTicketMutation) ResetEdge(name string) error {
-	switch name {
-	case updateticket.EdgeCredential:
-		m.ResetCredential()
-		return nil
-	}
 	return fmt.Errorf("unknown UpdateTicket edge %s", name)
 }
