@@ -50,6 +50,7 @@ func TestAll(t *testing.T) {
 	v := verifier.Verifier{
 		GroupPublicKey: gpk,
 		VerifyingKey:   verifierKey,
+		CountMax:       2,
 	}
 
 	reqBody, s, err := signer.RequestJoin(period, "")
@@ -84,7 +85,7 @@ func TestAll(t *testing.T) {
 	}
 
 	m := []byte("test")
-	signatureBuf, err := signer.Sign(m, 0, s, gsk.Bytes())
+	signatureBuf, err := signer.Sign(m, 1, s, gsk.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}

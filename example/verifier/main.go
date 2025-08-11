@@ -35,6 +35,7 @@ func main() {
 		Verifier: &core.Verifier{
 			GroupPublicKey: gpk,
 			VerifyingKey:   verifierKey,
+			CountMax:       2,
 		},
 	}
 

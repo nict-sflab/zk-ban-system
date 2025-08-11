@@ -66,6 +66,7 @@ func TestMain(t *testing.T) {
 	v := coreverifier.Verifier{
 		GroupPublicKey: &g.GroupPublicKey,
 		VerifyingKey:   verifierKey,
+		CountMax:       2,
 	}
 
 	verifierServ := verifier.VerifierServer{
@@ -102,7 +103,7 @@ func TestMain(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = signer.Sign([]byte("aaa"), 0, s1, gpk2, "http://localhost:1323/verify")
+	_, err = signer.Sign([]byte("aaa"), 2, s1, gpk2, "http://localhost:1323/verify")
 	if err != nil {
 		t.Fatal(err)
 	}
