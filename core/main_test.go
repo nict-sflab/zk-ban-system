@@ -103,7 +103,7 @@ func TestAll(t *testing.T) {
 
 	passDay()
 
-	rl, err := g.RevocationList(before)
+	rl, err := g.RevocationList(before, period)
 	if err != nil {
 		t.Fatal(err)
 	}

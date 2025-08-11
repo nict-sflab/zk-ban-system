@@ -48,7 +48,7 @@ func TestQuery(t *testing.T) {
 	}
 	passDay()
 
-	rl, err := g.QueryRL(2)
+	rl, err := g.QueryRL(2, today())
 	assert.NoError(t, err)
 	assert.Equal(t, 100, rl.Size.NymsNumberPerSession)
 	assert.Equal(t, 10, rl.Size.SessionNumber)

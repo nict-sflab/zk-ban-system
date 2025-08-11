@@ -7,7 +7,7 @@ import (
 	"github.com/akakou/zk-ban-system/core/gm/ent/revocation"
 )
 
-func (gm *GroupManager[T]) QueryRL(before int64) (*core.RevocationList, error) {
+func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, error) {
 	var v []struct {
 		CountAll     int `json:"count_all"`
 		Count        int `json:"count"`
@@ -17,6 +17,7 @@ func (gm *GroupManager[T]) QueryRL(before int64) (*core.RevocationList, error) {
 	gm.DB.Client.Revocation.Query().
 		Where(revocation.And(
 			revocation.RevokedPeriodGTE(int(before)),
+			revocation.RevokedPeriodLT(int(after)),
 			revocation.SignedPeriodLTE(int(before)),
 		)).
 		GroupBy(revocation.FieldSignedPeriod, revocation.FieldCount).

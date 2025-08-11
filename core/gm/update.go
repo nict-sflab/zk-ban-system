@@ -47,7 +47,7 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 	verifier, hasVerifier := gm.PreparedSnarkVerifiers[index]
 
 	if !hasVerifier {
-		rl, err := gm.QueryRL(req.Before)
+		rl, err := gm.QueryRL(req.Before, after)
 		if err != nil {
 			return "", err
 		}
