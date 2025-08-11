@@ -29,3 +29,4 @@ dump/tools/tools
 example/signer/signer.json
 example/signer/gpk.bin
 example/signer/tmp.json
+example/signer/signer
