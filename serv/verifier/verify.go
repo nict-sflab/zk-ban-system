@@ -1,7 +1,6 @@
 package verifier
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 
@@ -21,8 +20,7 @@ func (serv *VerifierServer) VerifyEndpoint() func(c echo.Context) error {
 			return err
 		}
 
-		nym := base64.URLEncoding.EncodeToString(signature.Signature.Commit.Nym.Bytes())
-		fmt.Printf("%v\n%v\n", nym, signature.Count)
+		fmt.Printf("%v\nPeriod: %v\nCount: %v\n", sigString, period, signature.Count)
 
 		err = serv.Verifier.Verify(&signature, period)
 		if err != nil {
