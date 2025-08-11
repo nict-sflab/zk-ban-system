@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -42,6 +43,7 @@ func init() {
 	rootCmd.AddCommand(joinCmd)
 	rootCmd.AddCommand(signCmd)
 	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(daemonCmd)
 
 	joinCmd.Flags().StringVar(&idToken, "token", "", "ID Token of Firebase")
 	joinCmd.Flags().StringVar(&gmBase, "url", "", "GM's URL")
@@ -59,4 +61,8 @@ func init() {
 
 	updateCmd.Flags().StringVar(&gmBase, "url", "", "GM's URL")
 	updateCmd.MarkFlagRequired("url")
+
+	daemonCmd.Flags().StringVar(&gmBase, "url", "", "GM's URL")
+	daemonCmd.Flags().Int64Var(&periodLength, "period_len", int64(time.Minute/2), "Period Length")
+	daemonCmd.MarkFlagRequired("url")
 }

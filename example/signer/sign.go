@@ -31,6 +31,6 @@ var signCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		fmt.Print(string(res))
+		fmt.Printf("%s\n", res)
 	},
 }
