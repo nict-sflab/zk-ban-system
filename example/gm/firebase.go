@@ -51,6 +51,7 @@ func (s *FirebaseAuthService) FirebaseAuth() func(t *core.JoinRequest[string]) (
 		}
 
 		if v, ok := token.Claims["phone_number"].(string); ok && v != "" {
+			fmt.Printf("new user added: %s", v)
 			return v, nil
 		}
 
@@ -61,6 +62,8 @@ func (s *FirebaseAuthService) FirebaseAuth() func(t *core.JoinRequest[string]) (
 		if user.PhoneNumber == "" {
 			return "", fmt.Errorf("no phone number found")
 		}
+
+		fmt.Printf("new user added: %s", user.PhoneNumber)
 		return user.PhoneNumber, nil
 	}
 }
