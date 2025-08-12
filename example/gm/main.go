@@ -82,7 +82,7 @@ func main() {
 		return c.String(200, "ok")
 	})
 
-	e.Static("/", "./static")
+	e.Static("/admin", "./static")
 
 	gmServ.SetupEchoServer(e)
 	e.Debug = true
