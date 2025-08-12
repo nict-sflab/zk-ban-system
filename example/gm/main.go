@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -20,7 +22,7 @@ func main() {
 	utils.PeriodUnit = time.Duration(time.Minute / 2)
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	g, err := gm.Default[string](gsk.Bytes(), &core.DBConfig{
@@ -28,35 +30,22 @@ func main() {
 		Config: "file::memory:?cache=shared&_fk=1",
 	})
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+	}
+
+	ctx := context.Background()
+	svc, err := NewFirebaseAuthService(ctx, "serviceAccount.json")
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	gmServ := serv.GMServer[string]{
-		GM: g,
-		AuthToken: func(t *corecore.JoinRequest[string]) (string, error) {
-			return t.Option, nil
-		},
+		GM:        g,
+		AuthToken: svc.FirebaseAuth(),
+		// AuthToken: allOKAuth,
 	}
 
 	e := echo.New()
-
-	// e.GET("/period", func(c echo.Context) error {
-	// 	str := c.QueryParam("period")
-	// 	if str == "" {
-	// 		return c.String(200, strconv.Itoa(int(utils.Period())))
-	// 	}
-
-	// 	i, err := strconv.Atoi(str)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// 	utils.Period = func() int64 {
-	// 		return int64(i)
-	// 	}
-
-	// 	return c.String(200, strconv.Itoa(i))
-	// })
 
 	e.GET("/revoke", func(c echo.Context) error {
 		revoked := c.QueryParam("signature")
