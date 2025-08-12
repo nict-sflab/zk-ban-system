@@ -2,12 +2,12 @@ package dump
 
 import (
 	"encoding/json"
-	"math/big"
 
 	gnarkserializable "github.com/akakou/gnark-serializable"
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban/circuit"
 	"github.com/akakou/zk-ban/precomputes"
+	"github.com/akakou/zk-ban/primitives"
 	"github.com/akakou/zk-ban/snark"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/consensys/gnark/frontend"
@@ -51,8 +51,8 @@ func UpdateCircuit(nymsNumberPerSession, sessionNumber int) ([]byte, []byte, err
 
 	for range sessionNumber {
 		rns := witness.RevokedNymsPerSession{
-			SessionTag: big.NewInt(0),
-			Nyms:       make([]*big.Int, nymsNumberPerSession),
+			SessionTag: primitives.NewBigInt(0),
+			Nyms:       make([]*primitives.BigInt, nymsNumberPerSession),
 		}
 
 		rlWit = append(rlWit, rns)
@@ -62,7 +62,7 @@ func UpdateCircuit(nymsNumberPerSession, sessionNumber int) ([]byte, []byte, err
 
 	cc, err := snark.InitSNARK(&precomputes.UpdateCircuit{
 		UpdateCircuit: circuit.UpdateCircuit{
-			RevocationList: circuit.NewRevocationListWitness(rlWit),
+			RevocationList: circuit.NewRevocationListAssigned(rlWit),
 		},
 	})
 	if err != nil {
