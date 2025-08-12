@@ -15,7 +15,7 @@ type PreparedSnarkVerifier struct {
 	Prepared    *curve_bls12381.G1Jac
 }
 
-func QueryProperRLWitSize(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*core.SizedSnarkVerifier, int) {
+func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*core.SizedSnarkVerifier, int) {
 	distance := math.MaxFloat64
 	var verifyKey *core.SizedSnarkVerifier = nil
 	var result = -1
@@ -23,7 +23,7 @@ func QueryProperRLWitSize(verifierKeys core.SizedVerifyingKeys, rlSize *core.Rev
 	for i, vk := range verifierKeys {
 		isFit := len(rlSize.NymsNumberPerSession) <= len(vk.RLSize.NymsNumberPerSession)
 
-		for i, _ := range rlSize.NymsNumberPerSession {
+		for i := range rlSize.NymsNumberPerSession {
 			isFit = rlSize.NymsNumberPerSession[i] <= vk.RLSize.NymsNumberPerSession[i] && isFit
 		}
 

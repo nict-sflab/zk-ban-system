@@ -3,10 +3,8 @@ package gm
 import (
 	"encoding/base64"
 
-	corecore "github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/core/gm/ent/credential"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
-	"github.com/akakou/zk-ban/precomputes"
 	"github.com/cockroachdb/errors"
 )
 
@@ -14,17 +12,14 @@ var ErrAlreadyIssueCredential = errors.New("already issue credential")
 var ErrCredentialNotFound = errors.New("ent: credential not found")
 var ErrTicketAlreadyUsed = errors.New("ticket already has benn used")
 
-func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after int64) (string, error) {
-	existCred, err := gm.DB.Client.Credential.Query().
-		Where(
-			credential.PublicKey(req.UpdateRequest.PublicKey.Number.Bytes()),
-		).Only(*gm.DB.Ctx)
-
-	if err == nil {
-		resp := base64.URLEncoding.EncodeToString(existCred.Credential)
-		return resp, nil
-	} else if err.Error() != ErrCredentialNotFound.Error() {
+func (gm *GroupManager[T]) UpdateCredential(req *core.UpdateRequest, after int64) (string, error) {
+	registeredCred, err := gm.queryAlreadyRegisteredCredential(req.UpdateRequest.PublicKey.Number.Bytes())
+	if err != nil {
 		return "", err
+	}
+
+	if registeredCred != "" {
+		return registeredCred, nil
 	}
 
 	if after == req.Before {
@@ -39,7 +34,7 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 		return "", ErrTicketAlreadyUsed
 	}
 
-	index := corecore.KeyIndex{
+	index := core.KeyIndex{
 		First:  after,
 		Second: req.Before,
 	}
@@ -47,24 +42,9 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 	verifier, hasVerifier := gm.PreparedSnarkVerifiers[index]
 
 	if !hasVerifier {
-		rl, v, err := gm.QueryRL(req.Before, after)
+		verifier, err = gm.precomputesVerifyUpdateRequest(req.Before, after)
 		if err != nil {
 			return "", err
-		}
-
-		vk, err := precomputes.NewUpdateVerificationKeyBLS12381(v.VerifyKey.VerifyingKey)
-		if err != nil {
-			return "", err
-		}
-
-		prepared, err := vk.PrecomputeVerify(*rl.List, &gm.GroupPublicKey)
-		if err != nil {
-			return "", err
-		}
-
-		verifier = &PreparedSnarkVerifier{
-			VerifierKey: vk,
-			Prepared:    *prepared,
 		}
 
 		gm.PreparedSnarkVerifiers[index] = verifier

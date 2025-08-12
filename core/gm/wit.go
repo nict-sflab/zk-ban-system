@@ -9,7 +9,7 @@ import (
 	"github.com/akakou/zk-ban/witness"
 )
 
-func TranslateRLFromDBToWit(dbEntries []*ent.Revocation, rlSize *core.RevocationListSize, witSize *core.RevocationListSize) witness.RevocationList {
+func MakeRLWit(dbEntries []*ent.Revocation, rlSize *core.RevocationListSize, witSize *core.RevocationListSize) witness.RevocationList {
 	rl := witness.EmptyRevocationList(witSize.NymsNumberPerSession)
 	fmt.Printf("entries: %v\n", dbEntries)
 
