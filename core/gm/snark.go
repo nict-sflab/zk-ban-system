@@ -1,6 +1,8 @@
 package gm
 
 import (
+	"errors"
+	"fmt"
 	"math"
 
 	"github.com/akakou/zk-ban-system/core"
@@ -15,10 +17,13 @@ type PreparedSnarkVerifier struct {
 	Prepared    *curve_bls12381.G1Jac
 }
 
-func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*core.SizedSnarkVerifier, int) {
+var errRLTooLarge = errors.New("RL is too large")
+
+func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*core.SizedSnarkVerifier, int, error) {
 	distance := math.MaxFloat64
 	var verifyKey *core.SizedSnarkVerifier = nil
 	var result = -1
+	var err error = nil
 
 	for i, vk := range verifierKeys {
 		isFit := len(rlSize.NymsNumberPerSession) <= len(vk.RLSize.NymsNumberPerSession)
@@ -46,5 +51,9 @@ func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.Rev
 		}
 	}
 
-	return verifyKey, result
+	if result == -1 {
+		err = fmt.Errorf("%v: %v", errRLTooLarge, rlSize.NymsNumberPerSession)
+	}
+
+	return verifyKey, result, err
 }

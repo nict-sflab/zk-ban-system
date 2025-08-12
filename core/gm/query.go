@@ -45,7 +45,11 @@ func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *
 
 	fmt.Printf("rl condition: %v <= revoked < %v & sign <= %v\nrl: %v\n", before, after, before, rlDB)
 
-	verifier, keyIndex := SelectProperVerifier(gm.VerifierKeys, &rlSize)
+	verifier, keyIndex, err := SelectProperVerifier(gm.VerifierKeys, &rlSize)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	wit := MakeRLWit(rlDB, &rlSize, verifier.RLSize)
 
 	return &core.RevocationList{
