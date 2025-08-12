@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"time"
 
 	signer "github.com/akakou/zk-ban-system/client/signer"
@@ -18,17 +19,17 @@ func main() {
 
 	gpkBuf, err := signer.FetchGroupPublicKey("http://localhost:8080/group-public-key")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	gpk, err := zkbanw.GroupPublicKeyFromBytes(gpkBuf)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	verifierKey, err := load.DocodeVerifyingKey(load.SignVerifierKey)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	verifierServ := serv.VerifierServer{
