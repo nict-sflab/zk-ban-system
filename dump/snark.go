@@ -7,7 +7,6 @@ import (
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban/circuit"
 	"github.com/akakou/zk-ban/precomputes"
-	"github.com/akakou/zk-ban/primitives"
 	"github.com/akakou/zk-ban/snark"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/consensys/gnark/frontend"
@@ -45,24 +44,13 @@ func SignCircuit() ([]byte, []byte, error) {
 	return Prepare(&circuit.SignCircuit{})
 }
 
-func UpdateCircuit(nymsNumberPerSession, sessionNumber int) ([]byte, []byte, error) {
-	rlWit := witness.RevocationList{}
-	size := []int{}
-
-	for range sessionNumber {
-		rns := witness.RevokedNymsPerSession{
-			SessionTag: primitives.NewBigInt(0),
-			Nyms:       make([]*primitives.BigInt, nymsNumberPerSession),
-		}
-
-		rlWit = append(rlWit, rns)
-
-		size = append(size, nymsNumberPerSession)
-	}
+func UpdateCircuit(sessionNumber, nymsNumberPerSession int) ([]byte, []byte, error) {
+	size := witness.MakeUniformRLSize(sessionNumber, nymsNumberPerSession)
+	rns := witness.EmptyRevocationList(size)
 
 	cc, err := snark.InitSNARK(&precomputes.UpdateCircuit{
 		UpdateCircuit: circuit.UpdateCircuit{
-			RevocationList: circuit.NewRevocationListAssigned(rlWit),
+			RevocationList: circuit.NewRevocationListAssigned(rns),
 		},
 	})
 	if err != nil {
