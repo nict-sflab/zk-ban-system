@@ -11,6 +11,7 @@ type KeyIndex struct {
 	First, Second int64
 }
 
-type ProvingKeys map[RevocationListSize]*SnarkProver
+type ProvingKeys []*SnarkProver
 
-type VerifyingKeys map[RevocationListSize]*gnarkserializable.VerifyingKey
+type VerifyingKeys []*gnarkserializable.VerifyingKey
+type SizedVerifyingKeys []*SizedSnarkVerifier

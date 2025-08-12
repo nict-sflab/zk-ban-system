@@ -3,7 +3,6 @@ package load
 import (
 	"embed"
 	"encoding/json"
-	"fmt"
 
 	gnarkserializable "github.com/akakou/gnark-serializable"
 	"github.com/akakou/zk-ban-system/core"
@@ -28,25 +27,15 @@ var SignVerifierKey []byte
 //go:embed all:update_verifier-*-*.key.json
 var UpdateVerifierKey embed.FS
 
-func LoadKeyWithRL[T any](format string, fs embed.FS, fun func([]byte) (T, error)) (map[core.RevocationListSize]T, error) {
+func LoadKeyWithRL[T any](format string, fs embed.FS, fun func([]byte) (T, error)) ([]T, error) {
 	files, err := fs.ReadDir(".")
 	if err != nil {
 		return nil, err
 	}
 
-	keys := make(map[core.RevocationListSize]T)
+	keys := []T{}
 	for _, f := range files {
 		name := f.Name()
-
-		index := core.RevocationListSize{
-			NymsNumberPerSession: 0,
-			SessionNumber:        0,
-		}
-
-		_, err = fmt.Sscanf(name, format, &index.NymsNumberPerSession, &index.SessionNumber)
-		if err != nil {
-			return nil, err
-		}
 
 		buf, err := fs.ReadFile(name)
 		if err != nil {
@@ -58,7 +47,7 @@ func LoadKeyWithRL[T any](format string, fs embed.FS, fun func([]byte) (T, error
 			return nil, err
 		}
 
-		keys[index] = key
+		keys = append(keys, key)
 	}
 
 	return keys, nil
@@ -79,12 +68,19 @@ func DocodeVerifyingKey(buf []byte) (*gnarkserializable.VerifyingKey, error) {
 	return &verifyingKey, err
 }
 
-func LoadUserUpdateKey() (map[core.RevocationListSize]*core.SnarkProver, error) {
+func DocodeSizedVerifyingKey(buf []byte) (*core.SizedSnarkVerifier, error) {
+	verifyingKey := core.SizedSnarkVerifier{}
+
+	err := json.Unmarshal(buf, &verifyingKey)
+	return &verifyingKey, err
+}
+
+func LoadUserUpdateKey() ([]*core.SnarkProver, error) {
 	return LoadKeyWithRL(dump.UpdateProverKeyFileNameFormat, UpdateProverKey, DocodeProver)
 }
 
-func LoadGroupManagerUpdateKey() (map[core.RevocationListSize]*gnarkserializable.VerifyingKey, error) {
-	keys, err := LoadKeyWithRL(dump.UpdateVerifierKeyFileNameFormat, UpdateVerifierKey, DocodeVerifyingKey)
+func LoadGroupManagerUpdateKey() (core.SizedVerifyingKeys, error) {
+	keys, err := LoadKeyWithRL(dump.UpdateVerifierKeyFileNameFormat, UpdateVerifierKey, DocodeSizedVerifyingKey)
 	if err != nil {
 		return nil, err
 	}

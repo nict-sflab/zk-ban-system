@@ -48,6 +48,7 @@ func DumpUpdateKeys(nymsNumberPerSession, sessionNumber int) {
 
 	proverFileName := fmt.Sprintf(UpdateProverKeyFileNameFormat, nymsNumberPerSession, sessionNumber)
 	verifierFileName := fmt.Sprintf(UpdateVerifierKeyFileNameFormat, nymsNumberPerSession, sessionNumber)
+
 	err = os.WriteFile(BASE_PATH+proverFileName, updateProver, 0644)
 	if err != nil {
 		fmt.Printf("failed to dump update keys")

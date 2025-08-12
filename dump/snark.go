@@ -47,6 +47,8 @@ func SignCircuit() ([]byte, []byte, error) {
 
 func UpdateCircuit(nymsNumberPerSession, sessionNumber int) ([]byte, []byte, error) {
 	rlWit := witness.RevocationList{}
+	size := []int{}
+
 	for range sessionNumber {
 		rns := witness.RevokedNymsPerSession{
 			SessionTag: big.NewInt(0),
@@ -54,11 +56,40 @@ func UpdateCircuit(nymsNumberPerSession, sessionNumber int) ([]byte, []byte, err
 		}
 
 		rlWit = append(rlWit, rns)
+
+		size = append(size, nymsNumberPerSession)
 	}
 
-	return Prepare(&precomputes.UpdateCircuit{
+	cc, err := snark.InitSNARK(&precomputes.UpdateCircuit{
 		UpdateCircuit: circuit.UpdateCircuit{
 			RevocationList: circuit.NewRevocationListWitness(rlWit),
 		},
 	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	verifier := core.SizedSnarkVerifier{
+		VerifyKey: &gnarkserializable.VerifyingKey{
+			cc.VerifyKey,
+		},
+		RLSize: &core.RevocationListSize{size},
+	}
+
+	verifierBuf, err := json.Marshal(&verifier)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	prover := core.SnarkProver{
+		ConstraintSystem: &gnarkserializable.ConstraintSystem{cc.ConstraintSystem},
+		ProveKey:         &gnarkserializable.ProvingKey{cc.ProveKey},
+	}
+
+	proverBuf, err := json.Marshal(&prover)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return proverBuf, verifierBuf, nil
 }

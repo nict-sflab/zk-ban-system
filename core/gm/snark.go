@@ -3,7 +3,7 @@ package gm
 import (
 	"math"
 
-	corecore "github.com/akakou/zk-ban-system/core"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban/precomputes"
 	curve_bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381"
 	fr_bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381/fr"
@@ -15,30 +15,36 @@ type PreparedSnarkVerifier struct {
 	Prepared    *curve_bls12381.G1Jac
 }
 
-func QueryProperRLWitSize(verifierKeys corecore.VerifyingKeys, size *corecore.RevocationListSize) *corecore.RevocationListSize {
+func QueryProperRLWitSize(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*core.SizedSnarkVerifier, int) {
 	distance := math.MaxFloat64
-	var result *corecore.RevocationListSize = nil
+	var verifyKey *core.SizedSnarkVerifier = nil
+	var result = -1
 
-	for i := range verifierKeys {
-		isNotFitSize1 := i.NymsNumberPerSession < size.NymsNumberPerSession
-		isNotFitSize2 := i.SessionNumber < size.SessionNumber
+	for i, vk := range verifierKeys {
+		isFit := len(rlSize.NymsNumberPerSession) <= len(vk.RLSize.NymsNumberPerSession)
 
-		if isNotFitSize1 || isNotFitSize2 {
+		for i, _ := range rlSize.NymsNumberPerSession {
+			isFit = rlSize.NymsNumberPerSession[i] <= vk.RLSize.NymsNumberPerSession[i] && isFit
+		}
+
+		if !isFit {
 			continue
 		}
 
 		if verifierKeys == nil {
-			result = &i
+			verifyKey = vk
+			result = i
 			continue
 		}
 
-		d := i.Distance(corecore.RevocationListSizeWeightSetting)
+		d := vk.RLSize.Distance(core.RevocationListSizeWeightSetting)
 
 		if distance > d {
 			distance = d
-			result = &i
+			verifyKey = vk
+			result = i
 		}
 	}
 
-	return result
+	return verifyKey, result
 }

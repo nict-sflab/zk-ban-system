@@ -16,3 +16,8 @@ func (prover *SnarkProver) CoreKey() *snark.SnarkProver {
 		ProveKey:         prover.ProveKey.ProvingKey,
 	}
 }
+
+type SizedSnarkVerifier struct {
+	VerifyKey *gnarkserializable.VerifyingKey
+	RLSize    *RevocationListSize
+}

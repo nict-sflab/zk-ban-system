@@ -1,38 +1,36 @@
 package gm
 
 import (
+	"fmt"
 	"math/big"
 
-	corecore "github.com/akakou/zk-ban-system/core"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
 	"github.com/akakou/zk-ban/witness"
 )
 
-func TranslateRLFromDBToWit(dbEntries []*ent.Revocation, size *corecore.RevocationListSize) witness.RevocationList {
-	rl := witness.EmptyConstantRevocationAddList(size.SessionNumber, size.NymsNumberPerSession)
-	tag := big.NewInt(0)
+func TranslateRLFromDBToWit(dbEntries []*ent.Revocation, rlSize *core.RevocationListSize, witSize *core.RevocationListSize) witness.RevocationList {
+	rl := witness.EmptyRevocationList(witSize.NymsNumberPerSession)
+	fmt.Printf("entries: %v\n", dbEntries)
 
-	tagIndex := 0
-	nymIndex := 0
-
-	for _, entry := range dbEntries {
-		t := witness.SessionTag(
+	index := 0
+	for t, nyms := range rlSize.NymsNumberPerSession {
+		entry := dbEntries[index]
+		tag := witness.SessionTag(
 			int64(entry.Count),
 			int64(entry.SignedPeriod))
 
-		if tag.Cmp(&t.Int) == 0 {
-			n := big.NewInt(0)
-			n.SetBytes(entry.Nym)
+		rl[t].SessionTag = &tag.Int
 
-			rl[tagIndex].Nyms[nymIndex] = n
-			nymIndex += 1
-		} else {
-			rl[tagIndex].SessionTag = &t.Int
-			nymIndex = 0
-			tagIndex += 1
-			tag = &t.Int
+		for n := range nyms {
+			entry := dbEntries[index]
+
+			ny := big.NewInt(0)
+			ny.SetBytes(entry.Nym)
+			rl[t].Nyms[n] = ny
+
+			index++
 		}
 	}
-
 	return rl
 }

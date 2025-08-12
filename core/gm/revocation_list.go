@@ -5,7 +5,7 @@ import (
 )
 
 func (gm *GroupManager[T]) RevocationList(before, after int64) ([]byte, error) {
-	rl, err := gm.QueryRL(before, after)
+	rl, _, err := gm.QueryRL(before, after)
 	if err != nil {
 		return nil, err
 	}

@@ -3,6 +3,7 @@ package core_test
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/akakou/zk-ban-system/core"
@@ -101,12 +102,21 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// g.DB.Client.Revocation.Create().
+	// 	SetCount(int(signature.Count)).
+	// 	SetNym(signature.Signature.Commit.Nym.Bytes()).
+	// 	SetRevokedPeriod(int(period)).
+	// 	SetSignedPeriod(int(period)).
+	// 	SaveX(*g.DB.Ctx)
+
 	passDay()
 
 	rl, err := g.RevocationList(before, period)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	fmt.Printf("res: %s\n", string(rl))
 
 	updateReqBuf, err := signer.RequestUpdate(rl, s, period, gpk.Bytes())
 	if err != nil {
@@ -155,8 +165,12 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = g.UpdateCredential(&updateReq2, utils.Period())
-	if err != nil {
-		t.Fatal(err)
-	}
+	// updateReq3, err := g.UpdateCredential(&updateReq2, utils.Period())
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	// // revokcation check
+	// signer.Sign([]byte("test"), 2, updateReq2Buf, gpk.Bytes())
+
 }

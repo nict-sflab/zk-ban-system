@@ -1,26 +1,28 @@
 package core
 
 import (
-	"math"
-
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 type RevocationList struct {
-	List *zkbanw.RevocationList
-	Size *RevocationListSize
+	List  *zkbanw.RevocationList
+	Index int
+	// Size *RevocationListSize
 }
 
 type RevocationListSize struct {
-	NymsNumberPerSession int
-	SessionNumber        int
+	NymsNumberPerSession []int
 }
 
 func (size *RevocationListSize) Distance(weight *RevocationListSizeWeight) float64 {
-	weightedNymNumber := float64(size.NymsNumberPerSession) * weight.NymsNumberPerSession
-	weightedSessionNumber := float64(size.SessionNumber) * weight.SessionNumber
+	var deltaL = 0.0
+	for _, nymNum := range size.NymsNumberPerSession {
+		deltaL += float64(nymNum)
+	}
 
-	return math.Pow(weightedNymNumber, 2.0) + math.Pow(weightedSessionNumber, 2.0)
+	tDash := float64(len(size.NymsNumberPerSession))
+
+	return deltaL*weight.NymsNumberPerSession + tDash*weight.SessionNumber
 }
 
 type RevocationListSizeWeight struct {

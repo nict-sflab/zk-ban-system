@@ -21,7 +21,7 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	prover := provers[*rlObj.Size]
+	prover := provers[rlObj.Index]
 
 	var signerObj zkbanw.Signer
 	err = json.Unmarshal(signer, &signerObj)

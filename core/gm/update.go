@@ -47,14 +47,12 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 	verifier, hasVerifier := gm.PreparedSnarkVerifiers[index]
 
 	if !hasVerifier {
-		rl, err := gm.QueryRL(req.Before, after)
+		rl, v, err := gm.QueryRL(req.Before, after)
 		if err != nil {
 			return "", err
 		}
 
-		gk := gm.VerifierKeys[*rl.Size]
-
-		vk, err := precomputes.NewUpdateVerificationKeyBLS12381(gk.VerifyingKey)
+		vk, err := precomputes.NewUpdateVerificationKeyBLS12381(v.VerifyKey.VerifyingKey)
 		if err != nil {
 			return "", err
 		}

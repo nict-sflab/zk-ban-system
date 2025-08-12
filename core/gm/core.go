@@ -11,7 +11,7 @@ type GroupManager[T any] struct {
 	GroupSecretKey         zkbanw.GroupSecretKey
 	GroupPublicKey         zkbanw.GroupPublicKey
 	JoinVerifyKey          *gnarkserializable.VerifyingKey
-	VerifierKeys           corecore.VerifyingKeys
+	VerifierKeys           corecore.SizedVerifyingKeys
 	PreparedSnarkVerifiers map[corecore.KeyIndex]*PreparedSnarkVerifier
 	DB                     *DB
 }

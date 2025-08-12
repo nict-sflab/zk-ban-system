@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -59,7 +60,7 @@ func main() {
 
 	e.GET("/revoke", func(c echo.Context) error {
 		revoked := c.QueryParam("signature")
-		period := c.QueryParam("period")
+		signPeriod := c.QueryParam("period")
 
 		var signature corecore.Signature
 		err := json.Unmarshal([]byte(revoked), &signature)
@@ -67,15 +68,18 @@ func main() {
 			return err
 		}
 
-		p, err := strconv.Atoi(period)
+		p, err := strconv.Atoi(signPeriod)
 		if err != nil {
 			return err
 		}
 
+		revokePeriod := utils.Period()
+		fmt.Printf("revoked: sign period is %v, and revoked period is %v", signPeriod, revokePeriod)
+
 		gmServ.GM.DB.Client.Revocation.Create().
 			SetCount(int(signature.Count)).
 			SetNym(signature.Signature.Commit.Nym.Bytes()).
-			SetRevokedPeriod(int(utils.Period())).
+			SetRevokedPeriod(int(revokePeriod)).
 			SetSignedPeriod(p).
 			SaveX(*gmServ.GM.DB.Ctx)
 
