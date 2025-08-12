@@ -2,6 +2,7 @@ package gm
 
 import (
 	"encoding/base64"
+	"fmt"
 
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
@@ -42,12 +43,16 @@ func (gm *GroupManager[T]) UpdateCredential(req *core.UpdateRequest, after int64
 	verifier, hasVerifier := gm.PreparedSnarkVerifiers[index]
 
 	if !hasVerifier {
+		fmt.Println("precomputing...")
+
 		verifier, err = gm.precomputesVerifyUpdateRequest(req.Before, after)
 		if err != nil {
 			return "", err
 		}
 
 		gm.PreparedSnarkVerifiers[index] = verifier
+	} else {
+		fmt.Println("use precomputed !")
 	}
 
 	err = verifier.VerifierKey.VerifyPrepared(verifier.Prepared, req.UpdateRequest, after, req.Before)
