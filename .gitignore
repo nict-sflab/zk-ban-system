@@ -30,3 +30,4 @@ example/signer/signer.json
 example/signer/gpk.bin
 example/signer/tmp.json
 example/signer/signer
+example/gm/serviceAccount.json
