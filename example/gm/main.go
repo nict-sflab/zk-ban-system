@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"time"
 
 	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm"
@@ -19,7 +18,7 @@ import (
 )
 
 func main() {
-	utils.PeriodUnit = time.Duration(time.Minute / 2)
+	utils.PeriodUnit = utils.HalfMinutes
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {
 		log.Fatal(err)
