@@ -38,7 +38,7 @@ func TestQuery(t *testing.T) {
 			SaveX(*g.DB.Ctx)
 	}
 
-	for range 100 {
+	for range 80 {
 		g.DB.Client.Revocation.Create().
 			SetCount(0).
 			SetNym([]byte("gggg")).
@@ -48,10 +48,14 @@ func TestQuery(t *testing.T) {
 	}
 	passDay()
 
-	rl, err := g.QueryRL(2)
+	rl, _, err := g.QueryRL(2, today())
 	assert.NoError(t, err)
-	assert.Equal(t, 100, rl.Size.NymsNumberPerSession)
-	assert.Equal(t, 10, rl.Size.SessionNumber)
+	for _, nyms := range *rl.List {
+		for _, nym := range nyms.Nyms {
+			assert.Equal(t, 100, nym)
+
+		}
+	}
 
 	t.Fatalf("%v", rl.List)
 }

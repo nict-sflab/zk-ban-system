@@ -26,9 +26,15 @@ var joinCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		fmt.Print(string(config))
-
-		writeFile(gpk, GPK_PATH)
+		err = writeFile(gpk, GPK_PATH)
+		if err != nil {
+			log.Fatal(err)
+		}
 		writeFile(config, SIGNER_PATH)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("%s\n", config)
 	},
 }

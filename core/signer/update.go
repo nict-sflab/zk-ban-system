@@ -2,8 +2,6 @@ package signer
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
@@ -23,16 +21,12 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	prover := provers[*rlObj.Size]
+	prover := provers[rlObj.Index]
 
 	var signerObj zkbanw.Signer
 	err = json.Unmarshal(signer, &signerObj)
 	if err != nil {
 		return nil, err
-	}
-
-	if now == signerObj.Period {
-		return nil, errors.New("no update")
 	}
 
 	gpkObj, err := zkbanw.GroupPublicKeyFromBytes(gpk)
@@ -44,8 +38,6 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("periods: %v %v\n", now, signerObj.Period)
 
 	req := core.UpdateRequest{
 		Before:        signerObj.Period,
@@ -59,17 +51,3 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 
 	return reqBytes, nil
 }
-
-// func UpdateCredential(a signer) ([]byte, []byte, error) {
-
-// 	signerObj.UserPublicKey = upk
-// 	signerObj.Credential = cred
-// 	signerObj.Period = period
-
-// 	signerBytes, err := json.Marshal(signerObj)
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
-
-// 	return signerBytes, nil
-// }

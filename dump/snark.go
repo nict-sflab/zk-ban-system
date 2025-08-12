@@ -2,7 +2,6 @@ package dump
 
 import (
 	"encoding/json"
-	"math/big"
 
 	gnarkserializable "github.com/akakou/gnark-serializable"
 	"github.com/akakou/zk-ban-system/core"
@@ -45,20 +44,40 @@ func SignCircuit() ([]byte, []byte, error) {
 	return Prepare(&circuit.SignCircuit{})
 }
 
-func UpdateCircuit(nymsNumberPerSession, sessionNumber int) ([]byte, []byte, error) {
-	rlWit := witness.RevocationList{}
-	for range sessionNumber {
-		rns := witness.RevokedNymsPerSession{
-			SessionTag: big.NewInt(0),
-			Nyms:       make([]*big.Int, nymsNumberPerSession),
-		}
+func UpdateCircuit(sessionNumber, nymsNumberPerSession int) ([]byte, []byte, error) {
+	size := witness.MakeUniformRLSize(sessionNumber, nymsNumberPerSession)
+	rns := witness.EmptyRevocationList(size)
 
-		rlWit = append(rlWit, rns)
-	}
-
-	return Prepare(&precomputes.UpdateCircuit{
+	cc, err := snark.InitSNARK(&precomputes.UpdateCircuit{
 		UpdateCircuit: circuit.UpdateCircuit{
-			RevocationList: circuit.NewRevocationListWitness(rlWit),
+			RevocationList: circuit.NewRevocationListAssigned(rns),
 		},
 	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	verifier := core.SizedSnarkVerifier{
+		VerifyKey: &gnarkserializable.VerifyingKey{
+			cc.VerifyKey,
+		},
+		RLSize: &core.RevocationListSize{size},
+	}
+
+	verifierBuf, err := json.Marshal(&verifier)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	prover := core.SnarkProver{
+		ConstraintSystem: &gnarkserializable.ConstraintSystem{cc.ConstraintSystem},
+		ProveKey:         &gnarkserializable.ProvingKey{cc.ProveKey},
+	}
+
+	proverBuf, err := json.Marshal(&prover)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return proverBuf, verifierBuf, nil
 }

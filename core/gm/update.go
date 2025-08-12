@@ -2,36 +2,40 @@ package gm
 
 import (
 	"encoding/base64"
-	"errors"
 	"fmt"
 
-	corecore "github.com/akakou/zk-ban-system/core"
+	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent/updateticket"
-	"github.com/akakou/zk-ban/precomputes"
+	"github.com/cockroachdb/errors"
 )
 
 var ErrAlreadyIssueCredential = errors.New("already issue credential")
+var ErrCredentialNotFound = errors.New("ent: credential not found")
+var ErrTicketAlreadyUsed = errors.New("ticket already has benn used")
 
-func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after int64) (string, error) {
-	fmt.Printf("period: %v\n", after)
-	if after == req.Before {
-		return "", errors.New("no update")
-	}
-
-	exist, err := gm.DB.Client.UpdateTicket.
-		Query().
-		Where(updateticket.Ticket(req.UpdateRequest.UpdateTicket.Number.Bytes())).
-		Exist(*gm.DB.Ctx)
-
+func (gm *GroupManager[T]) UpdateCredential(req *core.UpdateRequest, after int64) (string, error) {
+	registeredCred, err := gm.queryAlreadyRegisteredCredential(req.UpdateRequest.PublicKey.Number.Bytes())
 	if err != nil {
 		return "", err
 	}
 
-	if exist {
-		return "", ErrAlreadyIssueCredential
+	if registeredCred != "" {
+		return registeredCred, nil
 	}
 
-	index := corecore.KeyIndex{
+	if after == req.Before {
+		return "", errors.New("no update")
+	}
+
+	ticketExist := gm.DB.Client.UpdateTicket.Query().
+		Where(updateticket.Ticket(req.UpdateRequest.PublicKey.Number.Bytes())).
+		ExistX(*gm.DB.Ctx)
+
+	if ticketExist {
+		return "", ErrTicketAlreadyUsed
+	}
+
+	index := core.KeyIndex{
 		First:  after,
 		Second: req.Before,
 	}
@@ -39,29 +43,16 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 	verifier, hasVerifier := gm.PreparedSnarkVerifiers[index]
 
 	if !hasVerifier {
-		rl, err := gm.QueryRL(req.Before)
+		fmt.Println("precomputing...")
+
+		verifier, err = gm.precomputesVerifyUpdateRequest(req.Before, after)
 		if err != nil {
 			return "", err
-		}
-
-		gk := gm.VerifierKeys[*rl.Size]
-
-		vk, err := precomputes.NewUpdateVerificationKeyBLS12381(gk.VerifyingKey)
-		if err != nil {
-			return "", err
-		}
-
-		prepared, err := vk.PrecomputeVerify(*rl.List, &gm.GroupPublicKey)
-		if err != nil {
-			return "", err
-		}
-
-		verifier = &PreparedSnarkVerifier{
-			VerifierKey: vk,
-			Prepared:    *prepared,
 		}
 
 		gm.PreparedSnarkVerifiers[index] = verifier
+	} else {
+		fmt.Println("use precomputed !")
 	}
 
 	err = verifier.VerifierKey.VerifyPrepared(verifier.Prepared, req.UpdateRequest, after, req.Before)
@@ -76,6 +67,11 @@ func (gm *GroupManager[T]) UpdateCredential(req *corecore.UpdateRequest, after i
 
 	gm.DB.Client.UpdateTicket.Create().
 		SetTicket(req.UpdateRequest.UpdateTicket.Number.Bytes()).
+		SaveX(*gm.DB.Ctx)
+
+	gm.DB.Client.Credential.Create().
+		SetCredential(cred.Signature).
+		SetPublicKey(req.UpdateRequest.PublicKey.Number.Bytes()).
 		SaveX(*gm.DB.Ctx)
 
 	resp := base64.URLEncoding.EncodeToString(cred.Signature)

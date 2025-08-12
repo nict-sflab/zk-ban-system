@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -42,21 +43,20 @@ func init() {
 	rootCmd.AddCommand(joinCmd)
 	rootCmd.AddCommand(signCmd)
 	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(daemonCmd)
 
 	joinCmd.Flags().StringVar(&idToken, "token", "", "ID Token of Firebase")
-	joinCmd.Flags().StringVar(&gmBase, "url", "", "GM's URL")
-
+	joinCmd.Flags().StringVar(&gmBase, "base", "http://localhost:8080", "GM's base URL")
 	joinCmd.MarkFlagRequired("token")
-	joinCmd.MarkFlagRequired("url")
 
 	signCmd.Flags().StringVar(&message, "message", "", "Message")
 	signCmd.Flags().Int64Var(&count, "count", 0, "Count")
-	signCmd.Flags().StringVar(&verifierURL, "url", "", "Verifier's URL")
-
+	signCmd.Flags().StringVar(&verifierURL, "url", "http://localhost:8000/verify", "Verifier's URL")
 	signCmd.MarkFlagRequired("message")
 	signCmd.MarkFlagRequired("count")
-	signCmd.MarkFlagRequired("url")
 
-	updateCmd.Flags().StringVar(&gmBase, "url", "", "GM's URL")
-	updateCmd.MarkFlagRequired("url")
+	updateCmd.Flags().StringVar(&gmBase, "base", "http://localhost:8080", "GM's base URL")
+
+	daemonCmd.Flags().StringVar(&gmBase, "base", "http://localhost:8080", "GM's base URL")
+	daemonCmd.Flags().Int64Var(&periodLength, "period_len", int64(time.Minute/2), "Period Length")
 }

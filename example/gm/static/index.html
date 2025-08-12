@@ -1,0 +1,33 @@
+<link rel="stylesheet" href="./mvp.css"> 
+<script src="./axios.min.js"></script>
+
+<main>
+    <h1>This is revocation demo of the zk-ban</h1>
+    
+    <h2>Signature</h2>
+    <input type="text" id="signature"></text>
+
+    <h2>Period</h2>
+    <input type="number" id="period"></text>
+
+    <button onclick="run()">Revoke</button>
+    
+
+    <script>
+        const PATH = `/revoke`
+        async function run() {
+            const signatureInputTag = document.getElementById("signature")
+            const periodInputTag = document.getElementById("period")
+
+            const url = `${PATH}?signature=${signatureInputTag.value}&period=${periodInputTag.value}`
+            console.log("url: ", url)
+
+            try {
+                const res = await axios.get(url)
+                alert(`${res.statusText}\n${res.data}`)
+            } catch(e) {
+                alert(e)
+            }
+        }
+    </script>
+</main>

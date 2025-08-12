@@ -2,33 +2,30 @@ package main
 
 import (
 	"io"
-	"log"
 	"os"
 )
 
-func writeFile(buf []byte, path string) {
+func writeFile(buf []byte, path string) error {
 	f, err := os.Create(path)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer f.Close()
 
 	_, err = f.Write(buf)
-	if err != nil {
-		log.Fatal(err)
-	}
+	return err
 }
 
 func readFile(path string) ([]byte, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer f.Close()
 
 	buf, err := io.ReadAll(f)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	return buf, nil

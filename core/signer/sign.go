@@ -43,6 +43,7 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error
 	signatureObj := &core.Signature{
 		Signature: signature,
 		Message:   message,
+		Count:     count,
 	}
 
 	signatureBuf, err := json.Marshal(signatureObj)

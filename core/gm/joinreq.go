@@ -38,6 +38,11 @@ func (gm *GroupManager[T]) IssueCredential(identifer string, req *corecore.JoinR
 		SetIdToken(identifer).
 		SaveX(*gm.DB.Ctx)
 
+	gm.DB.Client.Credential.Create().
+		SetCredential(cred.Signature).
+		SetPublicKey(req.JoinRequest.UserPublicKey.Number.Bytes()).
+		SaveX(*gm.DB.Ctx)
+
 	resp := base64.URLEncoding.EncodeToString(cred.Signature)
 	return resp, nil
 }

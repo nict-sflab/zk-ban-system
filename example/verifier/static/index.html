@@ -1,0 +1,34 @@
+<link rel="stylesheet" href="./mvp.css"> 
+<script src="./axios.min.js"></script>
+
+<main>
+    <h1>This is authentication demo of the zk-ban</h1>
+    
+    <h3>Message</h3>
+    <input id="message" type="text" placeholder="hello"></input>
+    <button onclick="run()">Generate Link</button>
+
+    <br>
+    
+    <h3>Generated Link: </h3>
+    <a href="" id="auth" hidden="true">Click here</a>
+    
+    <script>
+        const BASE = "zk-ban://zk-ban"
+        const PATH = "/verify"
+        const callback = window.location.origin + PATH
+        
+        function run() {
+            const authLinkTag = document.getElementById("auth")
+            const messageInputTag = document.getElementById("message")
+            const message = messageInputTag.value
+            if (!message) {
+                message = "hello"
+            }
+            
+            const url = `${BASE}?callback=${callback}&message=${message}`
+            authLinkTag.href = url
+            authLinkTag.hidden = false
+        }
+    </script>
+</main>

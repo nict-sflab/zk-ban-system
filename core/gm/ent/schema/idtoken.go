@@ -19,5 +19,5 @@ func (IDToken) Fields() []ent.Field {
 
 // Edges of the IDToken.
 func (IDToken) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{}
 }

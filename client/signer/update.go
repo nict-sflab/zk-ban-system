@@ -1,11 +1,7 @@
 package signer
 
 import (
-	"bytes"
-	"encoding/base64"
-	"fmt"
-	"net/http"
-
+	signerutils "github.com/akakou/zk-ban-system/client/utils"
 	coresigner "github.com/akakou/zk-ban-system/core/signer"
 	"github.com/akakou/zk-ban-system/utils"
 )
@@ -18,20 +14,7 @@ func RequestUpdate(signer, rl, gpk []byte, url string) ([]byte, error) {
 		return nil, err
 	}
 
-	res, err := http.Post(url, "application/json", bytes.NewBuffer(req))
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	buf := new(bytes.Buffer)
-	_, err = buf.ReadFrom(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	cred, err := base64.URLEncoding.DecodeString(buf.String())
+	cred, err := signerutils.FetchBase64WithPOST(req, url)
 	if err != nil {
 		return nil, err
 	}
@@ -41,6 +24,5 @@ func RequestUpdate(signer, rl, gpk []byte, url string) ([]byte, error) {
 		return nil, err
 	}
 
-	fmt.Printf("next: %v\n", string(newSignerFinalized))
 	return newSignerFinalized, nil
 }

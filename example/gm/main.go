@@ -1,7 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	"log"
 	"strconv"
 
 	corecore "github.com/akakou/zk-ban-system/core"
@@ -15,9 +18,10 @@ import (
 )
 
 func main() {
+	utils.PeriodUnit = utils.HalfMinutes
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	g, err := gm.Default[string](gsk.Bytes(), &core.DBConfig{
@@ -25,39 +29,26 @@ func main() {
 		Config: "file::memory:?cache=shared&_fk=1",
 	})
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+	}
+
+	ctx := context.Background()
+	svc, err := NewFirebaseAuthService(ctx, "serviceAccount.json")
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	gmServ := serv.GMServer[string]{
-		GM: g,
-		AuthToken: func(t *corecore.JoinRequest[string]) (string, error) {
-			return "token", nil
-		},
+		GM:        g,
+		AuthToken: svc.FirebaseAuth(),
+		// AuthToken: allOKAuth,
 	}
 
 	e := echo.New()
 
-	// e.GET("/period", func(c echo.Context) error {
-	// 	str := c.QueryParam("period")
-	// 	if str == "" {
-	// 		return c.String(200, strconv.Itoa(int(utils.Period())))
-	// 	}
-
-	// 	i, err := strconv.Atoi(str)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// 	utils.Period = func() int64 {
-	// 		return int64(i)
-	// 	}
-
-	// 	return c.String(200, strconv.Itoa(i))
-	// })
-
 	e.GET("/revoke", func(c echo.Context) error {
 		revoked := c.QueryParam("signature")
-		period := c.QueryParam("period")
+		signPeriod := c.QueryParam("period")
 
 		var signature corecore.Signature
 		err := json.Unmarshal([]byte(revoked), &signature)
@@ -65,20 +56,25 @@ func main() {
 			return err
 		}
 
-		p, err := strconv.Atoi(period)
+		p, err := strconv.Atoi(signPeriod)
 		if err != nil {
 			return err
 		}
 
+		revokePeriod := utils.Period()
+		fmt.Printf("revoked: sign period is %v, and revoked period is %v", signPeriod, revokePeriod)
+
 		gmServ.GM.DB.Client.Revocation.Create().
 			SetCount(int(signature.Count)).
 			SetNym(signature.Signature.Commit.Nym.Bytes()).
-			SetRevokedPeriod(int(utils.Period())).
+			SetRevokedPeriod(int(revokePeriod)).
 			SetSignedPeriod(p).
 			SaveX(*gmServ.GM.DB.Ctx)
 
 		return c.String(200, "ok")
 	})
+
+	e.Static("/admin", "./static")
 
 	gmServ.SetupEchoServer(e)
 	e.Debug = true
