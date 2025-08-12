@@ -14,11 +14,8 @@
     <a href="" id="auth" hidden="true">Click here</a>
     
     <script>
-        const VERIFIER_HOST = "http://localhost"
-        const VERIFIER_PORT = 8000
-
-        const CALLBACK = `${VERIFIER_HOST}:${VERIFIER_PORT}/verify`
         const BASE = "zk-ban://zk-ban"
+        const callback = window.location.origin
         
         function run() {
             const authLinkTag = document.getElementById("auth")
@@ -28,7 +25,7 @@
                 message = "hello"
             }
             
-            const url = `${BASE}?callback=${CALLBACK}&message=${message}`
+            const url = `${BASE}?callback=${callback}&message=${message}`
             authLinkTag.href = url
             authLinkTag.hidden = false
         }
