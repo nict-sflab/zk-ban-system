@@ -5,14 +5,15 @@ import (
 
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/load"
+	"github.com/akakou/zk-ban-system/keys"
 	"github.com/akakou/zk-ban/primitives"
+	"github.com/akakou/zk-ban/snark"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error) {
-	proverObj := core.SnarkProver{}
-	err := json.Unmarshal(load.SignProverKey, &proverObj)
+	proverObj := snark.SnarkProver{}
+	err := json.Unmarshal(keys.SignProverKey, &proverObj)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +35,7 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error
 		count,
 		&signerObj,
 		&zkbanw.GroupPublicKey{PublicKey: gpkObj},
-		proverObj.CoreKey(),
+		&proverObj,
 	)
 	if err != nil {
 		return nil, err

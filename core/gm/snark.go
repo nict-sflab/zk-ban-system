@@ -7,6 +7,7 @@ import (
 
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban/precomputes"
+	"github.com/akakou/zk-ban/snark"
 	curve_bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381"
 	fr_bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381/fr"
 	groth16_bls12381 "github.com/consensys/gnark/backend/groth16/bls12-381"
@@ -19,17 +20,17 @@ type PreparedSnarkVerifier struct {
 
 var errRLTooLarge = errors.New("RL is too large")
 
-func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*core.SizedSnarkVerifier, int, error) {
+func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*snark.SizedSnarkVerifier, int, error) {
 	distance := math.MaxFloat64
-	var verifyKey *core.SizedSnarkVerifier = nil
+	var verifyKey *snark.SizedSnarkVerifier = nil
 	var result = -1
 	var err error = nil
 
 	for i, vk := range verifierKeys {
-		isFit := len(rlSize.NymsNumberPerSession) <= len(vk.RLSize.NymsNumberPerSession)
+		isFit := len(rlSize.NymsNumberPerSession) <= len(vk.RLSize)
 
 		for i := range rlSize.NymsNumberPerSession {
-			isFit = rlSize.NymsNumberPerSession[i] <= vk.RLSize.NymsNumberPerSession[i] && isFit
+			isFit = rlSize.NymsNumberPerSession[i] <= vk.RLSize[i] && isFit
 		}
 
 		if !isFit {
@@ -42,7 +43,7 @@ func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.Rev
 			continue
 		}
 
-		d := vk.RLSize.Distance(core.RevocationListSizeWeightSetting)
+		d := (&core.RevocationListSize{vk.RLSize}).Distance(core.RevocationListSizeWeightSetting)
 
 		if distance > d {
 			distance = d

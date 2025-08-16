@@ -3,7 +3,8 @@ package gm
 import (
 	gnarkserializable "github.com/akakou/gnark-serializable"
 	corecore "github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/load"
+	"github.com/akakou/zk-ban-system/keys"
+	"github.com/akakou/zk-ban/load"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
@@ -22,12 +23,12 @@ func Default[T any](gsk []byte, dbConfig *DBConfig) (*GroupManager[T], error) {
 		return nil, err
 	}
 
-	joinVerifierKey, err := load.DocodeVerifyingKey(load.JoinVerifierKey)
+	joinVerifierKey, err := load.DocodeVerifyingKey(keys.JoinVerifierKey)
 	if err != nil {
 		return nil, err
 	}
 
-	updateVerifierKeys, err := load.LoadGroupManagerUpdateKey()
+	updateVerifierKeys, err := keys.LoadGroupManagerUpdateKey(keys.UpdateVerifierKey)
 	if err != nil {
 		return nil, err
 	}

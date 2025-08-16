@@ -10,8 +10,9 @@ import (
 	"github.com/akakou/zk-ban-system/core/gm"
 	"github.com/akakou/zk-ban-system/core/signer"
 	"github.com/akakou/zk-ban-system/core/verifier"
-	"github.com/akakou/zk-ban-system/load"
+	"github.com/akakou/zk-ban-system/keys"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban/load"
 	"github.com/akakou/zk-ban/witness"
 )
 
@@ -43,7 +44,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	verifierKey, err := load.DocodeVerifyingKey(load.SignVerifierKey)
+	verifierKey, err := load.DocodeVerifyingKey(keys.SignVerifierKey)
 	if err != nil {
 		t.Fatal(err)
 	}
