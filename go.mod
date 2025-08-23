@@ -16,7 +16,6 @@ require (
 	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000
 	github.com/akakou/gnark-serializable v0.0.0-00010101000000-000000000000
 	github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
-	github.com/akakou/zk-ban-system/dump v0.0.0-00010101000000-000000000000
 	github.com/cockroachdb/errors v1.12.0
 	github.com/consensys/gnark v0.13.0
 	github.com/consensys/gnark-crypto v0.18.0
