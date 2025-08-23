@@ -15,8 +15,6 @@
     
     <script>
         const BASE = "zk-ban://zk-ban"
-        const PATH = "/verify"
-        const callback = window.location.origin + PATH
         
         function run() {
             const authLinkTag = document.getElementById("auth")
@@ -26,7 +24,7 @@
                 message = "hello"
             }
             
-            const url = `${BASE}?callback=${callback}&message=${message}`
+            const url = `${BASE}?&message=${message}`
             authLinkTag.href = url
             authLinkTag.hidden = false
         }
