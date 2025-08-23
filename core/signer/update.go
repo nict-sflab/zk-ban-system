@@ -5,7 +5,7 @@ import (
 
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/load"
+	"github.com/akakou/zk-ban-system/keys"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
@@ -16,7 +16,7 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	provers, err := load.LoadUserUpdateKey()
+	provers, err := keys.LoadUserUpdateKey(keys.UpdateProverKey)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	coreReq, err := zkban.RequestUpdate(now, &signerObj, *rlObj.List, gpkObj, prover.CoreKey())
+	coreReq, err := zkban.RequestUpdate(now, &signerObj, *rlObj.List, gpkObj, prover)
 	if err != nil {
 		return nil, err
 	}

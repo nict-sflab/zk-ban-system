@@ -5,9 +5,10 @@ import (
 
 	signer "github.com/akakou/zk-ban-system/client/signer"
 	core "github.com/akakou/zk-ban-system/core/verifier"
-	"github.com/akakou/zk-ban-system/load"
+	"github.com/akakou/zk-ban-system/keys"
 	serv "github.com/akakou/zk-ban-system/serv/verifier"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban/load"
 	zkbanw "github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -25,7 +26,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	verifierKey, err := load.DocodeVerifyingKey(load.SignVerifierKey)
+	verifierKey, err := load.DocodeVerifyingKey(keys.SignVerifierKey)
 	if err != nil {
 		log.Fatal(err)
 	}

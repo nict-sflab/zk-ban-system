@@ -7,9 +7,10 @@ import (
 	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
 	"github.com/akakou/zk-ban-system/core/gm/ent/revocation"
+	"github.com/akakou/zk-ban/snark"
 )
 
-func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *core.SizedSnarkVerifier, error) {
+func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *snark.SizedSnarkVerifier, error) {
 	var v []struct {
 		CountAll     int `json:"count_all"`
 		Count        int `json:"count"`
@@ -50,7 +51,7 @@ func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *
 		return nil, nil, err
 	}
 
-	wit := MakeRLWit(rlDB, &rlSize, verifier.RLSize)
+	wit := MakeRLWit(rlDB, &rlSize, &core.RevocationListSize{verifier.RLSize})
 
 	return &core.RevocationList{
 		List:  &wit,

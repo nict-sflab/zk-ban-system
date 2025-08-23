@@ -9,10 +9,11 @@ import (
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm"
 	coreverifier "github.com/akakou/zk-ban-system/core/verifier"
-	"github.com/akakou/zk-ban-system/load"
+	"github.com/akakou/zk-ban-system/keys"
 	gmserv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/serv/verifier"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban/load"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -59,7 +60,7 @@ func TestMain(t *testing.T) {
 
 	gmServ.SetupEchoServer(e)
 
-	verifierKey, err := load.DocodeVerifyingKey(load.SignVerifierKey)
+	verifierKey, err := load.DocodeVerifyingKey(keys.SignVerifierKey)
 	if err != nil {
 		t.Fatal(err)
 	}

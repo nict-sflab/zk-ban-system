@@ -5,17 +5,18 @@ import (
 
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/load"
+	"github.com/akakou/zk-ban-system/keys"
+	"github.com/akakou/zk-ban/load"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 func RequestJoin[T any](now int64, option T) ([]byte, []byte, error) {
-	proverObj, err := load.DocodeProver(load.JoinProverKey)
+	proverObj, err := load.DocodeProver(keys.JoinProverKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	proof, usk, err := zkban.RequestJoin(now, proverObj.CoreKey())
+	proof, usk, err := zkban.RequestJoin(now, proverObj)
 	if err != nil {
 		return nil, nil, err
 	}
