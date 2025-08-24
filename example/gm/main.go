@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -32,16 +31,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ctx := context.Background()
-	svc, err := NewFirebaseAuthService(ctx, "serviceAccount.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	gmServ := serv.GMServer[string]{
 		GM:        g,
-		AuthToken: svc.FirebaseAuth(),
-		// AuthToken: allOKAuth,
+		AuthToken: authToken(),
 	}
 
 	e := echo.New()
@@ -79,5 +71,5 @@ func main() {
 	gmServ.SetupEchoServer(e)
 	e.Debug = true
 	e.Use(middleware.Logger())
-	e.Start(":8080")
+	panic(e.Start(":8080"))
 }
