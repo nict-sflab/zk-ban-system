@@ -9,14 +9,22 @@ import (
 func RequestUpdate(signer, rl, gpk []byte, url string) ([]byte, error) {
 	now := utils.Period()
 
-	req, err := coresigner.RequestUpdate(rl, signer, now, gpk)
+	req, err := coresigner.RequestCheckUpdateIsExist(signer, now)
 	if err != nil {
 		return nil, err
 	}
 
 	cred, err := signerutils.FetchBase64WithPOST(req, url)
 	if err != nil {
-		return nil, err
+		req, err := coresigner.RequestUpdate(rl, signer, now, gpk)
+		if err != nil {
+			return nil, err
+		}
+
+		cred, err = signerutils.FetchBase64WithPOST(req, url)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	newSignerFinalized, err := coresigner.SetCredential(cred, now, signer)

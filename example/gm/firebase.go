@@ -1,14 +1,29 @@
+//go:build !debug
+// +build !debug
+
 package main
 
 import (
 	"context"
 	"fmt"
+	"log"
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"github.com/akakou/zk-ban-system/core"
 	"google.golang.org/api/option"
 )
+
+func authToken() func(t *core.JoinRequest[string]) (string, error) {
+	fmt.Println("firebase mode")
+	ctx := context.Background()
+	svc, err := NewFirebaseAuthService(ctx, "serviceAccount.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return svc.FirebaseAuth()
+}
 
 type FirebaseAuthService struct {
 	authClient *auth.Client
