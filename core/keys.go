@@ -2,8 +2,8 @@ package core
 
 import (
 	gnarkprecomputes "github.com/akakou/gnark-precomputes"
-	gnarkserializable "github.com/akakou/gnark-serializable"
 	"github.com/akakou/zk-ban/snark"
+	"github.com/consensys/gnark/backend/groth16"
 )
 
 var UpdateRequestVerifyingKeys []gnarkprecomputes.PreparableCircuit
@@ -14,5 +14,5 @@ type KeyIndex struct {
 
 type ProvingKeys []*snark.SnarkProver
 
-type VerifyingKeys []*gnarkserializable.VerifyingKey
+type VerifyingKeys []*groth16.VerifyingKey
 type SizedVerifyingKeys []*snark.SizedSnarkVerifier

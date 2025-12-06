@@ -6,8 +6,8 @@ import (
 	gnarkserializable "github.com/akakou/gnark-serializable"
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/keys"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban/load"
 	"github.com/akakou/zk-ban/primitives"
 	"github.com/akakou/zk-ban/snark"
 	zkbanw "github.com/akakou/zk-ban/witness"
@@ -21,12 +21,10 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	provers, err := keys.LoadUserUpdateKey(keys.UpdateProverKey)
+	prover, err := load.LoadUserKey(rlObj.KeyName, "update")
 	if err != nil {
 		return nil, err
 	}
-
-	prover := provers[rlObj.Index]
 
 	var signerObj zkbanw.Signer
 	err = json.Unmarshal(signer, &signerObj)

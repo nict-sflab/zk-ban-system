@@ -5,9 +5,8 @@ import (
 )
 
 type RevocationList struct {
-	List  *zkbanw.RevocationList
-	Index int
-	// Size *RevocationListSize
+	List    *zkbanw.RevocationList
+	KeyName string
 }
 
 type RevocationListSize struct {

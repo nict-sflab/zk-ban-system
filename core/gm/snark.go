@@ -20,13 +20,12 @@ type PreparedSnarkVerifier struct {
 
 var errRLTooLarge = errors.New("RL is too large")
 
-func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*snark.SizedSnarkVerifier, int, error) {
+func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*snark.SizedSnarkVerifier, error) {
 	distance := math.MaxFloat64
 	var verifyKey *snark.SizedSnarkVerifier = nil
-	var result = -1
 	var err error = nil
 
-	for i, vk := range verifierKeys {
+	for _, vk := range verifierKeys {
 		isFit := len(rlSize.NymsNumberPerSession) <= len(vk.RLSize)
 
 		for i := range rlSize.NymsNumberPerSession {
@@ -39,7 +38,6 @@ func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.Rev
 
 		if verifierKeys == nil {
 			verifyKey = vk
-			result = i
 			continue
 		}
 
@@ -48,13 +46,12 @@ func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.Rev
 		if distance > d {
 			distance = d
 			verifyKey = vk
-			result = i
 		}
 	}
 
-	if result == -1 {
+	if verifyKey == nil {
 		err = fmt.Errorf("%v: %v", errRLTooLarge, rlSize.NymsNumberPerSession)
 	}
 
-	return verifyKey, result, err
+	return verifyKey, err
 }

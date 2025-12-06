@@ -5,7 +5,6 @@ import (
 
 	signer "github.com/akakou/zk-ban-system/client/signer"
 	core "github.com/akakou/zk-ban-system/core/verifier"
-	"github.com/akakou/zk-ban-system/keys"
 	serv "github.com/akakou/zk-ban-system/serv/verifier"
 	"github.com/akakou/zk-ban-system/utils"
 	"github.com/akakou/zk-ban/load"
@@ -26,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	verifierKey, err := load.DocodeVerifyingKey(keys.SignVerifierKey)
+	verifierKey, err := load.LoadBasicGroupManagerKey("update")
 	if err != nil {
 		log.Fatal(err)
 	}

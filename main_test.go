@@ -9,10 +9,10 @@ import (
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm"
 	coreverifier "github.com/akakou/zk-ban-system/core/verifier"
-	"github.com/akakou/zk-ban-system/keys"
 	gmserv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/serv/verifier"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban/dump"
 	"github.com/akakou/zk-ban/load"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
@@ -33,6 +33,7 @@ func passDay() {
 
 func TestMain(t *testing.T) {
 	utils.Period = today
+	dump.KeyPath = "./keys"
 
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {
@@ -60,7 +61,7 @@ func TestMain(t *testing.T) {
 
 	gmServ.SetupEchoServer(e)
 
-	verifierKey, err := load.DocodeVerifyingKey(keys.SignVerifierKey)
+	verifierKey, err := load.LoadBasicGroupManagerKey("sign")
 	if err != nil {
 		t.Fatal(err)
 	}

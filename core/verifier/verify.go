@@ -16,7 +16,7 @@ func (verifier *Verifier) Verify(signature *corecore.Signature, period int64) er
 		signature.Count,
 		period,
 		verifier.GroupPublicKey,
-		verifier.VerifyingKey.VerifyingKey)
+		*verifier.VerifyingKey)
 	if err != nil {
 		return err
 	}

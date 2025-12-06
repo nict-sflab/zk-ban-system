@@ -8,7 +8,7 @@ func (gm *GroupManager[T]) precomputesVerifyUpdateRequest(before, after int64) (
 		return nil, err
 	}
 
-	vk, err := precomputes.NewUpdateVerificationKeyBLS12381(v.VerifyKey.VerifyingKey)
+	vk, err := precomputes.NewUpdateVerificationKeyBLS12381(*v.VerifyKey)
 	if err != nil {
 		return nil, err
 	}

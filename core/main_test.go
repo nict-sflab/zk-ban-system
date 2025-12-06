@@ -10,8 +10,8 @@ import (
 	"github.com/akakou/zk-ban-system/core/gm"
 	"github.com/akakou/zk-ban-system/core/signer"
 	"github.com/akakou/zk-ban-system/core/verifier"
-	"github.com/akakou/zk-ban-system/keys"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban/dump"
 	"github.com/akakou/zk-ban/load"
 	"github.com/akakou/zk-ban/witness"
 )
@@ -29,6 +29,7 @@ func passDay() {
 func TestAll(t *testing.T) {
 	utils.Period = today
 	before := today()
+	dump.KeyPath = "../keys"
 
 	gsk, gpk, err := witness.RandomGroupKeyPair()
 	if err != nil {
@@ -44,7 +45,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	verifierKey, err := load.DocodeVerifyingKey(keys.SignVerifierKey)
+	verifierKey, err := load.LoadBasicGroupManagerKey("sign")
 	if err != nil {
 		t.Fatal(err)
 	}

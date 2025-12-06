@@ -1,17 +1,16 @@
 package gm
 
 import (
-	gnarkserializable "github.com/akakou/gnark-serializable"
 	corecore "github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/keys"
 	"github.com/akakou/zk-ban/load"
 	zkbanw "github.com/akakou/zk-ban/witness"
+	"github.com/consensys/gnark/backend/groth16"
 )
 
 type GroupManager[T any] struct {
 	GroupSecretKey         zkbanw.GroupSecretKey
 	GroupPublicKey         zkbanw.GroupPublicKey
-	JoinVerifyKey          *gnarkserializable.VerifyingKey
+	JoinVerifyKey          *groth16.VerifyingKey
 	VerifierKeys           corecore.SizedVerifyingKeys
 	PreparedSnarkVerifiers map[corecore.KeyIndex]*PreparedSnarkVerifier
 	DB                     *DB
@@ -23,12 +22,12 @@ func Default[T any](gsk []byte, dbConfig *DBConfig) (*GroupManager[T], error) {
 		return nil, err
 	}
 
-	joinVerifierKey, err := load.DocodeVerifyingKey(keys.JoinVerifierKey)
+	joinVerifierKey, err := load.LoadBasicGroupManagerKey("join")
 	if err != nil {
 		return nil, err
 	}
 
-	updateVerifierKeys, err := keys.LoadGroupManagerUpdateKey(keys.UpdateVerifierKey)
+	updateVerifierKeys, err := load.LoadGroupManagerUpdateKeys()
 	if err != nil {
 		return nil, err
 	}

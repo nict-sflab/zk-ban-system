@@ -1,12 +1,12 @@
 package verifier
 
 import (
-	gnarkserializable "github.com/akakou/gnark-serializable"
 	zkbanw "github.com/akakou/zk-ban/witness"
+	"github.com/consensys/gnark/backend/groth16"
 )
 
 type Verifier struct {
 	GroupPublicKey *zkbanw.GroupPublicKey
-	VerifyingKey   *gnarkserializable.VerifyingKey
+	VerifyingKey   *groth16.VerifyingKey
 	CountMax       int64
 }
