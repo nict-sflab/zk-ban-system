@@ -11,12 +11,14 @@ import (
 	core "github.com/akakou/zk-ban-system/core/gm"
 	serv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban/dump"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
+	dump.KeyPath = "../../keys/"
 	utils.PeriodUnit = utils.HalfMinutes
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {

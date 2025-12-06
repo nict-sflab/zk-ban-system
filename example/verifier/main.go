@@ -7,6 +7,7 @@ import (
 	core "github.com/akakou/zk-ban-system/core/verifier"
 	serv "github.com/akakou/zk-ban-system/serv/verifier"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban/dump"
 	"github.com/akakou/zk-ban/load"
 	zkbanw "github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
@@ -15,6 +16,7 @@ import (
 
 func main() {
 	utils.PeriodUnit = utils.HalfMinutes
+	dump.KeyPath = "../../keys/"
 	gpkBuf, err := signer.FetchGroupPublicKey("http://localhost:8080/group-public-key")
 	if err != nil {
 		log.Fatal(err)
@@ -25,7 +27,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	verifierKey, err := load.LoadBasicGroupManagerKey("update")
+	verifierKey, err := load.LoadBasicGroupManagerKey("sign")
 	if err != nil {
 		log.Fatal(err)
 	}
