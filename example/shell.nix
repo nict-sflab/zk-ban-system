@@ -8,5 +8,6 @@ pkgs.mkShell {
     sleep 10s
     cd ../verifier
     go run -tags debug .
+    cd ..
   '';
   }
