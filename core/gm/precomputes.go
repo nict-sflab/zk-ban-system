@@ -40,7 +40,7 @@ func (gm *GroupManager[T]) ReadyUpdateVerifyKeys(periodRange, after int64) error
 	for i := before; i < after; i++ {
 		_, err := gm.ReadyUpdateVerifyKey(corecore.KeyIndex{
 			First:  after,
-			Second: before,
+			Second: i,
 		})
 
 		if err != nil {
