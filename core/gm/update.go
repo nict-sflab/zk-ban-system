@@ -45,7 +45,7 @@ func (gm *GroupManager[T]) UpdateCredential(req *core.UpdateRequest, after int64
 	if !hasVerifier {
 		fmt.Println("precomputing...")
 
-		verifier, err = gm.readyUpdateVerifyKey(index)
+		verifier, err = gm.ReadyUpdateVerifyKey(index)
 		if err != nil {
 			return "", err
 		}

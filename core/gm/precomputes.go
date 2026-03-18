@@ -5,7 +5,7 @@ import (
 	"github.com/akakou/zk-ban/precomputes"
 )
 
-func (gm *GroupManager[T]) readyUpdateVerifyKey(index corecore.KeyIndex) (*PreparedSnarkVerifier, error) {
+func (gm *GroupManager[T]) ReadyUpdateVerifyKey(index corecore.KeyIndex) (*PreparedSnarkVerifier, error) {
 	before := index.Second
 	after := index.First
 
@@ -34,11 +34,11 @@ func (gm *GroupManager[T]) readyUpdateVerifyKey(index corecore.KeyIndex) (*Prepa
 	return &verifier, nil
 }
 
-func (gm *GroupManager[T]) readyUpdateVerifyKeysForRange(periodRange, after int64) error {
+func (gm *GroupManager[T]) ReadyUpdateVerifyKeys(periodRange, after int64) error {
 	before := after - periodRange
 
 	for i := before; i < after; i++ {
-		_, err := gm.readyUpdateVerifyKey(corecore.KeyIndex{
+		_, err := gm.ReadyUpdateVerifyKey(corecore.KeyIndex{
 			First:  after,
 			Second: before,
 		})
