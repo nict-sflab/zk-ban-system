@@ -1,6 +1,6 @@
 { pkgs ? import <nixpkgs> {} }:
 pkgs.mkShell {
-  packages = with pkgs; [ go gcc ];
+  packages = with pkgs; [ go clang sqlite ];
   shellHook = ''
     cd ./gm/
     go run -tags debug . &
