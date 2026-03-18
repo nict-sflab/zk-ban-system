@@ -11,7 +11,7 @@ const SIGNER_PATH = "./signer.json"
 const GPK_PATH = "./gpk.bin"
 
 func main() {
-	dump.KeyPath = "../../keys/"
+	dump.KeyPath = "../../dump/"
 	utils.PeriodUnit = time.Duration(time.Minute / 2)
 	rootCmd.Execute()
 }

@@ -29,7 +29,7 @@ func passDay() {
 func TestAll(t *testing.T) {
 	utils.Period = today
 	before := today()
-	dump.KeyPath = "../keys"
+	dump.KeyPath = "../dump/"
 
 	gsk, gpk, err := witness.RandomGroupKeyPair()
 	if err != nil {

@@ -16,7 +16,7 @@ import (
 
 func main() {
 	utils.PeriodUnit = utils.HalfMinutes
-	dump.KeyPath = "../../keys/"
+	dump.KeyPath = "../../dump/"
 	gpkBuf, err := signer.FetchGroupPublicKey("http://localhost:8080/group-public-key")
 	if err != nil {
 		log.Fatal(err)

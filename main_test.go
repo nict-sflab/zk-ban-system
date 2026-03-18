@@ -33,7 +33,7 @@ func passDay() {
 
 func TestMain(t *testing.T) {
 	utils.Period = today
-	dump.KeyPath = "./keys"
+	dump.KeyPath = "./dump/"
 
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {

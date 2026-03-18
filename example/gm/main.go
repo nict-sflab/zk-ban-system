@@ -18,7 +18,7 @@ import (
 )
 
 func main() {
-	dump.KeyPath = "../../keys/"
+	dump.KeyPath = "../../dump/"
 	utils.PeriodUnit = utils.HalfMinutes
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {
