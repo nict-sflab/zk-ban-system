@@ -73,5 +73,7 @@ func main() {
 	gmServ.SetupEchoServer(e)
 	e.Debug = true
 	e.Use(middleware.Logger())
+
+	go gmServ.RunKeyPrecomputeDaemon()
 	panic(e.Start(":8080"))
 }
