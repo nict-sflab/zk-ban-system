@@ -1,11 +1,11 @@
 package signer
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/url"
 
 	"github.com/akakou/zk-ban-system/client/utils"
+	"github.com/akakou/zk-ban-system/utils/codec"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
@@ -15,7 +15,7 @@ func FetchGroupPublicKey(url string) ([]byte, error) {
 
 func FetchRevocationList(signer []byte, u string) ([]byte, error) {
 	signerObj := zkbanw.Signer{}
-	err := json.Unmarshal(signer, &signerObj)
+	err := codec.Unmarshal(signer, &signerObj)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,6 @@ package core_test
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/akakou/zk-ban-system/core/signer"
 	"github.com/akakou/zk-ban-system/core/verifier"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban-system/utils/codec"
 	"github.com/akakou/zk-ban/dump"
 	"github.com/akakou/zk-ban/load"
 	"github.com/akakou/zk-ban/witness"
@@ -62,7 +62,7 @@ func TestAll(t *testing.T) {
 	}
 
 	var req core.JoinRequest[string]
-	err = json.Unmarshal(reqBody, &req)
+	err = codec.Unmarshal(reqBody, &req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +94,7 @@ func TestAll(t *testing.T) {
 	}
 
 	var signature core.Signature
-	err = json.Unmarshal(signatureBuf, &signature)
+	err = codec.Unmarshal(signatureBuf, &signature)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +118,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("res: %s\n", string(rl))
+	fmt.Printf("revocation list bytes: %d\n", len(rl))
 
 	updateReqBuf, err := signer.RequestUpdate(rl, s, period, gpk.Bytes())
 	if err != nil {
@@ -126,7 +126,7 @@ func TestAll(t *testing.T) {
 	}
 
 	var updateReq core.UpdateRequest
-	err = json.Unmarshal(updateReqBuf, &updateReq)
+	err = codec.Unmarshal(updateReqBuf, &updateReq)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -162,7 +162,7 @@ func TestAll(t *testing.T) {
 	}
 
 	var updateReq2 core.UpdateRequest
-	err = json.Unmarshal(updateReq2Buf, &updateReq2)
+	err = codec.Unmarshal(updateReq2Buf, &updateReq2)
 	if err != nil {
 		t.Fatal(err)
 	}

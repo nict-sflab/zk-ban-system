@@ -1,11 +1,11 @@
 package gm
 
 import (
-	"encoding/json"
 	"io"
 
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban-system/utils/codec"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,7 +17,7 @@ func (serv *GMServer[T]) IssueCredentialEndpoint() func(c echo.Context) error {
 		}
 
 		var req core.JoinRequest[T]
-		err = json.Unmarshal(reqBody, &req)
+		err = codec.Unmarshal(reqBody, &req)
 		if err != nil {
 			return err
 		}

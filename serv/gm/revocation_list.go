@@ -22,6 +22,6 @@ func (serv *GMServer[T]) RevocationList() func(c echo.Context) error {
 			return err
 		}
 
-		return c.String(200, string(rl))
+		return c.Blob(200, "application/octet-stream", rl)
 	}
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -11,6 +10,7 @@ import (
 	core "github.com/akakou/zk-ban-system/core/gm"
 	serv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban-system/utils/codec"
 	"github.com/akakou/zk-ban/dump"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
@@ -45,7 +45,7 @@ func main() {
 		signPeriod := c.QueryParam("period")
 
 		var signature corecore.Signature
-		err := json.Unmarshal([]byte(revoked), &signature)
+		err := codec.UnmarshalBase64(revoked, &signature)
 		if err != nil {
 			return err
 		}

@@ -7,7 +7,7 @@ import (
 	"github.com/akakou/zk-ban/dump"
 )
 
-const SIGNER_PATH = "./signer.json"
+const SIGNER_PATH = "./signer.gob"
 const GPK_PATH = "./gpk.bin"
 
 func main() {
