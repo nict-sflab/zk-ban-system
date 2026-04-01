@@ -1,12 +1,11 @@
 package signer
 
 import (
-	"encoding/json"
-
 	gnarkserializable "github.com/akakou/gnark-serializable"
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban-system/utils/codec"
 	"github.com/akakou/zk-ban/load"
 	"github.com/akakou/zk-ban/primitives"
 	"github.com/akakou/zk-ban/snark"
@@ -16,7 +15,7 @@ import (
 
 func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 	var rlObj core.RevocationList
-	err := json.Unmarshal(rl, &rlObj)
+	err := codec.Unmarshal(rl, &rlObj)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +26,7 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 	}
 
 	var signerObj zkbanw.Signer
-	err = json.Unmarshal(signer, &signerObj)
+	err = codec.Unmarshal(signer, &signerObj)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +46,7 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 		UpdateRequest: coreReq,
 	}
 
-	reqBytes, err := json.Marshal(req)
+	reqBytes, err := codec.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +56,7 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 
 func RequestCheckUpdateIsExist(signer []byte, now int64) ([]byte, error) {
 	var signerObj zkbanw.Signer
-	err := json.Unmarshal(signer, &signerObj)
+	err := codec.Unmarshal(signer, &signerObj)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +80,7 @@ func RequestCheckUpdateIsExist(signer []byte, now int64) ([]byte, error) {
 		},
 	}
 
-	reqBytes, err := json.Marshal(req)
+	reqBytes, err := codec.Marshal(req)
 	if err != nil {
 		return nil, err
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func FetchBinaryWithPOST(request []byte, url string) ([]byte, error) {
-	res, err := http.Post(url, "application/json", bytes.NewBuffer(request))
+	res, err := http.Post(url, "application/octet-stream", bytes.NewBuffer(request))
 	if err != nil {
 		return nil, err
 	}

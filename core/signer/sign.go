@@ -1,10 +1,9 @@
 package signer
 
 import (
-	"encoding/json"
-
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
+	"github.com/akakou/zk-ban-system/utils/codec"
 	"github.com/akakou/zk-ban/load"
 	"github.com/akakou/zk-ban/primitives"
 	zkbanw "github.com/akakou/zk-ban/witness"
@@ -17,7 +16,7 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error
 	}
 
 	signerObj := zkbanw.Signer{}
-	err = json.Unmarshal(signer, &signerObj)
+	err = codec.Unmarshal(signer, &signerObj)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +44,7 @@ func Sign(message []byte, count int64, signer []byte, gpk []byte) ([]byte, error
 		Count:     count,
 	}
 
-	signatureBuf, err := json.Marshal(signatureObj)
+	signatureBuf, err := codec.Marshal(signatureObj)
 	if err != nil {
 		return nil, err
 	}

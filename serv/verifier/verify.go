@@ -1,11 +1,11 @@
 package verifier
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban-system/utils/codec"
 	"github.com/labstack/echo/v4"
 )
 
@@ -15,7 +15,7 @@ func (serv *VerifierServer) VerifyEndpoint() func(c echo.Context) error {
 		period := utils.Period()
 
 		var signature core.Signature
-		err := json.Unmarshal([]byte(sigString), &signature)
+		err := codec.UnmarshalBase64(sigString, &signature)
 		if err != nil {
 			return err
 		}
