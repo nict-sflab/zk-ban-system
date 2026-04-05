@@ -1,7 +1,6 @@
 package signer
 
 import (
-	gnarkserializable "github.com/akakou/gnark-serializable"
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/utils"
@@ -74,9 +73,7 @@ func RequestCheckUpdateIsExist(signer []byte, now int64) ([]byte, error) {
 			UpdateTicket: &zkbanw.OneTimeTicket{
 				Number: primitives.NewBigInt(0),
 			},
-			Proof: gnarkserializable.Proof{
-				Proof: groth16.NewProof(snark.EcCurve),
-			},
+			Proof: groth16.NewProof(snark.EcCurve),
 		},
 	}
 

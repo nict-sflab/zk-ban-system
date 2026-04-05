@@ -10,17 +10,14 @@ import (
 )
 
 func MakeRLWit(dbEntries []*ent.Revocation, rlSize *core.RevocationListSize, witSize *core.RevocationListSize) witness.RevocationList {
-	rl := witness.EmptyRevocationList(witSize.NymsNumberPerSession)
+	rl := witness.EmptyRevocationList(witSize.NymsNumberPerPeriod)
 	fmt.Printf("entries: %v\n", dbEntries)
 
 	index := 0
-	for t, nyms := range rlSize.NymsNumberPerSession {
+	for t, nyms := range rlSize.NymsNumberPerPeriod {
 		entry := dbEntries[index]
-		tag := witness.SessionTag(
-			int64(entry.Count),
-			int64(entry.SignedPeriod))
 
-		rl[t].SessionTag = tag
+		rl[t].Period = primitives.NewBigInt(int64(entry.SignedPeriod))
 
 		for n := range nyms {
 			entry := dbEntries[index]

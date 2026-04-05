@@ -59,7 +59,6 @@ func main() {
 		fmt.Printf("revoked: sign period is %v, and revoked period is %v", signPeriod, revokePeriod)
 
 		gmServ.GM.DB.Client.Revocation.Create().
-			SetCount(int(signature.Count)).
 			SetNym(signature.Signature.Commit.Nym.Bytes()).
 			SetRevokedPeriod(int(revokePeriod)).
 			SetSignedPeriod(p).

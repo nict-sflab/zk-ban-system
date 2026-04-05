@@ -57,11 +57,6 @@ func Nym(v []byte) predicate.Revocation {
 	return predicate.Revocation(sql.FieldEQ(FieldNym, v))
 }
 
-// Count applies equality check predicate on the "count" field. It's identical to CountEQ.
-func Count(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldCount, v))
-}
-
 // RevokedPeriod applies equality check predicate on the "revoked_period" field. It's identical to RevokedPeriodEQ.
 func RevokedPeriod(v int) predicate.Revocation {
 	return predicate.Revocation(sql.FieldEQ(FieldRevokedPeriod, v))
@@ -110,46 +105,6 @@ func NymLT(v []byte) predicate.Revocation {
 // NymLTE applies the LTE predicate on the "nym" field.
 func NymLTE(v []byte) predicate.Revocation {
 	return predicate.Revocation(sql.FieldLTE(FieldNym, v))
-}
-
-// CountEQ applies the EQ predicate on the "count" field.
-func CountEQ(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldEQ(FieldCount, v))
-}
-
-// CountNEQ applies the NEQ predicate on the "count" field.
-func CountNEQ(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNEQ(FieldCount, v))
-}
-
-// CountIn applies the In predicate on the "count" field.
-func CountIn(vs ...int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldIn(FieldCount, vs...))
-}
-
-// CountNotIn applies the NotIn predicate on the "count" field.
-func CountNotIn(vs ...int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldNotIn(FieldCount, vs...))
-}
-
-// CountGT applies the GT predicate on the "count" field.
-func CountGT(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGT(FieldCount, v))
-}
-
-// CountGTE applies the GTE predicate on the "count" field.
-func CountGTE(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldGTE(FieldCount, v))
-}
-
-// CountLT applies the LT predicate on the "count" field.
-func CountLT(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLT(FieldCount, v))
-}
-
-// CountLTE applies the LTE predicate on the "count" field.
-func CountLTE(v int) predicate.Revocation {
-	return predicate.Revocation(sql.FieldLTE(FieldCount, v))
 }
 
 // RevokedPeriodEQ applies the EQ predicate on the "revoked_period" field.

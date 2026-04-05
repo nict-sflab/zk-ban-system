@@ -23,7 +23,7 @@ func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *
 			revocation.RevokedPeriodLT(int(after)),
 			revocation.SignedPeriodLTE(int(before)),
 		)).
-		GroupBy(revocation.FieldSignedPeriod, revocation.FieldCount).
+		GroupBy(revocation.FieldSignedPeriod).
 		Aggregate(ent.Count()).
 		ScanX(*gm.DB.Ctx, &v)
 
@@ -32,7 +32,7 @@ func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *
 		nymNums = append(nymNums, vv.Count)
 	}
 	rlSize := corecore.RevocationListSize{
-		NymsNumberPerSession: nymNums,
+		NymsNumberPerPeriod: nymNums,
 	}
 
 	rlDB := gm.DB.Client.Revocation.Query().
@@ -41,7 +41,7 @@ func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *
 			revocation.RevokedPeriodLT(int(after)),
 			revocation.SignedPeriodLTE(int(before)),
 		)).
-		Order(ent.Asc(revocation.FieldSignedPeriod, revocation.FieldCount)).
+		Order(ent.Asc(revocation.FieldSignedPeriod)).
 		AllX(*gm.DB.Ctx)
 
 	fmt.Printf("rl condition: %v <= revoked < %v & sign <= %v\nrl: %v\n", before, after, before, rlDB)

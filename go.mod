@@ -8,13 +8,11 @@ replace github.com/akakou/gnark-precomputes => ../gnark-precomputes
 
 replace github.com/akakou/zk-ban-system/dump => ./dump
 
-replace github.com/akakou/gnark-serializable => ../gnark-serializable
 
 require (
 	entgo.io/ent v0.14.4
 	firebase.google.com/go v3.13.0+incompatible
 	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000
-	github.com/akakou/gnark-serializable v0.0.0-00010101000000-000000000000
 	github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
 	github.com/cockroachdb/errors v1.12.0
 	github.com/consensys/gnark v0.13.0

@@ -35,7 +35,6 @@ var (
 	RevocationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "nym", Type: field.TypeBytes},
-		{Name: "count", Type: field.TypeInt},
 		{Name: "revoked_period", Type: field.TypeInt},
 		{Name: "signed_period", Type: field.TypeInt},
 	}

@@ -10,8 +10,6 @@ import (
 )
 
 func init() {
-	// gnarkserializable.Proof stores groth16.Proof as an interface.
-	// Registering the concrete proof type allows gob to decode it.
 	gob.Register(groth16.NewProof(snark.EcCurve))
 }
 

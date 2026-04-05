@@ -25,12 +25,6 @@ func (rc *RevocationCreate) SetNym(b []byte) *RevocationCreate {
 	return rc
 }
 
-// SetCount sets the "count" field.
-func (rc *RevocationCreate) SetCount(i int) *RevocationCreate {
-	rc.mutation.SetCount(i)
-	return rc
-}
-
 // SetRevokedPeriod sets the "revoked_period" field.
 func (rc *RevocationCreate) SetRevokedPeriod(i int) *RevocationCreate {
 	rc.mutation.SetRevokedPeriod(i)
@@ -80,9 +74,6 @@ func (rc *RevocationCreate) check() error {
 	if _, ok := rc.mutation.Nym(); !ok {
 		return &ValidationError{Name: "nym", err: errors.New(`ent: missing required field "Revocation.nym"`)}
 	}
-	if _, ok := rc.mutation.Count(); !ok {
-		return &ValidationError{Name: "count", err: errors.New(`ent: missing required field "Revocation.count"`)}
-	}
 	if _, ok := rc.mutation.RevokedPeriod(); !ok {
 		return &ValidationError{Name: "revoked_period", err: errors.New(`ent: missing required field "Revocation.revoked_period"`)}
 	}
@@ -118,10 +109,6 @@ func (rc *RevocationCreate) createSpec() (*Revocation, *sqlgraph.CreateSpec) {
 	if value, ok := rc.mutation.Nym(); ok {
 		_spec.SetField(revocation.FieldNym, field.TypeBytes, value)
 		_node.Nym = value
-	}
-	if value, ok := rc.mutation.Count(); ok {
-		_spec.SetField(revocation.FieldCount, field.TypeInt, value)
-		_node.Count = value
 	}
 	if value, ok := rc.mutation.RevokedPeriod(); ok {
 		_spec.SetField(revocation.FieldRevokedPeriod, field.TypeInt, value)
