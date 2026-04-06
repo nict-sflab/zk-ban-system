@@ -14,7 +14,6 @@ type Revocation struct {
 func (Revocation) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bytes("nym"),
-		field.Int("count"),
 		field.Int("revoked_period"),
 		field.Int("signed_period"),
 	}

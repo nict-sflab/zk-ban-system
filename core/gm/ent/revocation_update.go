@@ -33,27 +33,6 @@ func (ru *RevocationUpdate) SetNym(b []byte) *RevocationUpdate {
 	return ru
 }
 
-// SetCount sets the "count" field.
-func (ru *RevocationUpdate) SetCount(i int) *RevocationUpdate {
-	ru.mutation.ResetCount()
-	ru.mutation.SetCount(i)
-	return ru
-}
-
-// SetNillableCount sets the "count" field if the given value is not nil.
-func (ru *RevocationUpdate) SetNillableCount(i *int) *RevocationUpdate {
-	if i != nil {
-		ru.SetCount(*i)
-	}
-	return ru
-}
-
-// AddCount adds i to the "count" field.
-func (ru *RevocationUpdate) AddCount(i int) *RevocationUpdate {
-	ru.mutation.AddCount(i)
-	return ru
-}
-
 // SetRevokedPeriod sets the "revoked_period" field.
 func (ru *RevocationUpdate) SetRevokedPeriod(i int) *RevocationUpdate {
 	ru.mutation.ResetRevokedPeriod()
@@ -140,12 +119,6 @@ func (ru *RevocationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ru.mutation.Nym(); ok {
 		_spec.SetField(revocation.FieldNym, field.TypeBytes, value)
 	}
-	if value, ok := ru.mutation.Count(); ok {
-		_spec.SetField(revocation.FieldCount, field.TypeInt, value)
-	}
-	if value, ok := ru.mutation.AddedCount(); ok {
-		_spec.AddField(revocation.FieldCount, field.TypeInt, value)
-	}
 	if value, ok := ru.mutation.RevokedPeriod(); ok {
 		_spec.SetField(revocation.FieldRevokedPeriod, field.TypeInt, value)
 	}
@@ -181,27 +154,6 @@ type RevocationUpdateOne struct {
 // SetNym sets the "nym" field.
 func (ruo *RevocationUpdateOne) SetNym(b []byte) *RevocationUpdateOne {
 	ruo.mutation.SetNym(b)
-	return ruo
-}
-
-// SetCount sets the "count" field.
-func (ruo *RevocationUpdateOne) SetCount(i int) *RevocationUpdateOne {
-	ruo.mutation.ResetCount()
-	ruo.mutation.SetCount(i)
-	return ruo
-}
-
-// SetNillableCount sets the "count" field if the given value is not nil.
-func (ruo *RevocationUpdateOne) SetNillableCount(i *int) *RevocationUpdateOne {
-	if i != nil {
-		ruo.SetCount(*i)
-	}
-	return ruo
-}
-
-// AddCount adds i to the "count" field.
-func (ruo *RevocationUpdateOne) AddCount(i int) *RevocationUpdateOne {
-	ruo.mutation.AddCount(i)
 	return ruo
 }
 
@@ -320,12 +272,6 @@ func (ruo *RevocationUpdateOne) sqlSave(ctx context.Context) (_node *Revocation,
 	}
 	if value, ok := ruo.mutation.Nym(); ok {
 		_spec.SetField(revocation.FieldNym, field.TypeBytes, value)
-	}
-	if value, ok := ruo.mutation.Count(); ok {
-		_spec.SetField(revocation.FieldCount, field.TypeInt, value)
-	}
-	if value, ok := ruo.mutation.AddedCount(); ok {
-		_spec.AddField(revocation.FieldCount, field.TypeInt, value)
 	}
 	if value, ok := ruo.mutation.RevokedPeriod(); ok {
 		_spec.SetField(revocation.FieldRevokedPeriod, field.TypeInt, value)

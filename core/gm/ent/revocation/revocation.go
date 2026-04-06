@@ -13,8 +13,6 @@ const (
 	FieldID = "id"
 	// FieldNym holds the string denoting the nym field in the database.
 	FieldNym = "nym"
-	// FieldCount holds the string denoting the count field in the database.
-	FieldCount = "count"
 	// FieldRevokedPeriod holds the string denoting the revoked_period field in the database.
 	FieldRevokedPeriod = "revoked_period"
 	// FieldSignedPeriod holds the string denoting the signed_period field in the database.
@@ -27,7 +25,6 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldNym,
-	FieldCount,
 	FieldRevokedPeriod,
 	FieldSignedPeriod,
 }
@@ -48,11 +45,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByCount orders the results by the count field.
-func ByCount(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCount, opts...).ToFunc()
 }
 
 // ByRevokedPeriod orders the results by the revoked_period field.

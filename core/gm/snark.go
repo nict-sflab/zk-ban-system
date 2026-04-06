@@ -26,10 +26,10 @@ func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.Rev
 	var err error = nil
 
 	for _, vk := range verifierKeys {
-		isFit := len(rlSize.NymsNumberPerSession) <= len(vk.RLSize)
+		isFit := len(rlSize.NymsNumberPerPeriod) <= len(vk.RLSize)
 
-		for i := range rlSize.NymsNumberPerSession {
-			isFit = rlSize.NymsNumberPerSession[i] <= vk.RLSize[i] && isFit
+		for i := range rlSize.NymsNumberPerPeriod {
+			isFit = rlSize.NymsNumberPerPeriod[i] <= vk.RLSize[i] && isFit
 		}
 
 		if !isFit {
@@ -50,7 +50,7 @@ func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.Rev
 	}
 
 	if verifyKey == nil {
-		err = fmt.Errorf("%v: %v", errRLTooLarge, rlSize.NymsNumberPerSession)
+		err = fmt.Errorf("%v: %v", errRLTooLarge, rlSize.NymsNumberPerPeriod)
 	}
 
 	return verifyKey, err
