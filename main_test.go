@@ -65,14 +65,17 @@ func TestMain(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	v := coreverifier.Verifier{
-		GroupPublicKey: &g.GroupPublicKey,
-		VerifyingKey:   verifierKey,
-		CountMax:       2,
+
+	v, err := coreverifier.DefaultVerifier(
+		&g.GroupPublicKey,
+		verifierKey,
+	)
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	verifierServ := verifier.VerifierServer{
-		Verifier: &v,
+		Verifier: v,
 	}
 
 	verifierServ.SetupEchoServer(e)

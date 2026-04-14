@@ -36,9 +36,11 @@ func main() {
 		Verifier: &core.Verifier{
 			GroupPublicKey: gpk,
 			VerifyingKey:   verifierKey,
-			CountMax:       2,
 		},
 	}
+
+	period := utils.Period()
+	verifierServ.Verifier.Update(period)
 
 	e := echo.New()
 

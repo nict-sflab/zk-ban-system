@@ -13,7 +13,7 @@ import (
 	groth16_bls12381 "github.com/consensys/gnark/backend/groth16/bls12-381"
 )
 
-type PreparedSnarkVerifier struct {
+type PreparedUpdateSnarkVerifier struct {
 	VerifierKey *precomputes.PreparedUpdateRequestVerifyingKey[fr_bls12381.Vector, *curve_bls12381.G1Jac, *groth16_bls12381.Proof]
 	Prepared    *curve_bls12381.G1Jac
 }
