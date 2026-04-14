@@ -29,7 +29,7 @@ func (serv *GMServer[T]) RunKeyPrecomputeDaemon() {
 		last = period
 		nextPeriod := period + 1
 
-		serv.GM.PreparedSnarkVerifiers = make(map[core.KeyIndex]*gm.PreparedSnarkVerifier)
+		serv.GM.PreparedSnarkVerifiers = make(map[core.KeyIndex]*gm.PreparedUpdateSnarkVerifier)
 		err := serv.GM.ReadyUpdateVerifyKeys(PeriodRange, nextPeriod)
 		if err != nil {
 			fmt.Printf("Failed to run key precompute daemon: ", err)

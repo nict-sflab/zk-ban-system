@@ -12,7 +12,7 @@ type GroupManager[T any] struct {
 	GroupPublicKey         zkbanw.GroupPublicKey
 	JoinVerifyKey          *groth16.VerifyingKey
 	VerifierKeys           corecore.SizedVerifyingKeys
-	PreparedSnarkVerifiers map[corecore.KeyIndex]*PreparedSnarkVerifier
+	PreparedSnarkVerifiers map[corecore.KeyIndex]*PreparedUpdateSnarkVerifier
 	DB                     *DB
 }
 
@@ -44,7 +44,7 @@ func Default[T any](gsk []byte, dbConfig *DBConfig) (*GroupManager[T], error) {
 		GroupPublicKey:         zkbanw.GroupPublicKey{gpk},
 		JoinVerifyKey:          joinVerifierKey,
 		VerifierKeys:           updateVerifierKeys,
-		PreparedSnarkVerifiers: make(map[corecore.KeyIndex]*PreparedSnarkVerifier),
+		PreparedSnarkVerifiers: make(map[corecore.KeyIndex]*PreparedUpdateSnarkVerifier),
 		DB:                     db,
 	}
 

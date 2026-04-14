@@ -50,10 +50,9 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	v := verifier.Verifier{
-		GroupPublicKey: gpk,
-		VerifyingKey:   verifierKey,
-		CountMax:       2,
+	v, err := verifier.DefaultVerifier(gpk, verifierKey)
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	reqBody, s, err := signer.RequestJoin(period, "")

@@ -5,7 +5,7 @@ import (
 	"github.com/akakou/zk-ban/precomputes"
 )
 
-func (gm *GroupManager[T]) ReadyUpdateVerifyKey(index corecore.KeyIndex) (*PreparedSnarkVerifier, error) {
+func (gm *GroupManager[T]) ReadyUpdateVerifyKey(index corecore.KeyIndex) (*PreparedUpdateSnarkVerifier, error) {
 	before := index.Second
 	after := index.First
 
@@ -19,12 +19,12 @@ func (gm *GroupManager[T]) ReadyUpdateVerifyKey(index corecore.KeyIndex) (*Prepa
 		return nil, err
 	}
 
-	prepared, err := vk.PrecomputeVerify(*rl.List, &gm.GroupPublicKey)
+	prepared, err := vk.PrecomputeVerify(after, before, *rl.List, &gm.GroupPublicKey)
 	if err != nil {
 		return nil, err
 	}
 
-	verifier := PreparedSnarkVerifier{
+	verifier := PreparedUpdateSnarkVerifier{
 		VerifierKey: vk,
 		Prepared:    *prepared,
 	}
