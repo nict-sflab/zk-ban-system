@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 
@@ -30,11 +31,13 @@ func update() error {
 		return err
 	}
 
-	fmt.Printf("%s\n", res)
 	err = writeFile(res, SIGNER_PATH)
 	if err != nil {
 		return err
 	}
+
+	encoded := base64.RawStdEncoding.EncodeToString(config)
+	fmt.Printf("%s\n", encoded)
 
 	return nil
 }

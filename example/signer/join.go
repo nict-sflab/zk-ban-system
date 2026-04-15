@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 
@@ -35,6 +36,8 @@ var joinCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		fmt.Printf("%s\n", config)
+		encoded := base64.RawStdEncoding.EncodeToString(config)
+
+		fmt.Printf("%s\n", encoded)
 	},
 }
