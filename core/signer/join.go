@@ -56,9 +56,7 @@ func SetCredential(cred []byte, period int64, signer []byte) ([]byte, error) {
 	}
 
 	signerObj.Credential.Signature = cred
-	if period > 0 {
-		signerObj.Period = period
-	}
+	signerObj.Period = period
 
 	signerBytes, err := codec.Marshal(signerObj)
 	if err != nil {
