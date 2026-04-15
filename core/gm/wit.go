@@ -1,8 +1,6 @@
 package gm
 
 import (
-	"fmt"
-
 	"github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
 	"github.com/akakou/zk-ban/primitives"
@@ -11,7 +9,7 @@ import (
 
 func MakeRLWit(dbEntries []*ent.Revocation, rlSize *core.RevocationListSize, witSize *core.RevocationListSize) witness.RevocationList {
 	rl := witness.EmptyRevocationList(witSize.NymsNumberPerPeriod)
-	fmt.Printf("entries: %v\n", dbEntries)
+	// fmt.Printf("entries: %v\n", dbEntries)
 
 	index := 0
 	for t, nyms := range rlSize.NymsNumberPerPeriod {

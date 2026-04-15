@@ -1,8 +1,6 @@
 package gm
 
 import (
-	"fmt"
-
 	"github.com/akakou/zk-ban-system/core"
 	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm/ent"
@@ -44,7 +42,7 @@ func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *
 		Order(ent.Asc(revocation.FieldSignedPeriod)).
 		AllX(*gm.DB.Ctx)
 
-	fmt.Printf("rl condition: %v <= revoked < %v & sign <= %v\nrl: %v\n", before, after, before, rlDB)
+	// fmt.Printf("rl condition: %v <= revoked < %v & sign <= %v\nrl: %v\n", before, after, before, rlDB)
 
 	verifier, err := SelectProperVerifier(gm.VerifierKeys, &rlSize)
 	if err != nil {
