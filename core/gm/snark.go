@@ -13,24 +13,23 @@ import (
 	groth16_bls12381 "github.com/consensys/gnark/backend/groth16/bls12-381"
 )
 
-type PreparedSnarkVerifier struct {
+type PreparedUpdateSnarkVerifier struct {
 	VerifierKey *precomputes.PreparedUpdateRequestVerifyingKey[fr_bls12381.Vector, *curve_bls12381.G1Jac, *groth16_bls12381.Proof]
 	Prepared    *curve_bls12381.G1Jac
 }
 
 var errRLTooLarge = errors.New("RL is too large")
 
-func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*snark.SizedSnarkVerifier, int, error) {
+func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.RevocationListSize) (*snark.SizedSnarkVerifier, error) {
 	distance := math.MaxFloat64
 	var verifyKey *snark.SizedSnarkVerifier = nil
-	var result = -1
 	var err error = nil
 
-	for i, vk := range verifierKeys {
-		isFit := len(rlSize.NymsNumberPerSession) <= len(vk.RLSize)
+	for _, vk := range verifierKeys {
+		isFit := len(rlSize.NymsNumberPerPeriod) <= len(vk.RLSize)
 
-		for i := range rlSize.NymsNumberPerSession {
-			isFit = rlSize.NymsNumberPerSession[i] <= vk.RLSize[i] && isFit
+		for i := range rlSize.NymsNumberPerPeriod {
+			isFit = rlSize.NymsNumberPerPeriod[i] <= vk.RLSize[i] && isFit
 		}
 
 		if !isFit {
@@ -39,7 +38,6 @@ func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.Rev
 
 		if verifierKeys == nil {
 			verifyKey = vk
-			result = i
 			continue
 		}
 
@@ -48,13 +46,12 @@ func SelectProperVerifier(verifierKeys core.SizedVerifyingKeys, rlSize *core.Rev
 		if distance > d {
 			distance = d
 			verifyKey = vk
-			result = i
 		}
 	}
 
-	if result == -1 {
-		err = fmt.Errorf("%v: %v", errRLTooLarge, rlSize.NymsNumberPerSession)
+	if verifyKey == nil {
+		err = fmt.Errorf("%v: %v", errRLTooLarge, rlSize.NymsNumberPerPeriod)
 	}
 
-	return verifyKey, result, err
+	return verifyKey, err
 }

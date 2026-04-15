@@ -1,6 +1,7 @@
 package signer
 
 import (
+	"encoding/base64"
 	neturl "net/url"
 
 	"github.com/akakou/zk-ban-system/client/utils"
@@ -13,7 +14,7 @@ func Sign(message []byte, count int64, signer, gpk []byte, url string) ([]byte, 
 		return nil, err
 	}
 
-	signatureStr := string(signature)
+	signatureStr := base64.URLEncoding.EncodeToString(signature)
 
 	parsed, err := neturl.Parse(url)
 	if err != nil {

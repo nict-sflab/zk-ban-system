@@ -1,27 +1,52 @@
 package gm
 
-import "github.com/akakou/zk-ban/precomputes"
+import (
+	corecore "github.com/akakou/zk-ban-system/core"
+	"github.com/akakou/zk-ban/precomputes"
+)
 
-func (gm *GroupManager[T]) precomputesVerifyUpdateRequest(before, after int64) (*PreparedSnarkVerifier, error) {
+func (gm *GroupManager[T]) ReadyUpdateVerifyKey(index corecore.KeyIndex) (*PreparedUpdateSnarkVerifier, error) {
+	before := index.Second
+	after := index.First
+
 	rl, v, err := gm.QueryRL(before, after)
 	if err != nil {
 		return nil, err
 	}
 
-	vk, err := precomputes.NewUpdateVerificationKeyBLS12381(v.VerifyKey.VerifyingKey)
+	vk, err := precomputes.NewUpdateVerificationKeyBLS12381(*v.VerifyKey)
 	if err != nil {
 		return nil, err
 	}
 
-	prepared, err := vk.PrecomputeVerify(*rl.List, &gm.GroupPublicKey)
+	prepared, err := vk.PrecomputeVerify(after, before, *rl.List, &gm.GroupPublicKey)
 	if err != nil {
 		return nil, err
 	}
 
-	verifier := PreparedSnarkVerifier{
+	verifier := PreparedUpdateSnarkVerifier{
 		VerifierKey: vk,
 		Prepared:    *prepared,
 	}
 
+	gm.PreparedSnarkVerifiers[index] = &verifier
+
 	return &verifier, nil
+}
+
+func (gm *GroupManager[T]) ReadyUpdateVerifyKeys(periodRange, after int64) error {
+	before := after - periodRange
+
+	for i := before; i < after; i++ {
+		_, err := gm.ReadyUpdateVerifyKey(corecore.KeyIndex{
+			First:  after,
+			Second: i,
+		})
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

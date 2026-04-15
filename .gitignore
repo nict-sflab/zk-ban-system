@@ -31,3 +31,7 @@ example/signer/gpk.bin
 example/signer/tmp.json
 example/signer/signer
 example/gm/serviceAccount.json
+
+dump/*.bin
+dump/*.meta.json
+example/signer/signer.gob

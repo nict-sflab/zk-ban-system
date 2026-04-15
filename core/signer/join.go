@@ -1,17 +1,15 @@
 package signer
 
 import (
-	"encoding/json"
-
 	zkban "github.com/akakou/zk-ban"
 	"github.com/akakou/zk-ban-system/core"
-	"github.com/akakou/zk-ban-system/keys"
+	"github.com/akakou/zk-ban-system/utils/codec"
 	"github.com/akakou/zk-ban/load"
 	zkbanw "github.com/akakou/zk-ban/witness"
 )
 
 func RequestJoin[T any](now int64, option T) ([]byte, []byte, error) {
-	proverObj, err := load.DocodeProver(keys.JoinProverKey)
+	proverObj, err := load.LoadUserBasicKey("join")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -29,7 +27,7 @@ func RequestJoin[T any](now int64, option T) ([]byte, []byte, error) {
 		Period: now,
 	}
 
-	signerBytes, err := json.Marshal(signer)
+	signerBytes, err := codec.Marshal(signer)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -40,7 +38,7 @@ func RequestJoin[T any](now int64, option T) ([]byte, []byte, error) {
 		Option:      option,
 	}
 
-	reqBytes, err := json.Marshal(req)
+	reqBytes, err := codec.Marshal(req)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -51,18 +49,16 @@ func RequestJoin[T any](now int64, option T) ([]byte, []byte, error) {
 
 func SetCredential(cred []byte, period int64, signer []byte) ([]byte, error) {
 	signerObj := zkbanw.Signer{}
-	err := json.Unmarshal(signer, &signerObj)
+	err := codec.Unmarshal(signer, &signerObj)
 
 	if err != nil {
 		return nil, err
 	}
 
 	signerObj.Credential.Signature = cred
-	if period > 0 {
-		signerObj.Period = period
-	}
+	signerObj.Period = period
 
-	signerBytes, err := json.Marshal(signerObj)
+	signerBytes, err := codec.Marshal(signerObj)
 	if err != nil {
 		return nil, err
 	}

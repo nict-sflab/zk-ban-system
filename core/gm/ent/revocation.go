@@ -18,8 +18,6 @@ type Revocation struct {
 	ID int `json:"id,omitempty"`
 	// Nym holds the value of the "nym" field.
 	Nym []byte `json:"nym,omitempty"`
-	// Count holds the value of the "count" field.
-	Count int `json:"count,omitempty"`
 	// RevokedPeriod holds the value of the "revoked_period" field.
 	RevokedPeriod int `json:"revoked_period,omitempty"`
 	// SignedPeriod holds the value of the "signed_period" field.
@@ -34,7 +32,7 @@ func (*Revocation) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case revocation.FieldNym:
 			values[i] = new([]byte)
-		case revocation.FieldID, revocation.FieldCount, revocation.FieldRevokedPeriod, revocation.FieldSignedPeriod:
+		case revocation.FieldID, revocation.FieldRevokedPeriod, revocation.FieldSignedPeriod:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -62,12 +60,6 @@ func (r *Revocation) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field nym", values[i])
 			} else if value != nil {
 				r.Nym = *value
-			}
-		case revocation.FieldCount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field count", values[i])
-			} else if value.Valid {
-				r.Count = int(value.Int64)
 			}
 		case revocation.FieldRevokedPeriod:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -119,9 +111,6 @@ func (r *Revocation) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
 	builder.WriteString("nym=")
 	builder.WriteString(fmt.Sprintf("%v", r.Nym))
-	builder.WriteString(", ")
-	builder.WriteString("count=")
-	builder.WriteString(fmt.Sprintf("%v", r.Count))
 	builder.WriteString(", ")
 	builder.WriteString("revoked_period=")
 	builder.WriteString(fmt.Sprintf("%v", r.RevokedPeriod))

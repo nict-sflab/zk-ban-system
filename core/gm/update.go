@@ -45,12 +45,10 @@ func (gm *GroupManager[T]) UpdateCredential(req *core.UpdateRequest, after int64
 	if !hasVerifier {
 		fmt.Println("precomputing...")
 
-		verifier, err = gm.precomputesVerifyUpdateRequest(req.Before, after)
+		verifier, err = gm.ReadyUpdateVerifyKey(index)
 		if err != nil {
 			return "", err
 		}
-
-		gm.PreparedSnarkVerifiers[index] = verifier
 	} else {
 		fmt.Println("use precomputed !")
 	}

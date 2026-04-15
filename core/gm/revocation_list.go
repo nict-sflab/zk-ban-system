@@ -1,7 +1,7 @@
 package gm
 
 import (
-	"encoding/json"
+	"github.com/akakou/zk-ban-system/utils/codec"
 )
 
 func (gm *GroupManager[T]) RevocationList(before, after int64) ([]byte, error) {
@@ -10,7 +10,7 @@ func (gm *GroupManager[T]) RevocationList(before, after int64) ([]byte, error) {
 		return nil, err
 	}
 
-	res, err := json.Marshal(rl)
+	res, err := codec.Marshal(rl)
 
 	return res, err
 }

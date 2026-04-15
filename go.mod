@@ -8,13 +8,10 @@ replace github.com/akakou/gnark-precomputes => ../gnark-precomputes
 
 replace github.com/akakou/zk-ban-system/dump => ./dump
 
-replace github.com/akakou/gnark-serializable => ../gnark-serializable
-
 require (
 	entgo.io/ent v0.14.4
 	firebase.google.com/go v3.13.0+incompatible
 	github.com/akakou/gnark-precomputes v0.0.0-00010101000000-000000000000
-	github.com/akakou/gnark-serializable v0.0.0-00010101000000-000000000000
 	github.com/akakou/zk-ban v0.0.0-00010101000000-000000000000
 	github.com/cockroachdb/errors v1.12.0
 	github.com/consensys/gnark v0.13.0
@@ -70,13 +67,11 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
-	github.com/iden3/go-iden3-crypto v0.0.17 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/ingonyama-zk/icicle-gnark/v3 v3.2.2 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
-	github.com/liyue201/gnark-circomlib v0.0.0-20241024021655-892bf7c71a20 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect

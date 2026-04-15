@@ -5,32 +5,31 @@ import (
 )
 
 type RevocationList struct {
-	List  *zkbanw.RevocationList
-	Index int
-	// Size *RevocationListSize
+	List    *zkbanw.RevocationList
+	KeyName string
 }
 
 type RevocationListSize struct {
-	NymsNumberPerSession []int
+	NymsNumberPerPeriod []int
 }
 
 func (size *RevocationListSize) Distance(weight *RevocationListSizeWeight) float64 {
 	var deltaL = 0.0
-	for _, nymNum := range size.NymsNumberPerSession {
+	for _, nymNum := range size.NymsNumberPerPeriod {
 		deltaL += float64(nymNum)
 	}
 
-	tDash := float64(len(size.NymsNumberPerSession))
+	tDash := float64(len(size.NymsNumberPerPeriod))
 
-	return deltaL*weight.NymsNumberPerSession + tDash*weight.SessionNumber
+	return deltaL*weight.NymsNumberPerPeriod + tDash*weight.PeriodNumber
 }
 
 type RevocationListSizeWeight struct {
-	NymsNumberPerSession float64
-	SessionNumber        float64
+	NymsNumberPerPeriod float64
+	PeriodNumber        float64
 }
 
 var RevocationListSizeWeightSetting = &RevocationListSizeWeight{
-	NymsNumberPerSession: 3,
-	SessionNumber:        1,
+	NymsNumberPerPeriod: 3,
+	PeriodNumber:        1,
 }

@@ -745,8 +745,6 @@ type RevocationMutation struct {
 	typ               string
 	id                *int
 	nym               *[]byte
-	count             *int
-	addcount          *int
 	revoked_period    *int
 	addrevoked_period *int
 	signed_period     *int
@@ -889,62 +887,6 @@ func (m *RevocationMutation) OldNym(ctx context.Context) (v []byte, err error) {
 // ResetNym resets all changes to the "nym" field.
 func (m *RevocationMutation) ResetNym() {
 	m.nym = nil
-}
-
-// SetCount sets the "count" field.
-func (m *RevocationMutation) SetCount(i int) {
-	m.count = &i
-	m.addcount = nil
-}
-
-// Count returns the value of the "count" field in the mutation.
-func (m *RevocationMutation) Count() (r int, exists bool) {
-	v := m.count
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCount returns the old "count" field's value of the Revocation entity.
-// If the Revocation object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RevocationMutation) OldCount(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCount is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCount requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCount: %w", err)
-	}
-	return oldValue.Count, nil
-}
-
-// AddCount adds i to the "count" field.
-func (m *RevocationMutation) AddCount(i int) {
-	if m.addcount != nil {
-		*m.addcount += i
-	} else {
-		m.addcount = &i
-	}
-}
-
-// AddedCount returns the value that was added to the "count" field in this mutation.
-func (m *RevocationMutation) AddedCount() (r int, exists bool) {
-	v := m.addcount
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCount resets all changes to the "count" field.
-func (m *RevocationMutation) ResetCount() {
-	m.count = nil
-	m.addcount = nil
 }
 
 // SetRevokedPeriod sets the "revoked_period" field.
@@ -1093,12 +1035,9 @@ func (m *RevocationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RevocationMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 3)
 	if m.nym != nil {
 		fields = append(fields, revocation.FieldNym)
-	}
-	if m.count != nil {
-		fields = append(fields, revocation.FieldCount)
 	}
 	if m.revoked_period != nil {
 		fields = append(fields, revocation.FieldRevokedPeriod)
@@ -1116,8 +1055,6 @@ func (m *RevocationMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case revocation.FieldNym:
 		return m.Nym()
-	case revocation.FieldCount:
-		return m.Count()
 	case revocation.FieldRevokedPeriod:
 		return m.RevokedPeriod()
 	case revocation.FieldSignedPeriod:
@@ -1133,8 +1070,6 @@ func (m *RevocationMutation) OldField(ctx context.Context, name string) (ent.Val
 	switch name {
 	case revocation.FieldNym:
 		return m.OldNym(ctx)
-	case revocation.FieldCount:
-		return m.OldCount(ctx)
 	case revocation.FieldRevokedPeriod:
 		return m.OldRevokedPeriod(ctx)
 	case revocation.FieldSignedPeriod:
@@ -1154,13 +1089,6 @@ func (m *RevocationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNym(v)
-		return nil
-	case revocation.FieldCount:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCount(v)
 		return nil
 	case revocation.FieldRevokedPeriod:
 		v, ok := value.(int)
@@ -1184,9 +1112,6 @@ func (m *RevocationMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *RevocationMutation) AddedFields() []string {
 	var fields []string
-	if m.addcount != nil {
-		fields = append(fields, revocation.FieldCount)
-	}
 	if m.addrevoked_period != nil {
 		fields = append(fields, revocation.FieldRevokedPeriod)
 	}
@@ -1201,8 +1126,6 @@ func (m *RevocationMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *RevocationMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case revocation.FieldCount:
-		return m.AddedCount()
 	case revocation.FieldRevokedPeriod:
 		return m.AddedRevokedPeriod()
 	case revocation.FieldSignedPeriod:
@@ -1216,13 +1139,6 @@ func (m *RevocationMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *RevocationMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case revocation.FieldCount:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCount(v)
-		return nil
 	case revocation.FieldRevokedPeriod:
 		v, ok := value.(int)
 		if !ok {
@@ -1266,9 +1182,6 @@ func (m *RevocationMutation) ResetField(name string) error {
 	switch name {
 	case revocation.FieldNym:
 		m.ResetNym()
-		return nil
-	case revocation.FieldCount:
-		m.ResetCount()
 		return nil
 	case revocation.FieldRevokedPeriod:
 		m.ResetRevokedPeriod()

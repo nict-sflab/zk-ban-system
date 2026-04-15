@@ -31,7 +31,6 @@ func TestQuery(t *testing.T) {
 
 	for range 100 {
 		g.DB.Client.Revocation.Create().
-			SetCount(0).
 			SetNym([]byte("aaa")).
 			SetRevokedPeriod(3).
 			SetSignedPeriod(0).
@@ -40,7 +39,6 @@ func TestQuery(t *testing.T) {
 
 	for range 80 {
 		g.DB.Client.Revocation.Create().
-			SetCount(0).
 			SetNym([]byte("gggg")).
 			SetRevokedPeriod(3).
 			SetSignedPeriod(1).

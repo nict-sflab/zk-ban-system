@@ -6,9 +6,8 @@ import (
 )
 
 func main() {
-	path := "../keys/"
-	dump.DumpBasicKeys(path)
+	dump.DumpBasicKeys()
 
 	rl := witness.MakeGaussianRLSizeFromTotal(60, 1080, 60/4)
-	dump.DumpUpdateKeys("sample", rl, path)
+	dump.DumpUpdateKeys("sample", rl)
 }
