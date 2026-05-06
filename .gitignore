@@ -35,3 +35,4 @@ example/gm/serviceAccount.json
 dump/*.bin
 dump/*.meta.json
 example/signer/signer.gob
+dump/dump
