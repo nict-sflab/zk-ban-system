@@ -10,8 +10,12 @@ import (
 const SIGNER_PATH = "./signer.gob"
 const GPK_PATH = "./gpk.bin"
 
+const DEFAULT_KEY_PATH = "../../dump"
+
+var KeyPath = ""
+
 func main() {
-	dump.KeyPath = "../../dump/"
+	dump.KeyPath = KeyPath + "/"
 	utils.PeriodUnit = time.Duration(time.Minute / 2)
 	rootCmd.Execute()
 }

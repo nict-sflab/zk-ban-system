@@ -40,10 +40,13 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
+	rootCmd.AddCommand(importCmd)
 	rootCmd.AddCommand(joinCmd)
 	rootCmd.AddCommand(signCmd)
 	rootCmd.AddCommand(updateCmd)
 	rootCmd.AddCommand(daemonCmd)
+
+	rootCmd.Flags().StringVar(&KeyPath, "keyPath", DEFAULT_KEY_PATH, "Path of proving keys in zk-SNAKR")
 
 	joinCmd.Flags().StringVar(&idToken, "token", "", "ID Token of Firebase")
 	joinCmd.Flags().StringVar(&gmBase, "base", "http://localhost:8080", "GM's base URL")
