@@ -46,7 +46,11 @@ func init() {
 	rootCmd.AddCommand(updateCmd)
 	rootCmd.AddCommand(daemonCmd)
 
-	rootCmd.Flags().StringVar(&KeyPath, "keyPath", DEFAULT_KEY_PATH, "Path of proving keys in zk-SNAKR")
+	importCmd.Flags().StringVar(&KeyPath, "keyPath", DEFAULT_KEY_PATH, "Path of proving keys in zk-SNAKR")
+	joinCmd.Flags().StringVar(&KeyPath, "keyPath", DEFAULT_KEY_PATH, "Path of proving keys in zk-SNAKR")
+	signCmd.Flags().StringVar(&KeyPath, "keyPath", DEFAULT_KEY_PATH, "Path of proving keys in zk-SNAKR")
+	updateCmd.Flags().StringVar(&KeyPath, "keyPath", DEFAULT_KEY_PATH, "Path of proving keys in zk-SNAKR")
+	daemonCmd.Flags().StringVar(&KeyPath, "keyPath", DEFAULT_KEY_PATH, "Path of proving keys in zk-SNAKR")
 
 	joinCmd.Flags().StringVar(&idToken, "token", "", "ID Token of Firebase")
 	joinCmd.Flags().StringVar(&gmBase, "base", "http://localhost:8080", "GM's base URL")

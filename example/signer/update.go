@@ -7,10 +7,13 @@ import (
 
 	"github.com/akakou/zk-ban-system/client/signer"
 	"github.com/akakou/zk-ban-system/serv/gm"
+	"github.com/akakou/zk-ban/dump"
 	"github.com/spf13/cobra"
 )
 
 func update() error {
+	dump.KeyPath = KeyPath + "/"
+
 	config, err := readFile(SIGNER_PATH)
 	if err != nil {
 		return err

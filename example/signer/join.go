@@ -7,6 +7,7 @@ import (
 
 	"github.com/akakou/zk-ban-system/client/signer"
 	"github.com/akakou/zk-ban-system/serv/gm"
+	"github.com/akakou/zk-ban/dump"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +18,8 @@ var joinCmd = &cobra.Command{
 	Use:   "join",
 	Short: "Join process in zk-ban",
 	Run: func(cmd *cobra.Command, args []string) {
+		dump.KeyPath = KeyPath + "/"
+
 		gpk, err := signer.FetchGroupPublicKey(gmBase + gm.GROUP_PUBLIC_KEY_PATH)
 		if err != nil {
 			log.Fatal(err)
