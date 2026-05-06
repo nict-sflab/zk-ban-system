@@ -8,6 +8,7 @@ import (
 	"crypto/rand"
 
 	"github.com/akakou/zk-ban-system/utils"
+	"github.com/akakou/zk-ban/dump"
 	"github.com/spf13/cobra"
 )
 
@@ -18,6 +19,7 @@ var daemonCmd = &cobra.Command{
 	Use:   "daemon",
 	Short: "Update daemon in zk-ban",
 	Run: func(cmd *cobra.Command, args []string) {
+		dump.KeyPath = KeyPath + "/"
 		utils.PeriodUnit = time.Duration(time.Minute / 2)
 		var past int64 = 0
 		for {

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/akakou/zk-ban-system/client/signer"
+	"github.com/akakou/zk-ban/dump"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +17,8 @@ var signCmd = &cobra.Command{
 	Use:   "sign",
 	Short: "Sign process in zk-ban",
 	Run: func(cmd *cobra.Command, args []string) {
+		dump.KeyPath = KeyPath + "/"
+
 		config, err := readFile(SIGNER_PATH)
 		if err != nil {
 			log.Fatal(err)
