@@ -26,7 +26,7 @@ func FetchRevocationList(signer []byte, u string) ([]byte, error) {
 	}
 
 	query := uu.Query()
-	query.Add("before", fmt.Sprintf("%d", signerObj.Period))
+	query.Set("before", fmt.Sprintf("%d", signerObj.Period))
 	uu.RawQuery = query.Encode()
 
 	return utils.FetchBinaryWithGET(uu.String())
