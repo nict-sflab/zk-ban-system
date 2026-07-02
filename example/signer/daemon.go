@@ -20,7 +20,7 @@ var daemonCmd = &cobra.Command{
 	Short: "Update daemon in zk-ban",
 	Run: func(cmd *cobra.Command, args []string) {
 		dump.KeyPath = KeyPath + "/"
-		utils.PeriodUnit = time.Duration(time.Minute / 2)
+		utils.PeriodUnit = utils.HalfMinutes
 		var past int64 = 0
 		for {
 			r, err := rand.Int(rand.Reader, big.NewInt(int64(utils.PeriodUnit)))

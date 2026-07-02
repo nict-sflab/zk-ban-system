@@ -39,7 +39,7 @@ func update() error {
 		return err
 	}
 
-	encoded := base64.RawStdEncoding.EncodeToString(config)
+	encoded := base64.RawStdEncoding.EncodeToString(res)
 	fmt.Printf("%s\n", encoded)
 
 	return nil

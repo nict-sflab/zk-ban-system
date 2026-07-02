@@ -28,7 +28,7 @@ func (gm *GroupManager[T]) UpdateCredential(req *core.UpdateRequest, after int64
 	}
 
 	ticketExist := gm.DB.Client.UpdateTicket.Query().
-		Where(updateticket.Ticket(req.UpdateRequest.PublicKey.Number.Bytes())).
+		Where(updateticket.Ticket(req.UpdateRequest.UpdateTicket.Number.Bytes())).
 		ExistX(*gm.DB.Ctx)
 
 	if ticketExist {
