@@ -18,6 +18,7 @@ func RequestUpdate(rl, signer []byte, now int64, gpk []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	// fmt.Println("rl: %v\n", (*rlObj.List)[29].Nyms)
 
 	prover, err := load.LoadUserKey(rlObj.KeyName, "update")
 	if err != nil {
