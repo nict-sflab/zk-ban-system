@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/akakou/zk-ban-system/core/gm"
@@ -16,8 +17,10 @@ import (
 
 func main() {
 	dump.KeyPath = "../../dump/"
-	utils.PeriodUnit = utils.HalfMinutes
+	utils.PeriodUnit = 120000000000
 	serv.PeriodRange = 10
+	fmt.Printf("unit: %v\n", int64(utils.PeriodUnit))
+
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {
 		log.Fatal(err)
