@@ -3,14 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
-	"strconv"
 
-	corecore "github.com/akakou/zk-ban-system/core"
 	"github.com/akakou/zk-ban-system/core/gm"
 	core "github.com/akakou/zk-ban-system/core/gm"
+	"github.com/akakou/zk-ban-system/example/gm/extension"
 	serv "github.com/akakou/zk-ban-system/serv/gm"
 	"github.com/akakou/zk-ban-system/utils"
-	"github.com/akakou/zk-ban-system/utils/codec"
 	"github.com/akakou/zk-ban/dump"
 	"github.com/akakou/zk-ban/witness"
 	"github.com/labstack/echo/v4"
@@ -19,7 +17,10 @@ import (
 
 func main() {
 	dump.KeyPath = "../../dump/"
-	utils.PeriodUnit = utils.HalfMinutes
+	utils.PeriodUnit = 120000000000
+	serv.PeriodRange = 10
+	fmt.Printf("unit: %v\n", int64(utils.PeriodUnit))
+
 	gsk, _, err := witness.RandomGroupKeyPair()
 	if err != nil {
 		log.Fatal(err)
@@ -40,32 +41,11 @@ func main() {
 
 	e := echo.New()
 
-	e.GET("/revoke", func(c echo.Context) error {
-		revoked := c.QueryParam("signature")
-		signPeriod := c.QueryParam("period")
+	e.GET("/revoke", RevokeEndpoint(&gmServ))
 
-		var signature corecore.Signature
-		err := codec.UnmarshalBase64(revoked, &signature)
-		if err != nil {
-			return err
-		}
-
-		p, err := strconv.Atoi(signPeriod)
-		if err != nil {
-			return err
-		}
-
-		revokePeriod := utils.Period()
-		fmt.Printf("revoked: sign period is %v, and revoked period is %v", signPeriod, revokePeriod)
-
-		gmServ.GM.DB.Client.Revocation.Create().
-			SetNym(signature.Signature.Commit.Nym.Bytes()).
-			SetRevokedPeriod(int(revokePeriod)).
-			SetSignedPeriod(p).
-			SaveX(*gmServ.GM.DB.Ctx)
-
-		return c.String(200, "ok")
-	})
+	// extension for test
+	// curl http://localhost:8080/bulk_revoke?T=30&deltaL=30000&shape_type=0
+	e.GET("/bulk_revoke", extension.BulkRevokeEndpoint(&gmServ))
 
 	e.Static("/admin", "./static")
 

@@ -32,10 +32,10 @@ func (serv *GMServer[T]) RunKeyPrecomputeDaemon() {
 		serv.GM.PreparedSnarkVerifiers = make(map[core.KeyIndex]*gm.PreparedUpdateSnarkVerifier)
 		err := serv.GM.ReadyUpdateVerifyKeys(PeriodRange, nextPeriod)
 		if err != nil {
-			fmt.Printf("Failed to run key precompute daemon: ", err)
+			fmt.Printf("Failed to run key precompute daemon: %v\n", err)
 		}
 
-		fmt.Printf("done")
+		fmt.Printf("done\n")
 
 	}
 }

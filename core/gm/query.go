@@ -21,6 +21,7 @@ func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *
 			revocation.RevokedPeriodLT(int(after)),
 			revocation.SignedPeriodLTE(int(before)),
 		)).
+		Order(ent.Asc(revocation.FieldSignedPeriod)).
 		GroupBy(revocation.FieldSignedPeriod).
 		Aggregate(ent.Count()).
 		ScanX(*gm.DB.Ctx, &v)
@@ -39,7 +40,7 @@ func (gm *GroupManager[T]) QueryRL(before, after int64) (*core.RevocationList, *
 			revocation.RevokedPeriodLT(int(after)),
 			revocation.SignedPeriodLTE(int(before)),
 		)).
-		Order(ent.Asc(revocation.FieldSignedPeriod)).
+		Order(ent.Asc(revocation.FieldSignedPeriod, revocation.FieldID)).
 		AllX(*gm.DB.Ctx)
 
 	// fmt.Printf("rl condition: %v <= revoked < %v & sign <= %v\nrl: %v\n", before, after, before, rlDB)

@@ -2,6 +2,7 @@ package core_test
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -155,6 +156,22 @@ func TestAll(t *testing.T) {
 	}
 
 	passDay()
+	reusedUpdateReqBuf, err := signer.RequestUpdate(rl, s, utils.Period(), gpk.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var reusedUpdateReq core.UpdateRequest
+	err = codec.Unmarshal(reusedUpdateReqBuf, &reusedUpdateReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = g.UpdateCredential(&reusedUpdateReq, utils.Period())
+	if !errors.Is(err, gm.ErrTicketAlreadyUsed) {
+		t.Fatalf("expected reused update ticket to be rejected, got %v", err)
+	}
+
 	updateReq2Buf, err := signer.RequestUpdate(rl, newSignerBuf, utils.Period(), gpk.Bytes())
 	if err != nil {
 		t.Fatal(err)
